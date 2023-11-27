@@ -1,0 +1,115 @@
+<%-include("./partials/header.ejs")%>
+<body>
+  <main>
+    <section class="pt-100 pb-1">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-10 m-auto">
+            <div class="row">
+              <div class="col-lg-5 mx-auto mb-100">
+                <div
+                  class="login_wrap widget-taber-content p-30 background-white border-radius-10 mb-md-5 mb-lg-0 mb-sm-5"
+                >
+                  <div class="padding_eight_all bg-white">
+                    <div
+                      class="heading_s1 d-flex align-items-center justify-content-center"
+                    >
+                      <h3 class="mb-30">Login</h3>
+                    </div>
+                    <div>
+                      <%if(typeof message !== "undefined"){%>
+                      <p style="color: red" id="errormsg"><%=message%></p>
+                      <%}%>
+                    </div>
+                    <form method="post" action="">
+                      <div class="form-group">
+                        <input
+                          type="text"
+                          required=""
+                          name="email"
+                          id="email"
+                          placeholder="Your Email"
+                        />
+                      </div>
+                      <div class="form-group">
+                        <input
+                          required=""
+                          type="password"
+                          id="password"
+                          name="password"
+                          placeholder="Password"
+                        />
+                      </div>
+                      <div class="form-check">
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          value=""
+                          id="showPassword"
+                          onchange="togglePassword()"
+                        />
+                        <label class="form-check-label" for="showPassword">
+                          Show Password
+                        </label>
+                      </div>
+                      <div
+                        class="login_footer form-group align-items-center justify-content-end"
+                      >
+                        <a class="text-muted" href="#">Forgot password?</a>
+                      </div>
+                      <div
+                        class="form-group d-flex align-items-center justify-content-center"
+                      >
+                        <button
+                          type="submit"
+                          class="btn btn-fill-out btn-block hover-up"
+                          name="login"
+                        >
+                          Log in
+                        </button>
+                      </div>
+                      <div class="text-muted text-center">
+                        Don't have an account?
+                        <a href="/user/emailAuth">Create Account</a>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+<script>
+  function togglePassword() {
+    let passwordEle = document.getElementById("password");
+    if (passwordEle.type === "password") {
+      passwordEle.type = "text";
+    } else {
+      passwordEle.type = "password";
+    }
+  }
+
+  var email = document.getElementById("email");
+  var password = document.getElementById("password");
+  var message = document.getElementById("errormsg");
+
+  if (!isValidEmail(email)) {
+    message.innerHTML = "please enter correct email and password";
+  }
+  if (!isValidPassword()) {
+    message.innerHTML = "wrong password";
+  }
+
+  function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+  function isValidPassword() {
+    return password.length >= 6;
+  }
+</script>
+<%-include("./partials/footer.ejs")%>

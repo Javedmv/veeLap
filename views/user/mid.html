@@ -1,0 +1,61 @@
+<html>
+    <body>
+        
+    
+
+<div class="container pt-50">
+    <div class="row">
+        <div class="col-lg-10 m-auto">
+            <div class="row">
+                <div class="col-lg-3"></div>
+                <div class="col-lg-6" style="margin: 100px 0;">
+                    <div class="login_wrap widget-taber-content p-30 background-white border-radius-5">
+                        <div class="padding_eight_all bg-white">
+                            <div class="heading_s1">
+                                <h3 class="mb-20 ">Verify OTP</h3>
+                            </div>
+                            <div class="alert alert-success">An OTP have been shared to your email </div>
+                            <form method="post" action="/verifyOtp">
+                                <input type="text" value="<%= OTP %>" name="OTP" style="display: none;">
+                                <input type="text" value="<%= email %>" name="email" style="display: none;">
+                                <div class="form-group">
+                                    <input type="password" id="USOtp" name="USOtp" placeholder="Otp">
+                                    <span class="form-group text-danger" id="timer" style="display: flex; justify-content: flex-end;">01:00</span>
+                                </div>
+                                <div class="form-group" style="display: flex; justify-content: center;">
+                                    <button type="submit" class="btn btn-fill-out btn-block hover-up" id="loginButton" name="sendOtp" style="width: 300px;">Login</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3"></div>
+            </div>
+        </div>
+    </div>
+</div>
+</section>
+</main>
+
+<script>
+    var timerDuration = 60;
+    var timer = setInterval(updateTimer, 1000);
+
+    function updateTimer() {
+        var minutes = Math.floor(timerDuration / 60);
+        var seconds = timerDuration % 60;
+        document.getElementById("timer").textContent = "0" + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+
+        if (timerDuration <= 0) {
+          clearInterval(timer);
+          document.getElementById(
+            "timer"
+          ).innerHTML = <a href='/resendOtp?email=<%= email %>' class='link-primary'>Resend OTP</a>;
+          document.getElementById("loginButton").style.display = "none";
+        } else {
+          timerDuration--;
+        }
+      }
+</script>
+
+</html>
