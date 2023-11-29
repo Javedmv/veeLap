@@ -1,7 +1,6 @@
 const userSchema = require("../../models/userModel");
 const nodemailer = require("nodemailer");
 const { render } = require("../../routers/adminRouter");
-const { json } = require("express");
 
 const otpGenerator = {
     generate: function (length) {
@@ -16,20 +15,21 @@ const otpGenerator = {
         return otp;
     }
 };
-
+let generatedOTP;
 
 //get route for users login page
-const loadUserLogin = async (req, res) => {
+const loadLogin = async (req, res) => {
     try {
-        res.render("user/Login")
+        res.render("user/login")
     } catch (error) {
         console.log(error.message)
     }
 };
 //get route for usersignup page
-const loadUserSignup = async (req, res) => {
+const loadSignup = async (req, res) => {
     try {
-        res.render("user/Signup");
+        res.render("user/signup", { error: null, message: null });
+
     } catch (error) {
         console.log(error.message);
     }
@@ -42,38 +42,21 @@ const loadHome = async (req, res) => {
         console.log(error.message)
     }
 }
-// get route for email authenthecation page
-const loadEmailAuth = async (req, res) => {
-    try {
-        res.render("user/emailAuth")
-    } catch (error) {
-        console.log(error.message)
-    }
-}
 
-//get route for otp page
-const loadOtp = async (req, res) => {
-    try {
-        res.render("user/otp")
-    } catch (error) {
-        console.log(error.message)
-    }
-}
-
-// post route of otp page
 const sendOtp = async (req, res) => {
     try {
-        const { email, phone } = req.body
 
-        const userE = await userSchema.findOne({ email: email })
-        const userM = await userSchema.findOne({ phone: phone })
-        if (userE) {
-            res.render("user/emailAuth", { emailAlreadyExist: true })
-        } else if (userM) {
-            res.render("user/emailAuth", { phoneAlreadyExist: true })
+        const { email, phone } = req.query
+        const ifExist = await userSchema.findOne({
+            $or: [
+                { email: email },
+                { phoneNumber: phone }
+            ]
+        })
+        if (ifExist) {
+            res.status(200).json({ error: "User Already Exists" })
         } else {
-            // Generate OTP
-            let generatedOTP = otpGenerator.generate(6);
+            generatedOTP = otpGenerator.generate(6);
             console.log("Generated OTP:", generatedOTP);
 
             const transport = nodemailer.createTransport({
@@ -105,55 +88,109 @@ const sendOtp = async (req, res) => {
                     console.log(error)
                 }
             }
-            // sendMails(transport, mailOption);
+            await sendMails(transport, mailOption);
+            res.status(200).json({ message: "OTP send to email successfully" })
 
-            res.render("user/otp", { generatedOTP, email, phone, mess: null })
         }
+    } catch (error) {
+        console.error(error)
     }
-    catch (error) {
+}
+
+const verifyOtp = async (req, res) => {
+    try {
+        const userOtp = req.query.userOtp
+        console.log(typeof userOtp)
+        console.log(typeof generatedOTP)
+        console.log("userOTP: " + userOtp)
+        console.log("line 106 "+generatedOTP)
+    if (userOtp && generatedOTP && userOtp === generatedOTP.toString()) {
+        res.status(200).json({ message: "OTP Verification Successful" })
+        
+    } else {
+        res.status(400).json({error:"OTP Verification Failed"})
+    }
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({error:"Internal Server Error"})
+    }
+}
+
+
+const submitSignup = async (req, res) => {
+    try {
+        const { username, email, phonenumber, password, } = req.body
+        console.log("reached inside submit");
+        console.log(username)
+        console.log(email);
+        console.log(phonenumber);
+        console.log(password);
+        res.render("user/login")
+    } catch (error) {
         console.log(error)
     }
 }
 
 
-const verifyOtp = async (req, res) => {
-    try {
-        console.log("inside verify");
-        // const data = JSON.parse(req.body)
-        // console.log(data, "jjjjj")
-        const { email, phone, enteredOtp, genOTP } = req.body;
-        console.log("type of genotp===" + typeof (req.body.newOtp));
-        const generatedOTP = parseInt(req.body.newOtp);
-
-        console.log("gen otp  = " + generatedOTP)
-        console.log("entered one  = " + enteredOtp)
-        if (enteredOtp === genOTP) {
-            console.log("reached here");
-            res.redirect("/user/signup");
-        } else {
-            // If OTPs do not match, render the "user/otp" page with an error message
-            console.log("hope here");
-            console.log(email, "email");
-            console.log(phone, " here");
-            console.log("hope here");
-
-            res.status(200).render("user/otp", { mess: "invalid otp", email, phone, generatedOTP: genOTP })
-        }
-    } catch (error) {
-        console.error(error);
-        res.status(500).send("Internal Server Error");
-    }
-};
-
-
 module.exports = {
-    loadUserLogin,
-    loadUserSignup,
+    loadLogin,
+    loadSignup,
     loadHome,
-    loadEmailAuth,
     sendOtp,
-    loadOtp,
     verifyOtp,
-
-
+    submitSignup
 }
+// onst resendOtp = async (req, res) => {
+    //     try {
+    
+    //         const { email, phone } = req.query
+    //         const ifExist = await userSchema.findOne({
+    //             $or: [
+    //                 { email: email },
+    //                 { phoneNumber: phone }
+    //             ]
+    //         })
+    //         if (ifExist) {
+    //             res.status(200).json({ error: "User Already Exists" })
+    //         } else {
+    //             let generatedOTP = otpGenerator.generate(6);
+    //             console.log("Generated reSend OTP:", generatedOTP);
+    
+    //             const transport = nodemailer.createTransport({
+    //                 service: "gmail",
+    //                 host: "smtp.gmail.com",
+    //                 port: 587,
+    //                 auth: {
+    //                     user: process.env.MY_EMAIL_ID, //sender gmail
+    //                     pass: process.env.APP_PASSWORD    //app password from gmail account
+    //                 }
+    //             });
+    
+    //             const mailOption = {
+    //                 from: {
+    //                     name: "veeLap",
+    //                     address: process.env.MY_EMAIL_ID
+    //                 },
+    //                 to: email,
+    //                 subject: "veeLap login",
+    //                 text: "This is your one time OTP: " + generatedOTP + " don't share with anyone"
+    //             }
+    
+    //             const sendMails = async (transport, mailOption) => {
+    //                 try {
+    //                     await transport.sendMail(mailOption)
+    //                     console.log("email send successfully of reSend OTP")
+    //                     // console.log('Server response:', info.response); error says info is not defined
+    //                 } catch (error) {
+    //                     console.log(error)
+    //                 }
+    //             }
+    //             sendMails(transport, mailOption);
+    //             res.status(200).json({ message: "OTP send to email successfully" })
+    
+    //         }
+    //     } catch (error) {
+    //         console.error(error)
+    //     }
+    // }
+    

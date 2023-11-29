@@ -1,0 +1,231 @@
+﻿<%-include("./partials/header.ejs")%>
+<style>
+  /* Remove the spinner controls for number input */
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"] {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+</style>
+<body>
+  <main>
+    <section class="pt-150 pb-150">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-10 m-auto">
+            <div class="row">
+              <div class="col-lg-6 mx-auto">
+                <div
+                  class="login_wrap widget-taber-content p-30 background-white border-radius-5"
+                >
+                  <div class="padding_eight_all bg-white">
+                    <div class="heading_s1 d-flex justify-content-center">
+                      <h3 class="mb-30">Create an Account</h3>
+                    </div>
+                    <form method="post" id="userForm" action="/user/">
+                      <!-- <span id="errSignupName" class="text-danger"></span> -->
+                      <!-- need to find if user already exsists or not -->
+                      <div
+                        class="text-danger"
+                        id="validateName"
+                        style="display: none"
+                      >
+                        please enter valid username
+                      </div>
+                      <div class="form-group">
+                        <input
+                          type="text"
+                          required=""
+                          name="username"
+                          placeholder="Username"
+                          id="userName"
+                        />
+                      </div>
+                      <div
+                        class="text-danger"
+                        id="validateEmail"
+                        style="display: none"
+                      >
+                        please enter valid email address
+                      </div>
+                      <div class="form-group">
+                        <input
+                          type="text"
+                          required=""
+                          name="email"
+                          placeholder="Email"
+                          id="email"
+                        />
+                      </div>
+                      <div
+                        class="text-danger"
+                        id="validatePhone"
+                        style="display: none"
+                      >
+                        please enter valid phone number
+                      </div>
+                      <div class="form-group">
+                        <input
+                          type="number"
+                          name="phonenumber"
+                          placeholder="Phone Number"
+                          id="phoneNumber"
+                        />
+                      </div>
+                      <div
+                        class="text-danger"
+                        id="validatePassword"
+                        style="display: none"
+                      >
+                        password must contain minimum of atleast 8 characters
+                      </div>
+
+                      <div class="form-group">
+                        <input
+                          required=""
+                          type="password"
+                          name="password"
+                          placeholder="Password"
+                          id="password"
+                        />
+                      </div>
+
+                      <div class="form-group">
+                        <input
+                          required=""
+                          type="password"
+                          name="password"
+                          placeholder="Confirm password"
+                          id="ConfirmPassword"
+                        />
+                      </div>
+                      <div
+                        class="text-danger"
+                        id="validateCPassword"
+                        style="display: none"
+                      >
+                        password dosent match
+                      </div>
+                      <div class="form-check">
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          value=""
+                          id="showPassword"
+                          onchange="togglePassword()"
+                        />
+                        <label class="form-check-label" for="showPassword">
+                          Show Password
+                        </label>
+                      </div>
+                      <div class="form-group d-flex justify-content-center">
+                        <button
+                          type="submit"
+                          class="btn btn-fill-out btn-block hover-up"
+                          name="login"
+                        >
+                          Submit &amp; Register
+                        </button>
+                      </div>
+                    </form>
+                    <div class="divider-text-center mt-15 mb-15">
+                      <span> or</span>
+                    </div>
+                    <div class="text-muted text-center">
+                      Already have an account?
+                      <a href="/user/login">Sign in now</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // show the visiblility of password
+    function togglePassword() {
+      let passwordEle = document.getElementById("password");
+      let ConfirmPassword = document.getElementById("ConfirmPassword");
+      if (
+        passwordEle.type === "password" &&
+        ConfirmPassword.type === "password"
+      ) {
+        passwordEle.type = "text";
+        ConfirmPassword.type = "text";
+      } else {
+        passwordEle.type = "password";
+        ConfirmPassword.type = "password";
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const form = document.getElementById("userForm");
+      form.addEventListener("submit", function (event) {
+        const name = document.getElementById("userName").value;
+        const email = document.getElementById("email").value;
+        const phone = document.getElementById("phoneNumber").value;
+        const password = document.getElementById("password").value;
+        const cPassword = document.getElementById("ConfirmPassword").value;
+
+        const vName = document.getElementById("validateName");
+        if (name.trim() === "") {
+          vName.style.display = "block";
+          event.preventDefault();
+        } else {
+          vName.style.display = "none";
+        }
+
+        const vEmail = document.getElementById("validateEmail");
+        if (email.trim() === "" || emailValidation(email)) {
+          vEmail.style.display = "block";
+          event.preventDefault();
+        } else {
+          vEmail.style.display = "none";
+        }
+
+        const vPhone = document.getElementById("validatePhone");
+        if (phone.trim() === "" || phoneValidation(phone)) {
+          vPhone.style.display = "block";
+          event.preventDefault();
+        } else {
+          vPhone.style.display = "none";
+        }
+
+        const vPassword = document.getElementById("validatePassword");
+        if (password === "" || !passwordValidate(password)) {
+          vPassword.style.display = "block";
+          event.preventDefault();
+        } else {
+          vPassword.style.display = "none";
+        }
+
+        const vCPassword = document.getElementById("validateCPassword");
+        if (password != cPassword) {
+          vCPassword.style.display = "block";
+          event.preventDefault();
+        } else {
+          vCPassword.style.display = "none";
+        }
+      });
+    });
+
+    function emailValidation(email) {
+      const pattern = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+      return pattern.test(email);
+    }
+    function phoneValidation(phone) {
+      const pattern = /^(\+?91)?[6-9]\d{9}$/;
+      return pattern.test(phone);
+    }
+    function passwordValidate(password) {
+      const pattern = /^.{8,}$/;
+      return pattern.test(password);
+    }
+  </script>
+  <%-include("./partials/footer.ejs")%>
+</body>

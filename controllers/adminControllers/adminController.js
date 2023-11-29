@@ -1,4 +1,4 @@
-const admin = require("../../models/adminModel");
+const adminModel = require("../../models/adminModel");
 
 const loadAdminLogin = async (req, res) => {
     try {
@@ -11,7 +11,7 @@ const loadAdminLogin = async (req, res) => {
 const verifyAdmin = async (req, res) => {
     try {
         const { email, password } = req.body
-        const adminData = await admin.findOne({ email: email });
+        const adminData = await adminModel.findOne({ email: email });
         console.log(adminData)
         if (adminData) {
             if (adminData.password == password) {
@@ -34,7 +34,6 @@ const loadDashboard = async (req, res) => {
         console.log(error);
     }
 };
-
 
 
 

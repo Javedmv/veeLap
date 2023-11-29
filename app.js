@@ -4,7 +4,7 @@ const path = require("path")
 
 
 
-const session = require("express-session")
+// const session = require("express-session")
 const { v4: uuidv4 } = require('uuid');
 const app = express();
 
@@ -14,13 +14,14 @@ app.set("views", path.join(__dirname, "views"));
 // app.use(bodyParser)
 app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static('node_modules'));
 
 app.use(express.json());
-app.use(session({
-    secret: uuidv4(),
-    resave: false,
-    saveUninitialized: true
-}))
+// app.use(session({
+//     secret: uuidv4(),
+//     resave: false,
+//     saveUninitialized: true
+// }))
 
 
 const adminRoute = require("./routers/adminRouter")

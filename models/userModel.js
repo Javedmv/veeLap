@@ -13,6 +13,15 @@ const userModel = mongoose.Schema({
         type: String,
         required: true
     },
+    phoneNumber: {
+        type: Number,
+        required: true
+    },
+    status: {
+        type: String,
+        required: true,
+        default: "unblock"
+    }
 })
 
 module.exports = mongoose.model("User", userModel)

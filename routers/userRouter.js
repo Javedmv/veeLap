@@ -3,25 +3,18 @@ const userRouter = express();
 
 
 
-const { loadUserLogin,
-    loadUserSignup,
+const { loadLogin,
+    loadSignup,
     loadHome,
-    loadEmailAuth,
     sendOtp,
-    loadOtp,
     verifyOtp,
-    resendOtp } = require("../controllers/userControllers/userController")
+    submitSignup
+} = require("../controllers/userControllers/userController")
 
-userRouter.get("/login", loadUserLogin);
-userRouter.get("/signup", loadUserSignup);
+userRouter.get("/login", loadLogin);
+userRouter.get("/signup", loadSignup);
 userRouter.get("/", loadHome);
-userRouter.get("/emailAuth", loadEmailAuth);
-userRouter.post("/sendOtp", sendOtp);
-userRouter.get("/send-Otp", loadOtp)
-
-
+userRouter.get("/sendotp", sendOtp)
 userRouter.post("/verify-otp", verifyOtp)
-
-
-
+userRouter.post("/submit", submitSignup)
 module.exports = userRouter
