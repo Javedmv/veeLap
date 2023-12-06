@@ -15,7 +15,7 @@ const verifyAdmin = async (req, res) => {
         console.log(adminData)
         if (adminData) {
             if (adminData.password == password) {
-                res.redirect("/admin/dashboard");
+                res.redirect("/admin/");
             } else {
                 res.render("admin/adminlogin", { message: "invalid password" });
             }

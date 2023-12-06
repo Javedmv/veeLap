@@ -23,7 +23,7 @@
 
   </head>
 
-  <body>
+ 
     <header class="header-area header-style-4 header-height-2">
       <div class="header-top header-top-ptb-1 d-none d-lg-block">
         <div class="container">
@@ -61,20 +61,18 @@
             </div>
             <div class="col-xl-3 col-lg-4">
               <div class="header-info header-info-right">
-                <ul>
-                  <!-- <li>
-                    <a class="language-dropdown-active" href="#">
-                      <i class="fi-rs-world"></i> English
-                      <i class="fi-rs-angle-small-down"></i>
-                    </a>
-                  </li> -->
-                  <li>
-                    <i class="fi-rs-user"></i
-                    ><a href="/user/login">Log In</a>
-                    <span class="pl-5 pr-5"> | </span>
-                    <a href="/user/signup">Sign Up</a>
-                  </li>
-                </ul>
+                <% if (!loggedIn){ %>
+                  <ul>
+                      <i class="fi-rs-user"></i>
+                    <li><a href="/user/login">Log In</a></li>
+                    <li> <a href="/user/signup">Sign Up</a></li> 
+                  </ul>
+               <%}else{%>  
+                <i class="fi-rs-user"></i>
+                <!-- <a href="#">ejs</a> -->
+                <span class="ml-10 mr-10">|</span>
+               <a href="/user/logout">Log Out</a> 
+                <% } %>               
               </div>
             </div>
           </div>
@@ -132,7 +130,7 @@
             <div class="header-nav d-none d-lg-flex">
               <div class="main-categori-wrap d-none d-lg-block">
                 <a class="categori-button-active" href="#">
-                  <span class="fi-rs-apps"></span> Brands
+                  <span class="fi-rs-apps"></span> Browse Category
                 </a>
                 <div
                   class="categori-dropdown-wrap categori-dropdown-active-large"
@@ -334,3 +332,4 @@
       </div>
     </div>
   </header>
+  

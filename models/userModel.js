@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const userModel = mongoose.Schema({
-    username: {
+    userName: {
         type: String,
         required: true
     },
@@ -9,18 +9,18 @@ const userModel = mongoose.Schema({
         type: String,
         required: true
     },
-    password: {
-        type: String,
-        required: true
-    },
     phoneNumber: {
         type: Number,
+        required: true
+    },
+    password: {
+        type: String,
         required: true
     },
     status: {
         type: String,
         required: true,
-        default: "unblock"
+        default: "Active"
     }
 })
 

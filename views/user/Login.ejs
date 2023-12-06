@@ -1,115 +1,205 @@
-<%-include("./partials/header.ejs")%>
-<body>
-  <main>
-    <section class="pt-100 pb-1">
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-10 m-auto">
-            <div class="row">
-              <div class="col-lg-5 mx-auto mb-100">
-                <div
-                  class="login_wrap widget-taber-content p-30 background-white border-radius-10 mb-md-5 mb-lg-0 mb-sm-5"
-                >
-                  <div class="padding_eight_all bg-white">
-                    <div
-                      class="heading_s1 d-flex align-items-center justify-content-center"
-                    >
-                      <h3 class="mb-30">Login</h3>
-                    </div>
-                    <div>
-                      <%if(typeof message !== "undefined"){%>
-                      <p style="color: red" id="errormsg"><%=message%></p>
-                      <%}%>
-                    </div>
-                    <form method="post" action="">
-                      <div class="form-group">
-                        <input
-                          type="text"
-                          required=""
-                          name="email"
-                          id="email"
-                          placeholder="Your Email"
-                        />
-                      </div>
-                      <div class="form-group">
-                        <input
-                          required=""
-                          type="password"
-                          id="password"
-                          name="password"
-                          placeholder="Password"
-                        />
-                      </div>
-                      <div class="form-check">
-                        <input
-                          class="form-check-input"
-                          type="checkbox"
-                          value=""
-                          id="showPassword"
-                          onchange="togglePassword()"
-                        />
-                        <label class="form-check-label" for="showPassword">
-                          Show Password
-                        </label>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>VeeLap</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta property="og:title" content="" />
+    <meta property="og:type" content="" />
+    <meta property="og:url" content="" />
+    <meta property="og:image" content="" />
+    <!-- Favicon -->
+    <link
+      rel="shortcut icon"
+      type="image/x-icon"
+      href="/userassets/imgs/theme/favicon.svg"
+    />
+    <!-- Template CSS -->
+    <link rel="stylesheet" href="/userassets/css/main.css" />
+    <!-- <script src="/node_modules/sweetalert2/dist/sweetalert2.all.min.js"></script> -->
+  </head>
+
+  <body>
+    <main>
+      <section class="pt-100 pb-1">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-10 m-auto">
+              <div class="row">
+                <div class="col-lg-5 mx-auto mb-100">
+                  <div
+                    class="login_wrap widget-taber-content p-30 background-white border-radius-10 mb-md-5 mb-lg-0 mb-sm-5"
+                  >
+                    <div class="padding_eight_all bg-white">
+                      <div
+                        class="heading_s1 d-flex align-items-center justify-content-center"
+                      >
+                        <h3 class="mb-30">Login</h3>
                       </div>
                       <div
+                        class="d-flex align-items-center justify-content-center"
+                      >
+                        <%if(error){%>
+                        <p style="color: red" id="errormsg"><%=error%></p>
+                        <%}%>
+                        <div class="text-success" id="set">
+                          <%=locals.message%>
+                        </div>
+                      </div>
+                      <form method="post" action="/user/login-home">
+                        <div class="form-group">
+                          <input
+                            type="text"
+                            name="email"
+                            id="email"
+                            placeholder="Your Email"
+                          />
+                        </div>
+                        <div
+                          class="text-danger"
+                          id="validateEmail"
+                          style="display: none"
+                        >
+                          please enter valid email address
+                        </div>
+                        <div class="form-group">
+                          <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Password"
+                          />
+                          <div
+                            class="text-danger"
+                            id="validatePassword"
+                            style="display: none"
+                          >
+                            password must contain minimum of 6 characters
+                          </div>
+                        </div>
+                        <div class="form-check">
+                          <input
+                            class="form-check-input"
+                            type="checkbox"
+                            value=""
+                            id="showPassword"
+                            onchange="togglePassword()"
+                          />
+                          <label class="form-check-label" for="showPassword">
+                            Show Password
+                          </label>
+                        </div>
+                        <!-- <div
                         class="login_footer form-group align-items-center justify-content-end"
                       >
                         <a class="text-muted" href="#">Forgot password?</a>
-                      </div>
-                      <div
-                        class="form-group d-flex align-items-center justify-content-center"
-                      >
-                        <button
-                          type="submit"
-                          class="btn btn-fill-out btn-block hover-up"
-                          name="login"
+                      </div> -->
+                        <div
+                          class="form-group d-flex align-items-center justify-content-center"
                         >
-                          Log in
-                        </button>
-                      </div>
-                      <div class="text-muted text-center">
-                        Don't have an account?
-                        <a href="/user/signup">Create Account</a>
-                      </div>
-                    </form>
+                          <button
+                            type="submit"
+                            class="btn btn-fill-out btn-block hover-up"
+                            name="login"
+                            id="submitBtn"
+                          >
+                            Log in
+                          </button>
+                        </div>
+                        <div class="text-muted text-center">
+                          Don't have an account?
+                          <a href="/user/signup">Create Account</a>
+                        </div>
+                      </form>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </section>
-  </main>
-</body>
-<script>
-  function togglePassword() {
-    let passwordEle = document.getElementById("password");
-    if (passwordEle.type === "password") {
-      passwordEle.type = "text";
-    } else {
-      passwordEle.type = "password";
+      </section>
+    </main>
+  </body>
+  <script>
+    document.addEventListener("DOMContentLoaded", async function (event) {
+      const submitBtn = document.getElementById("submitBtn");
+
+      submitBtn.addEventListener("click", function (event) {
+        // email and password input value
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+        // validation message div
+        const emailVm = document.getElementById("validateEmail");
+        const passwordVm = document.getElementById("validatePassword");
+
+        if (email.trim() === "" || !emailValidation(email)) {
+          emailVm.style.display = "block";
+          event.preventDefault();
+        } else {
+          emailVm.style.display = "none";
+        }
+
+        if (password === "" || !passwordValidate(password)) {
+          passwordVm.style.display = "block";
+          event.preventDefault();
+        } else {
+          passwordVm.style.display = "none";
+          // form will submit when validtion is completed
+          submit();
+        }
+      });
+      // timer of ejs message
+      setTimeout(() => {
+        document.getElementById("set").style.display = "none";
+      }, 5000);
+    });
+
+    function emailValidation(email) {
+      const pattern = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+      return pattern.test(email);
     }
-  }
+    function passwordValidate(password) {
+      const minLength = 4;
+      return password.length >= minLength;
+    }
 
-  var email = document.getElementById("email");
-  var password = document.getElementById("password");
-  var message = document.getElementById("errormsg");
+    function togglePassword() {
+      let passwordEle = document.getElementById("password");
+      if (passwordEle.type === "password") {
+        passwordEle.type = "text";
+      } else {
+        passwordEle.type = "password";
+      }
+    }
+  </script>
+  <!-- Vendor JS-->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.16.6/dist/sweetalert2.all.min.js"></script>
+  <script src="/userassets/js/vendor/modernizr-3.6.0.min.js"></script>
+  <script src="/userassets/js/vendor/jquery-3.6.0.min.js"></script>
+  <script src="/userassets/js/vendor/jquery-migrate-3.3.0.min.js"></script>
+  <script src="/userassets/js/vendor/bootstrap.bundle.min.js"></script>
+  <script src="/userassets/js/plugins/slick.js"></script>
+  <script src="/userassets/js/plugins/jquery.syotimer.min.js"></script>
+  <script src="/userassets/js/plugins/wow.js"></script>
+  <script src="/userassets/js/plugins/jquery-ui.js"></script>
+  <script src="/userassets/js/plugins/perfect-scrollbar.js"></script>
+  <script src="/userassets/js/plugins/magnific-popup.js"></script>
+  <script src="/userassets/js/plugins/select2.min.js"></script>
+  <script src="/userassets/js/plugins/waypoints.js"></script>
+  <script src="/userassets/js/plugins/counterup.js"></script>
+  <script src="/userassets/js/plugins/jquery.countdown.min.js"></script>
+  <script src="/userassets/js/plugins/images-loaded.js"></script>
+  <script src="/userassets/js/plugins/isotope.js"></script>
+  <script src="/userassets/js/plugins/scrollup.js"></script>
+  <script src="/userassets/js/plugins/jquery.vticker-min.js"></script>
+  <script src="/userassets/js/plugins/jquery.theia.sticky.js"></script>
+  <script src="/userassets/js/plugins/jquery.elevatezoom.js"></script>
+  <!-- Template  JS -->
+  <script src="/userassets/js/main.js"></script>
+  <script src="/userassets/js/shop.js"></script>
 
-  if (!isValidEmail(email)) {
-    message.innerHTML = "please enter correct email and password";
-  }
-  if (!isValidPassword()) {
-    message.innerHTML = "wrong password";
-  }
-
-  function isValidEmail(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  }
-  function isValidPassword() {
-    return password.length >= 6;
-  }
-</script>
-<%-include("./partials/footer.ejs")%>
+  <!-- Mirrored from wp.alithemes.com/html/evara/evara-frontend/index-4.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 01 Aug 2021 15:26:20 GMT -->
+</html>

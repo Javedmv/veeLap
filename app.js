@@ -1,7 +1,7 @@
 const express = require("express");
 const dotenv = require("dotenv").config
 const path = require("path")
-
+const cookieParser = require("cookie-parser")
 
 
 // const session = require("express-session")
@@ -15,6 +15,7 @@ app.set("views", path.join(__dirname, "views"));
 app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('node_modules'));
+app.use(cookieParser());
 
 app.use(express.json());
 // app.use(session({
@@ -37,7 +38,7 @@ const dbConfig = require("./config/database");
 
 
 mongoose.connect(dbConfig.url).then(() => {
-    console.log("DB connected to " + process.env.DB_HOST + process.env.DB_NAME)
+    console.log("DB connected to " + dbConfig.url)
 }).catch((err) => {
     console.error(err);
     process.exit();

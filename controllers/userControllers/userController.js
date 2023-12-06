@@ -1,60 +1,64 @@
 const userSchema = require("../../models/userModel");
 const nodemailer = require("nodemailer");
 const { render } = require("../../routers/adminRouter");
+const jwt = require("jsonwebtoken")
+const jwtKey = require("../../config/jwt");
+const productModel = require("../../models/productModel");
+const categoryModel = require("../../models/categoryModel");
 
 const otpGenerator = {
     generate: function (length) {
-        const numberChars = '0123456789';
+        const numberChars = "0123456789";
 
-        let otp = '';
+        let otp = "";
         for (let i = 0; i < length; i++) {
             const randomIndex = Math.floor(Math.random() * numberChars.length);
             otp += numberChars.charAt(randomIndex);
         }
 
         return otp;
-    }
+    },
 };
 let generatedOTP;
+
 
 //get route for users login page
 const loadLogin = async (req, res) => {
     try {
-        res.render("user/login")
+        res.render("user/login", { error: null, loggedIn: null });
     } catch (error) {
-        console.log(error.message)
+        console.log(error.message);
     }
 };
 //get route for usersignup page
 const loadSignup = async (req, res) => {
     try {
-        res.render("user/signup", { error: null, message: null });
-
+        res.render("user/signup", { error: null, loggedIn: null });
     } catch (error) {
         console.log(error.message);
     }
-}
+};
 //get route of dashboard
 const loadHome = async (req, res) => {
     try {
-        res.render("user/home")
+        const loggedIn = req.cookies.loggedIn
+        const userEmail = req.cookies.userEmail
+        const products = await productModel.find({})
+        const category = await categoryModel.find({})
+        res.render("user/home", { userEmail, loggedIn, products, category });
     } catch (error) {
-        console.log(error.message)
+        console.log(error.message);
     }
-}
+};
 
 const sendOtp = async (req, res) => {
     try {
-
-        const { email, phone } = req.query
+        const { email, phone } = req.query;
         const ifExist = await userSchema.findOne({
-            $or: [
-                { email: email },
-                { phoneNumber: phone }
-            ]
-        })
+            $or: [{ email: email }, { phoneNumber: phone }],
+        });
         if (ifExist) {
-            res.status(200).json({ error: "User Already Exists" })
+            res.status(200).json({ error: "User Already Exists" });
         } else {
             generatedOTP = otpGenerator.generate(6);
             console.log("Generated OTP:", generatedOTP);
@@ -65,71 +69,124 @@ const sendOtp = async (req, res) => {
                 port: 587,
                 auth: {
                     user: process.env.MY_EMAIL_ID, //sender gmail
-                    pass: process.env.APP_PASSWORD    //app password from gmail account
-                }
+                    pass: process.env.APP_PASSWORD, //app password from gmail account
+                },
             });
 
             const mailOption = {
                 from: {
                     name: "veeLap",
-                    address: process.env.MY_EMAIL_ID
+                    address: process.env.MY_EMAIL_ID,
                 },
                 to: email,
                 subject: "veeLap login",
-                text: "This is your one time OTP: " + generatedOTP + " don't share with anyone"
-            }
+                text:
+                    "This is your one time OTP: " +
+                    generatedOTP +
+                    " don't share with anyone",
+            };
 
             const sendMails = async (transport, mailOption) => {
                 try {
-                    await transport.sendMail(mailOption)
-                    console.log("email send successfully")
+                    await transport.sendMail(mailOption);
+                    console.log("email send successfully");
                     // console.log('Server response:', info.response); error says info is not defined
                 } catch (error) {
-                    console.log(error)
+                    console.log(error);
                 }
-            }
+            };
             await sendMails(transport, mailOption);
-            res.status(200).json({ message: "OTP send to email successfully" })
-
+            res.status(200).json({ message: "OTP send to email successfully" });
         }
     } catch (error) {
-        console.error(error)
+        console.error(error);
     }
-}
+};
 
 const verifyOtp = async (req, res) => {
     try {
-        const userOtp = req.query.userOtp
-        console.log(typeof userOtp)
-        console.log(typeof generatedOTP)
-        console.log("userOTP: " + userOtp)
-        console.log("line 106 "+generatedOTP)
-    if (userOtp && generatedOTP && userOtp === generatedOTP.toString()) {
-        res.status(200).json({ message: "OTP Verification Successful" })
-        
-    } else {
-        res.status(400).json({error:"OTP Verification Failed"})
-    }
+        const userOtp = req.query.userOtp;
+        console.log(typeof userOtp);
+        console.log(typeof generatedOTP);
+        console.log("userOTP: " + userOtp);
+        console.log("line 106 " + generatedOTP);
+        if (userOtp && generatedOTP && userOtp === generatedOTP.toString()) {
+            res.status(200).json({ message: "OTP Verification Successful" });
+        } else {
+            res.status(400).json({ error: "OTP Verification Failed" });
+        }
     } catch (error) {
-        console.log(error)
-        res.status(500).json({error:"Internal Server Error"})
+        console.log(error);
+        res.status(500).json({ error: "Internal Server Error" });
     }
-}
+};
 
-
+// adding user to data base in signup
 const submitSignup = async (req, res) => {
     try {
-        const { username, email, phonenumber, password, } = req.body
-        console.log("reached inside submit");
-        console.log(username)
-        console.log(email);
-        console.log(phonenumber);
-        console.log(password);
-        res.render("user/login")
+        const { userName, email, phoneNumber, password } = req.body;
+        const userData = await userSchema.findOne({ email });
+        if (userData) {
+            res.render("user/signup", { error: "Email already exists" });
+        } else {
+            await userSchema.create({
+                userName: userName,
+                email: email,
+                phoneNumber: phoneNumber,
+                password: password,
+            });
+            res.render("user/login", {
+                message: "User sign up successfully",
+                error: null,
+            });
+        }
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+const userLogin = async (req, res) => {
+    try {
+        const { email, password } = req.body
+        const userData = await userSchema.findOne({ email })
+        // console.log("userData ------ password" + userData.password)
+        if (!userData) {
+            res.status(401).render("user/login", { error: "user not found" })
+        } else {
+            if (userData.password == password) {
+                try {
+                    const token = jwt.sign(email, jwtKey.secretKey)
+                    res.cookie("token", token, { maxAge: 24 * 60 * 60 * 1000 });
+                    res.cookie("loggedIn", true, { maxAge: 24 * 60 * 60 * 1000 });
+                    res.cookie("userEmail", userData.email);
+                    // res.status(200).json({ success: true });
+                    res.redirect("/user/")
+                } catch (error) {
+                    console.error(error)
+                    res.status(500).render("user/login", { error: "Internal Server Error" });
+
+                }
+            } else {
+                res.status(400).render("user/login", { error: "incorrect password" })
+            }
+        }
     } catch (error) {
         console.log(error)
     }
 }
+
+const userLogout = async (req, res) => {
+    try {
+        res.clearCookie("token");
+        res.clearCookie("loggedIn");
+        res.clearCookie("userEmail");
+        // res.clearCookie("userName");
+        res.redirect("/user/")
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 
 
 module.exports = {
@@ -138,59 +195,10 @@ module.exports = {
     loadHome,
     sendOtp,
     verifyOtp,
-    submitSignup
-}
-// onst resendOtp = async (req, res) => {
-    //     try {
-    
-    //         const { email, phone } = req.query
-    //         const ifExist = await userSchema.findOne({
-    //             $or: [
-    //                 { email: email },
-    //                 { phoneNumber: phone }
-    //             ]
-    //         })
-    //         if (ifExist) {
-    //             res.status(200).json({ error: "User Already Exists" })
-    //         } else {
-    //             let generatedOTP = otpGenerator.generate(6);
-    //             console.log("Generated reSend OTP:", generatedOTP);
-    
-    //             const transport = nodemailer.createTransport({
-    //                 service: "gmail",
-    //                 host: "smtp.gmail.com",
-    //                 port: 587,
-    //                 auth: {
-    //                     user: process.env.MY_EMAIL_ID, //sender gmail
-    //                     pass: process.env.APP_PASSWORD    //app password from gmail account
-    //                 }
-    //             });
-    
-    //             const mailOption = {
-    //                 from: {
-    //                     name: "veeLap",
-    //                     address: process.env.MY_EMAIL_ID
-    //                 },
-    //                 to: email,
-    //                 subject: "veeLap login",
-    //                 text: "This is your one time OTP: " + generatedOTP + " don't share with anyone"
-    //             }
-    
-    //             const sendMails = async (transport, mailOption) => {
-    //                 try {
-    //                     await transport.sendMail(mailOption)
-    //                     console.log("email send successfully of reSend OTP")
-    //                     // console.log('Server response:', info.response); error says info is not defined
-    //                 } catch (error) {
-    //                     console.log(error)
-    //                 }
-    //             }
-    //             sendMails(transport, mailOption);
-    //             res.status(200).json({ message: "OTP send to email successfully" })
-    
-    //         }
-    //     } catch (error) {
-    //         console.error(error)
-    //     }
-    // }
-    
+    submitSignup,
+    userLogin,
+    userLogout
+};
+
+
+

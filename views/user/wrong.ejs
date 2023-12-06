@@ -227,5 +227,59 @@
       return pattern.test(password);
     }
   </script>
+
   <%-include("./partials/footer.ejs")%>
 </body>
+<!-- const resendOtp = async (req, res) => {
+  try {
+
+      const { email, phone } = req.query
+      const ifExist = await userSchema.findOne({
+          $or: [
+              { email: email },
+              { phoneNumber: phone }
+          ]
+      })
+      if (ifExist) {
+          res.status(200).json({ error: "User Already Exists" })
+      } else {
+          let generatedOTP = otpGenerator.generate(6);
+          console.log("Generated reSend OTP:", generatedOTP);
+
+          const transport = nodemailer.createTransport({
+              service: "gmail",
+              host: "smtp.gmail.com",
+              port: 587,
+              auth: {
+                  user: process.env.MY_EMAIL_ID, //sender gmail
+                  pass: process.env.APP_PASSWORD    //app password from gmail account
+              }
+          });
+
+          const mailOption = {
+              from: {
+                  name: "veeLap",
+                  address: process.env.MY_EMAIL_ID
+              },
+              to: email,
+              subject: "veeLap login",
+              text: "This is your one time OTP: " + generatedOTP + " don't share with anyone"
+          }
+
+          const sendMails = async (transport, mailOption) => {
+              try {
+                  await transport.sendMail(mailOption)
+                  console.log("email send successfully of reSend OTP")
+                  // console.log('Server response:', info.response); error says info is not defined
+              } catch (error) {
+                  console.log(error)
+              }
+          }
+          sendMails(transport, mailOption);
+          res.status(200).json({ message: "OTP send to email successfully" })
+
+      }
+  } catch (error) {
+      console.error(error)
+  }
+} -->
