@@ -14,6 +14,10 @@ const { loadLogin,
 
 } = require("../controllers/userControllers/userController")
 
+
+const { productDetails } = require("../controllers/userControllers/product")
+
+
 // just rendering the pages
 userRouter.get("/login", loadLogin);
 userRouter.get("/signup", loadSignup);
@@ -29,6 +33,9 @@ userRouter.get("/logout", userLogout);
 
 // user login
 userRouter.post("/login-home", userLogin)  // user account page
+
+// from product.js
+userRouter.get("/product-details/:id", productDetails)
 
 
 

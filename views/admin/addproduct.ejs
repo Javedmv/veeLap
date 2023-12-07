@@ -385,7 +385,7 @@
                   </div>
 
                   <div class="mb-4 mt-20">
-                    <label class="form-label">Full description</label>
+                    <label class="form-label">Description</label>
                     <textarea
                       placeholder="Type here"
                       class="form-control"
@@ -393,13 +393,23 @@
                       id="full_description"
                       name="fullDescription"
                     ></textarea>
+
+                    <label class="form-label">Full description</label>
+                    <textarea
+                      placeholder="Type here"
+                      class="form-control"
+                      rows="4"
+                      id="full_description"
+                      name="detailedDescription"
+                    ></textarea>
+
                     <div
                       id="full_descriptionError"
                       class="error-message text-danger"
                     ></div>
                   </div>
                   <div class="row">
-                    <div class="col-lg-6">
+                    <div class="col-lg-4">
                       <div class="mb-4">
                         <label class="form-label">Category</label>
                         <select
@@ -422,7 +432,7 @@
                         ></div>
                       </div>
                     </div>
-                    <div class="col-lg-6">
+                    <div class="col-lg-4">
                       <div class="mb-4">
                         <label class="form-label">Stock</label>
                         <input
@@ -436,6 +446,18 @@
                           id="stockError"
                           class="error-message text-danger"
                         ></div>
+                      </div>
+                    </div>
+                    <div class="col-lg-4">
+                      <div class="mb-4">
+                        <label class="form-label">Status</label>
+                        <select class="form-select" id="Status" name="status">
+                          <option value="" selected disabled>
+                            Select Status
+                          </option>
+                          <option value="Active">Active</option>
+                          <option value="Inactive">Inavtive</option>
+                        </select>
                       </div>
                     </div>
                     <div class="col-lg-6">
