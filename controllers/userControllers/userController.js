@@ -1,10 +1,12 @@
-const userSchema = require("../../models/userModel");
+const userModel = require("../../models/userModel");
 const nodemailer = require("nodemailer");
 const { render } = require("../../routers/adminRouter");
 const jwt = require("jsonwebtoken")
 const jwtKey = require("../../config/jwt");
 const productModel = require("../../models/productModel");
 const categoryModel = require("../../models/categoryModel");
+const Swal = require('sweetalert2')
+
 
 const otpGenerator = {
     generate: function (length) {
@@ -25,7 +27,7 @@ let generatedOTP;
 //get route for users login page
 const loadLogin = async (req, res) => {
     try {
-        res.render("user/login", { error: null, loggedIn: null });
+        res.render("user/login", { error: null });
     } catch (error) {
         console.log(error.message);
     }
@@ -33,7 +35,8 @@ const loadLogin = async (req, res) => {
 //get route for usersignup page
 const loadSignup = async (req, res) => {
     try {
-        res.render("user/signup", { error: null, loggedIn: null });
+
+        res.render("user/signup", { error: null });
     } catch (error) {
         console.log(error.message);
     }
@@ -51,14 +54,25 @@ const loadHome = async (req, res) => {
     }
 };
 
+
+// load forgot password
+
+const loadForgotPassword = async (req, res) => {
+    try {
+        res.render("user/forgotPassword");
+    } catch (error) {
+        console.log(error);
+    }
+};
+
 const sendOtp = async (req, res) => {
     try {
         const { email, phone } = req.query;
-        const ifExist = await userSchema.findOne({
+        const ifExist = await userModel.findOne({
             $or: [{ email: email }, { phoneNumber: phone }],
         });
         if (ifExist) {
-            res.status(200).json({ error: "User Already Exists" });
+            res.status(401).json({ error: "User Already Exists" });
         } else {
             generatedOTP = otpGenerator.generate(6);
             console.log("Generated OTP:", generatedOTP);
@@ -125,11 +139,11 @@ const verifyOtp = async (req, res) => {
 const submitSignup = async (req, res) => {
     try {
         const { userName, email, phoneNumber, password } = req.body;
-        const userData = await userSchema.findOne({ email });
+        const userData = await userModel.findOne({ email });
         if (userData) {
             res.render("user/signup", { error: "Email already exists" });
         } else {
-            await userSchema.create({
+            await userModel.create({
                 userName: userName,
                 email: email,
                 phoneNumber: phoneNumber,
@@ -148,10 +162,13 @@ const submitSignup = async (req, res) => {
 const userLogin = async (req, res) => {
     try {
         const { email, password } = req.body
-        const userData = await userSchema.findOne({ email })
+        const userData = await userModel.findOne({ email })
         // console.log("userData ------ password" + userData.password)
         if (!userData) {
             res.status(401).render("user/login", { error: "user not found" })
+
+        } else if (userData.status == "Inactive") {
+            res.status(404).render("user/login", { error: "user is blocked" })
         } else {
             if (userData.password == password) {
                 try {
@@ -187,7 +204,88 @@ const userLogout = async (req, res) => {
     }
 }
 
+const sendOtpForgot = async (req, res) => {
+    try {
+        const userEmail = req.body.email;
+        const ifExist = await userModel.findOne({ email: userEmail })
+        if (ifExist) {
+            generatedOTP = otpGenerator.generate(6);
+            console.log("Generated OTP OF FORGOT:", generatedOTP);
+            const transport = nodemailer.createTransport({
+                service: "gmail",
+                host: "smtp.gmail.com",
+                port: 587,
+                auth: {
+                    user: process.env.MY_EMAIL_ID, //sender gmail
+                    pass: process.env.APP_PASSWORD, //app password from gmail account
+                },
+            });
 
+            const mailOption = {
+                from: {
+                    name: "veeLap",
+                    address: process.env.MY_EMAIL_ID,
+                },
+                to: userEmail,
+                subject: "veeLap login",
+                text:
+                    "This is your one time OTP: " +
+                    generatedOTP +
+                    " don't share with anyone",
+            };
+            const sendMails = async (transport, mailOption) => {
+                try {
+                    await transport.sendMail(mailOption);
+                    // console.log("email send successfully");
+                    // console.log('Server response:', info.response); error says info is not defined
+                } catch (error) {
+                    console.log(error);
+                }
+            };
+            // await sendMails(transport, mailOption);
+            res.status(200).json({ message: "OTP send to email successfully" });
+        } else {
+            res.json({ error: "User not found" })
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+};
+
+const verifyForgotOtp = async (req, res) => {
+    try {
+        const enteredOtp = req.body.OTP
+
+        if (enteredOtp === generatedOTP) {
+            res.status(200).json({ message: "OTP Verification Successful" });
+        } else {
+            res.status(401).json({ error: "Incorrect OTP" });
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+};
+
+const resetPassword = async (req, res) => {
+    try {
+        const { password, confirmPassword, email } = req.body
+        if (password === confirmPassword) {
+            await userModel.updateOne({ email }, {
+                $set: {
+                    password: password
+                }
+            })
+            res.status(200).json({ message: "Password Reset Successfull" })
+        } else {
+            res.status(401).json({ error: "password and confirm password dosent match" })
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: "Internal Server Error" })
+    }
+}
 
 module.exports = {
     loadLogin,
@@ -197,7 +295,11 @@ module.exports = {
     verifyOtp,
     submitSignup,
     userLogin,
-    userLogout
+    userLogout,
+    loadForgotPassword,
+    sendOtpForgot,
+    verifyForgotOtp,
+    resetPassword
 };
 
 

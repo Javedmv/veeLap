@@ -236,11 +236,11 @@
                               ><i class="fi-rs-heart"></i
                             ></a>
                           </div>
-                          <div
+                          <!-- <div
                             class="product-badges product-badges-position product-badges-mrg"
                           >
                             <span class="hot">Hot</span>
-                          </div>
+                          </div> -->
                         </div>
                         <div class="product-content-wrap">
                           <div class="product-category">
@@ -257,16 +257,17 @@
                             </span>
                           </div> -->
                           <div class="product-price">
-                            <span>₹ <%= e.regularPrice%></span>
-                            <span class="old-price">₹ <%= e.salesPrice%></span>
+                            <span>₹ <%= e.salesPrice%></span>
+                            <span class="old-price">₹ <%= e.regularPrice%></span>
                           </div>
                           <div class="product-action-1 show">
-                            <a
+                            <button
                               aria-label="Add To Cart"
-                              class="action-btn hover-up"
-                              href="shop-cart.html"
+                              class="action-btn hover-up CART"
+                              href=""
+                              prdctId = "<%= e._id %>"
                               ><i class="fi-rs-shopping-bag-add"></i
-                            ></a>
+                            ></button>
                           </div>
                         </div>
                         <!-- ejs ends -->
@@ -282,4 +283,70 @@
       </section>
 
     </main>
+    <script>
+      document.addEventListener("DOMContentLoaded",async (event)=>{
+
+        const addToCartBtn = document.querySelectorAll(".CART")
+        addToCartBtn.forEach(element => {
+
+          element.addEventListener("click",async (event) => {
+            event.preventDefault();
+            const productId = element.getAttribute("prdctId")
+           
+                await axios({
+                method:"post",
+                url:"/user/add-to-cart",
+                data:{
+                productId : productId,
+                }
+              })
+              .then((Response) => {
+                return Response.json();
+              })
+              .then((data) => {
+              console.log("this is response message");
+                console.log(data.message)
+                console.log("response message ends");
+              if(data.message){
+                  Swal.fire({
+                    title: data.message,
+                    icon: "success",
+                    showConfirmButton: false,
+                    timer: 2000,
+                    timerProgressBar: true,
+                  });
+                }else{
+                  console.log("this is response.error");
+                  console.log(data.error)
+                  console.log("response error ends");
+                  Swal.fire({
+                    title: "Please login for explore VeeLap.",
+                    text: data.error,
+                    icon: "error",
+                    confirmButtonText: "Ok",
+                    timer: 2000,
+                    timerProgressBar: true,
+                  });
+                }
+              })
+              .catch((error)=>{
+                console.log("this is catch error");
+                console.log(error);
+                console.log("this is catch error ends");
+                Swal.fire({
+                  title: "Sorry!",
+                  text: error,
+                  icon: "error",
+                  confirmButtonText: "Ok",
+                  timer: 2000,
+                  timerProgressBar: true,
+                  });
+              })
+
+          })
+          
+        });
+
+        });
+    </script>
 <%-include("./partials/footer.ejs")%>

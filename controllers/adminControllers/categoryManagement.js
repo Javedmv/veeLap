@@ -12,17 +12,23 @@ const loadCategory = async (req, res) => {
 const addCategory = async (req, res) => {
     try {
         const { status, categoryName } = req.body
-        const categoryData = await categoryModel.findOne({ categoryName: categoryName })
-        if (categoryData) {
-            res.status(409).json({ message: "Category Already Exists" })
+        const categories = await categoryModel.find({});
+        let existCateg;
+        categories.forEach(c => {
+            if (c.categoryName.toLowerCase() === categoryName.toLowerCase()) {
+                existCateg = true;
+            }
+        })
+        if (existCateg) {
+            res.status(404).json({ message: "Category Already Exists" })
         } else {
             await categoryModel.create({
                 categoryName: categoryName,
                 status: status
             })
-            const categories = await categoryModel.find();
             res.status(200).json({ message: "Category Added Successfully" })
         }
+
     } catch (error) {
         console.error(error)
         res.status(500).json({ message: "Internal server error" })
@@ -33,7 +39,7 @@ const loadEditCategory = async (req, res) => {
     try {
         const categoryID = req.params.id
         const categortData = await categoryModel.findById({ _id: categoryID });
-        res.render("admin/editcategory", { categortData })
+        res.render("admin/editcategory", { categortData, error: null })
     } catch (error) {
         console.log(error);
     }
@@ -41,13 +47,22 @@ const loadEditCategory = async (req, res) => {
 
 const editCategory = async (req, res) => {
     try {
-
-        const { newCatgName } = req.body
-        const categoryID = req.params.id
-        const category = await categoryModel.findById({ _id: categoryID });
-        category.categoryName = newCatgName
-        await category.save();
-        res.redirect("/admin/view-allcategory")
+        const { newCatgName, categoryID } = req.body
+        const categortData = await categoryModel.find({})
+        let existCateg;
+        categortData.forEach(c => {
+            if (c.categoryName.toLowerCase() === newCatgName.toLowerCase()) {
+                existCateg = true;
+            }
+        })
+        if (existCateg) {
+            res.status(404).json({ message: "Category Already Exists" })
+        } else {
+            const category = await categoryModel.findById({ _id: categoryID });
+            category.categoryName = newCatgName
+            await category.save();
+            res.status(200).json({ message: "Category Name has been updated successfully" })
+        }
     } catch (error) {
         console.log(error);
     }
@@ -77,6 +92,7 @@ const deleteCategory = async (req, res) => {
         const userData = await categoryModel.findById({ _id: id });
         if (userData) {
             await categoryModel.deleteOne({ _id: userData.id })
+            return res.status(200).json({ message: "Deleted Successfully" })
         }
         res.redirect("/admin/view-allcategory")
     } catch (error) {

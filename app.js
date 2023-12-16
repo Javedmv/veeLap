@@ -18,12 +18,6 @@ app.use(express.static('node_modules'));
 app.use(cookieParser());
 
 app.use(express.json());
-// app.use(session({
-//     secret: uuidv4(),
-//     resave: false,
-//     saveUninitialized: true
-// }))
-
 
 const adminRoute = require("./routers/adminRouter")
 const userRoute = require("./routers/userRouter")

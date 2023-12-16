@@ -166,6 +166,7 @@
                         >
                           invalid Otp
                         </div> -->
+                          <div id="timer"></div>
 
                           <div
                             class="d-flex align-items-center justify-content-around"
@@ -218,6 +219,7 @@
   </body>
 
   <script>
+    const Timer = document.getElementById("timer");
     document.addEventListener("DOMContentLoaded", function () {
       const submit = document.getElementById("submitBtn");
       const sendOtpBtn = document.getElementById("sendOtpBtn");
@@ -294,6 +296,7 @@
 
             console.log("Success:", data);
             if (data.message) {
+              startCountdown();
               Swal.fire({
                 title: "veeLap",
                 text: data.message,
@@ -302,10 +305,17 @@
                 timer: 3000,
                 timerProgressBar: true,
               });
-              setTimeout(() => {
+              setInterval(() => {
+                Timer.style.display = "none";
                 sendOtpBtn.style.display = "block";
                 sendOtpBtn.innerHTML = "Resent OTP";
-              }, 10000);
+                clearInterval();
+                setInterval(() => {
+                  sendOtpBtn.style.display = "none";
+                  console.log("inside is started");
+                  clearInterval();
+                }, 60000);
+              }, 60000);
             } else if (data.error) {
               Swal.fire({
                 title: "Hello!",
@@ -348,7 +358,6 @@
                 setTimeout(() => {
                   var intervalId = setInterval(() => {
                     console.log("exicuted");
-                    sendOtpBtn.style.display = "none";
                     verifyOtpBtn.style.display = "none";
                   }, 2000);
                 }, 1000);
@@ -369,12 +378,27 @@
       }
       submitBtn.addEventListener("click", () => {
         clearInterval(intervalId);
-        console.log("DOne");
+        console.log("Done");
       });
       setTimeout(() => {
         document.getElementById("set").style.display = "none";
       }, 10000);
     });
+
+    function startCountdown() {
+      let remainingTime = 58;
+
+      const countdown = setInterval(() => {
+        Timer.innerHTML = `Resent otp: ${remainingTime} seconds`;
+
+        remainingTime--;
+
+        if (remainingTime < 0) {
+          clearInterval(countdown);
+          console.log("Countdown completed!");
+        }
+      }, 1000);
+    }
 
     function usernameValidation(name) {
       const pattern = /^[a-zA-Z0-9_]+$/;
@@ -395,7 +419,7 @@
     }
 
     function phoneValidation(phone) {
-      const pattern = /^(\+?91)?[6-9]\d{9}$/;
+      const pattern = /^[0-9]{10}$/;
       return pattern.test(phone);
     }
 
@@ -444,17 +468,4 @@
   <!-- Template  JS -->
   <script src="/userassets/js/main.js"></script>
   <script src="/userassets/js/shop.js"></script>
-
-  <!-- Swal.fire({
-  title: "Hello!",
-  text: error,
-  icon: "error",
-  confirmButtonText: "Ok",
-  timer: 3000, // Set the timer to 3000 milliseconds (3 seconds)
-  timerProgressBar: true, // Show a progress bar during the timer duration
-}); -->
-  <!-- 
-Swal.fire({ title: "Hello!", text: error, icon: "error", confirmButtonText:
-"Ok", timer: 3000, // Set the timer to 3000 milliseconds (3 seconds)
-timerProgressBar: true, // Show a progress bar during the timer duration }); -->
 </html>

@@ -35,9 +35,9 @@ admin_Router.get("/", loadDashboard);
 admin_Router.get("/view-allcategory", loadCategory);
 admin_Router.post("/add-category", addCategory);
 admin_Router.get("/edit-category/:id", loadEditCategory);
-admin_Router.post("/post-edit-category/:id", editCategory);
+admin_Router.post("/post-edit-category", editCategory);
 admin_Router.get("/status-category", statusCategory);
-admin_Router.get("/delete-category/:id", deleteCategory);
+admin_Router.delete("/delete-category/:id", deleteCategory);
 
 // user Management
 admin_Router.get("/view-alluser", loadUser);
@@ -54,6 +54,7 @@ admin_Router.get("/edit-product/:id", loadEditProducts);
 admin_Router.get("/edit-delete-image", deleteSingleImage);
 admin_Router.get("/edit-add-image/:id", editAddImage);
 admin_Router.post("/edit-submit-product/:id", upload.array("productImages", 3), editSubmitProduct);
-admin_Router.get("/delete-product/:id", deleteProduct)
+admin_Router.get("/delete-product/:id", deleteProduct);
+
 
 module.exports = admin_Router

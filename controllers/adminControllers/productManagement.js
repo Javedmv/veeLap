@@ -1,7 +1,6 @@
 const productModel = require("../../models/productModel");
 const categoryModel = require("../../models/categoryModel")
 const upload = require("../../middleware/multer");
-const { path } = require("../../routers/adminRouter");
 const { json } = require("body-parser");
 const { default: mongoose } = require("mongoose");
 // const { ObjectId } = require("mongoose").Types;
