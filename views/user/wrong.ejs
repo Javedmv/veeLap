@@ -296,3 +296,81 @@
       console.error(error)
   }
 } -->
+
+<!-- 
+filter and sort 
+// pushing categories to filter to make it into an array
+const { sort, categories } = req.body
+let filter = [];
+let query
+let products;
+const loggedIn = req.cookies.loggedIn
+const userEmail = req.cookies.userEmail
+const category = await categoryModel.find({});
+if (sort === 'lowToHigh' & typeof categories == "string") {
+    console.log("lowtohigh");
+    products = await productModel.find({}).sort({ salesPrice: -1 });
+    return res.render("user/home", { loggedIn, userEmail, category, products })
+} else if (sort === 'highToLow' && typeof(categories) == "String") {
+    console.log("high to low");
+    products = await productModel.find({}).sort({ salesPrice: 1 });
+    return res.render("user/home", { loggedIn, userEmail, category, products })
+} else if (sort === 'popularity' && typeof categories == "String") {
+    console.log("popularity");
+    products = await productModel.find({});
+    return res.render("user/home", { loggedIn, userEmail, category, products });
+} else {
+    console.log("no sort");
+    products = null
+}
+filter.push(categories)
+console.log("before filter");
+if (filter.length >= 1) {
+    console.log("inside filter");
+    filter.flatMap(async (c, i) => {
+        console.log("inside filter loop",);
+        const result = await productModel.find({ category: c })
+        if (i == 0) {
+            filter = result
+        } else {
+            filter.push(result)
+        }
+    })
+} else {
+    filter = null
+}
+if (filter && query) {
+    await productModel.aggregate([{ $match: { category: { $in: filter } } }])
+} else if (filter) {
+    products = [...filter]
+} else if (query) {
+    products = [...query]
+} -->
+<% if(orderDetails.orderStatus === "Order Placed" || orderDetails.orderStatus
+=== "Shipped") {%>
+<a
+  href="#"
+  order-id="<%= orderDetails._id %>"
+  id="cancelButton"
+  class="btn btn-sm"
+  style="background-color: rgb(180, 36, 36)"
+  >Cancel Order</a
+>
+<%} else if(orderDetails.orderStatus === "Delivered") {%> <% if
+(orderDetails.expiryDate && new Date(orderDetails.expiryDate) >= new Date()) {
+%>
+<a
+  href="#"
+  order-id="<%= orderDetails._id %>"
+  id="returnButton"
+  class="btn btn-sm"
+  style="background-color: rgb(180, 36, 36)"
+  >Return</a
+>
+<% } else { %>
+<h5 class="mt-10" style="color: rgb(177, 29, 29)">Return Time Expired</h5>
+<% } %> <%} else if(orderDetails.orderStatus === "Cancelled") {%>
+<h5 style="color: rgb(177, 29, 29)">The order is Cancelled</h5>
+<%} else if (orderDetails.orderStatus === "Returned") {%>
+<h5 style="color: rgb(177, 29, 29)">The order is returned</h5>
+<%}%>

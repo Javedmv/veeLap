@@ -3,6 +3,7 @@ const categoryModel = require("../../models/categoryModel")
 const upload = require("../../middleware/multer");
 const { json } = require("body-parser");
 const { default: mongoose } = require("mongoose");
+const sharp = require("sharp");
 // const { ObjectId } = require("mongoose").Types;
 
 
@@ -23,14 +24,28 @@ const addProduct = async (req, res) => {
         if (req.files) {
             const prductImg = req.files
             let imageArr = [];
-            for (const elements of prductImg) {
-                const filePath = `/uploads/${elements.originalname}`;
-                imageArr.push({ path: filePath });
-                // console.log("image added");
-                // console.log(filePath + " -------- file path of image------");
+            for (let i = 0; i < prductImg.length; i++) {
+                const croppedImage = await sharp(prductImg[i].path)
+                    .resize({
+                        width: 750,
+                        height: 750,
+                        channels: 4,
+                        background: { r: 255, g: 0, b: 0, alpha: 0.5 }
+                    })
+                    .toBuffer()
+                const filename = `cropped_${prductImg[i].filename}`;
+                const filePath = `public/uploads/${filename}`;
+                await sharp(croppedImage).toFile(filePath);
+
+                imageArr.push({
+                    fileName: filename,
+                    originalname: prductImg[i].originalname,
+                    path: `/uploads/${filename}`,
+                });
             }
-            const imageId = imageArr.map((prductImg) => prductImg.path)
-            // console.log("------This is image id--------  " + imageId);
+
+
+
 
             await productModel.create({
                 brand: brand,
@@ -172,7 +187,7 @@ const deleteProduct = async (req, res) => {
             // Delete the product itself
             await productModel.deleteOne({ _id: product._id });
             // console.log(`Product with ID ${productId} and associated images deleted successfully.`);
-
+            return res.status(200).json({ message: "Deleted Successfully" })
         }
         res.redirect("/admin/view-all-products")
         // console.log("completeed");

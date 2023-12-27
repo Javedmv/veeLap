@@ -209,11 +209,11 @@ input:focus::-moz-placeholder {
 }
 
 a {
-  color: #01ade7;
+  color: #000000;
 }
 
 a:hover {
-  color: rgb(4, 48, 105);
+  color: #198754;
 }
 
 /*--- Common Classes---------------------*/

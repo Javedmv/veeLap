@@ -4,13 +4,20 @@ const userRouter = express();
 const { verifyUser, checkBlockedStatus } = require("../middleware/userAuth")
 
 const { loadLogin, loadSignup, loadHome, sendOtp, verifyOtp, submitSignup, userLogin,
-    userLogout, loadForgotPassword, sendOtpForgot, verifyForgotOtp, resetPassword
+    userLogout, loadForgotPassword, sendOtpForgot, verifyForgotOtp, resetPassword, editUserDetails
 } = require("../controllers/userControllers/userController")
 
-const { loadCart, addToCart } = require("../controllers/userControllers/cart")
+const { loadCart, addToCart, removeProductFromCart, clearAllCart, updateQuantity } = require("../controllers/userControllers/cart")
 
 const { productDetails } = require("../controllers/userControllers/product")
 
+const { filterAndSort } = require("../controllers/userControllers/filterAndSort")
+
+const { loadUserProfile, loadAddAddress, submitAddress, loadEditAddress, postEditAddress, deleteAddress, loadOrderDetails, cancelOrder } = require("../controllers/userControllers/profile")
+
+const { loadCheckout } = require("../controllers/userControllers/checkout")
+
+const { loadOrderSuccess, placeOrderCOD } = require("../controllers/userControllers/payment")
 // just rendering the pages
 userRouter.get("/login", loadLogin);
 userRouter.get("/signup", loadSignup);
@@ -36,6 +43,8 @@ userRouter.post("/login-home", userLogin)  // user account page
 // from product.js
 userRouter.get("/product-details/:id", productDetails)
 
+//filter and sort products
+userRouter.post("/filter-sort", filterAndSort)
 
 // added a middleware of authenticating token
 userRouter.use(verifyUser)
@@ -46,9 +55,25 @@ userRouter.use(checkBlockedStatus)
 // cart
 userRouter.get("/load-cart", loadCart)
 userRouter.post("/add-to-cart", addToCart)
+userRouter.get("/delete-cart", removeProductFromCart)
+userRouter.get("/clear-all-cart", clearAllCart)
+userRouter.post("/update-quantity", updateQuantity)
 
 
+//profile
+userRouter.get("/profile", loadUserProfile)
+userRouter.get("/add-address", loadAddAddress)
+userRouter.post("/submit-address", submitAddress)
+userRouter.get("/edit-address/:id", loadEditAddress)
+userRouter.post("/submit-edit-address/:id", postEditAddress)
+userRouter.get("/delete-single-address/:id", deleteAddress)
+userRouter.get("/order-status-details", loadOrderDetails)
+userRouter.post("/edit-user-details", editUserDetails)
+//checkout
+userRouter.get("/checkout", loadCheckout)
+userRouter.get("/order/success", loadOrderSuccess)
+userRouter.post("/placeorder/cod", placeOrderCOD)
 
 
-
+userRouter.get("/cancel-order/:id", cancelOrder)
 module.exports = userRouter

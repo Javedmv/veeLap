@@ -13,6 +13,7 @@ app.set("views", path.join(__dirname, "views"));
 
 // app.use(bodyParser)
 app.use(express.static("public"));
+// app.use(express.static("public/uploads"));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('node_modules'));
 app.use(cookieParser());

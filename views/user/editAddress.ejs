@@ -1,0 +1,164 @@
+<%-include("./partials/header.ejs")%>
+<style>
+  .bold-label {
+    font-weight: bold;
+    color: black;
+  }
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"] {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+</style>
+<div class="container mt-50 mb-50 col-lg-5">
+  <div class="card">
+    <div class="card-body">
+      <%for(const element of address.address){%>
+      <form method="post" action="/user/submit-edit-address/<%=element._id%>">
+        <div class="form-group">
+          <label for="AddressType" class="bold-label">Address Type :</label>
+          <input
+            type="text"
+            required=""
+            id="AddressType"
+            name="addressType"
+            placeholder="Home address/ Work address"
+            class="form-control"
+            value="<%=element.addressType%>"
+          />
+        </div>
+        <div class="form-group">
+          <label for="Name" class="bold-label">Name :</label>
+          <input
+            type="text"
+            required=""
+            id="Name"
+            name="name"
+            placeholder="House name,14/6865"
+            class="form-control"
+            value="<%=element.name%>"
+          />
+        </div>
+        <div class="form-group">
+          <label for="City" class="bold-label">City :</label>
+          <input
+            required=""
+            type="text"
+            id="City"
+            name="city"
+            placeholder="City"
+            value="<%=element.city%>"
+          />
+        </div>
+        <div class="form-group">
+          <label for="Landmark" class="bold-label">Landmark :</label>
+          <input
+            required=""
+            type="text"
+            id="Landmark"
+            name="landMark"
+            placeholder="Landmark"
+            class="form-control"
+            value="<%=element.landMark%>"
+          />
+        </div>
+        <div class="form-group">
+          <label for="State" class="bold-label">State :</label>
+          <input
+            required=""
+            type="text"
+            id="State"
+            name="state"
+            placeholder="State"
+            class="form-control"
+            value="<%=element.state%>"
+          />
+        </div>
+        <div class="form-group">
+          <label for="Pincode" class="bold-label">Pincode :</label>
+          <input
+            required=""
+            type="number"
+            id="Pincode"
+            name="pincode"
+            placeholder="Pincode"
+            class="form-control"
+            value="<%=element.pincode%>"
+          />
+        </div>
+        <div class="form-group">
+          <label for="Phone" class="bold-label">Phone :</label>
+          <input
+            required=""
+            type="number"
+            id="Phone"
+            name="phone"
+            placeholder="Phone Number"
+            class="form-control"
+            value="<%=element.phone%>"
+          />
+        </div>
+        <%}%>
+        <div class="d-flex justify-content-center">
+          <button type="submit" id="submitButton" class="btn btn-primary">
+            Submit
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    document
+      .getElementById("submitButton")
+      .addEventListener("click", function (event) {
+        if (!validateForm()) {
+          event.preventDefault();
+        }
+
+        function validateForm() {
+          let isValid = true;
+          const requiredField = [
+            "Phone",
+            "Pincode",
+            "State",
+            "Landmark",
+            "City",
+            "Name",
+            "AddressType",
+          ];
+          requiredField.forEach((field) => {
+            const input = document.getElementById(field);
+            if (input.value.trim() === "") {
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Enter all the fields!",
+              });
+              isValid = false;
+            }
+          });
+
+          // Additional validation for the Phone field
+          if (isValid) {
+            const phoneInput = document.getElementById("Phone");
+            const phoneValue = phoneInput.value;
+            if (phoneValue === "" || !/^\d{10}$/.test(phoneValue)) {
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Enter a valid 10-digit phone number!",
+              });
+              isValid = false;
+            }
+          }
+
+          return isValid;
+        }
+      });
+  });
+</script>
+
+<%-include("./partials/footer.ejs")%>

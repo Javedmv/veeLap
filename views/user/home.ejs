@@ -128,7 +128,7 @@
         <div class="container">
           <div class="row">
             <div class="col-lg-3">
-              <div class="widget-category mb-30">
+              <!-- <div class="widget-category mb-30">
                 <h5 class="section-title style-1 mb-30 wow fadeIn animated">
                   Brands
                 </h5>
@@ -137,23 +137,12 @@
                   <li><a href="shop-grid-right.html">ASUS</a></li>
                   <li><a href="shop-grid-right.html">Dell</a></li>
                   <li><a href="shop-grid-right.html">HP</a></li>
-                  <!-- <li><a href="shop-grid-right.html">Beauty</a></li> -->
-                  <!-- <li><a href="shop-grid-right.html">Jewelry & Watch</a></li> -->
-                  <!-- <li><a href="shop-grid-right.html">Accessories</a></li> -->
+                  <li><a href="shop-grid-right.html">Beauty</a></li>
+                  <li><a href="shop-grid-right.html">Jewelry & Watch</a></li>
+                  <li><a href="shop-grid-right.html">Accessories</a></li>
                 </ul>
-              </div>
-              <div class="widget-category mb-30">
-                <h5 class="section-title style-1 mb-30 wow fadeIn animated">
-                  Sort by
-                </h5>
-                <ul class="categories">
-                  <li><a href="shop-grid-right.html">Popularity</a></li>
-                  <!-- <li><a href="shop-grid-right.html">Average rating</a></li> -->
-                  <li><a href="shop-grid-right.html">Price: Low to High</a></li>
-                  <li><a href="shop-grid-right.html">Price: High to Low</a></li>
-                </ul>
-              </div>
-              <div class="widget-category mb-30">
+              </div> -->
+              <!-- <div class="widget-category mb-30">
                 <h5 class="section-title style-1 mb-30 wow fadeIn animated">
                   Price Range
                 </h5>
@@ -167,8 +156,8 @@
 
                 </ul>
 
-              </div>
-              <div class="widget-category mb-30">
+              </div> -->
+              <!-- <div class="widget-category mb-30">
                 <h5 class="section-title style-1 mb-30 wow fadeIn animated">
                   RAM SIZE
                 </h5>
@@ -177,23 +166,53 @@
                   <li><a href="shop-grid-right.html">4GB</a></li>
                   <li><a href="shop-grid-right.html">8GB</a></li>
                   <li><a href="shop-grid-right.html">16GB</a></li>
-                  <!-- <li><a href="shop-grid-right.html">80000-100000</a></li> -->
-                  <!-- <li><a href="shop-grid-right.html">100000-120000</a></li> -->
+                  <li><a href="shop-grid-right.html">80000-100000</a></li>
+                  <li><a href="shop-grid-right.html">100000-120000</a></li>
 
                 </ul>
-              </div>
-              <div class="widget-category mb-30">
-                <h5 class="section-title style-1 mb-30 wow fadeIn animated">
-                  Categories
-                </h5>
-                <ul class="categories">
-                  <li><a href="shop-grid-right.html">Gaming Laptop</a></li>
-                  <li><a href="shop-grid-right.html">Bussiness Laptop</a></li>
-                  <li><a href="shop-grid-right.html">Laptop</a></li>
-
-                </ul>
-              </div>
-            </div>
+              </div> -->
+              <form action="/user/filter-sort" method="post" class="row">
+                <div class="col-md-12">
+                  <div class="widget-category mb-30">
+                    <h5 class="section-title style-1 mb-30 wow fadeIn animated">
+                        Sort by
+                    </h5>
+                    <ul class="categories">
+                        <li class="form-check">
+                            <input type="radio" class="form-check-input " id="viewAll" value="viewAll" name="sort" >
+                            <label class="form-check-label" for="popularity">View All</label>
+                        </li>
+                        <li class="form-check">
+                            <input type="radio" class="form-check-input" id="lowToHigh" value="lowToHigh" name="sort">
+                            <label class="form-check-label" for="lowToHigh">Price: Low to High</label>
+                        </li>
+                        <li class="form-check">
+                            <input type="radio" class="form-check-input" id="highToLow" value="highToLow" name="sort">
+                            <label class="form-check-label" for="highToLow">Price: High to Low</label>
+                        </li>
+                    </ul>
+                </div>                
+                </div>
+                <div class="col-md-12">
+                    <div class="widget-category mb-30">
+                        <h5 class="section-title style-1 mb-30 wow fadeIn animated">
+                            Categories
+                        </h5>
+                        <ul class="categories">
+                            <% category.forEach((catgory) => { %>
+                                <li class="form-check">
+                                    <input type="checkbox" class="form-check-input " id="<%= catgory.categoryName%>" name="categories" value="<%= catgory._id%>">
+                                    <label class="form-check-label" for="<%= catgory.categoryName%>"><%= catgory.categoryName%></label>
+                                </li>
+                            <% }) %>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-12 d-flex align-items-center justify-content-center mt--30">
+                    <button type="submit" class="btn btn-primary APPLYFILTER">Apply Filter</button>
+                </div>
+            </form>
+          </div>
             <div class="col-lg-9">
               <div class="tab-content wow fadeIn animated" id="myTabContent">
                 <div
@@ -203,8 +222,9 @@
                   aria-labelledby="tab-one"
                 >
  <!--BODY PRODUCT START  -->
+          <%if(products.length > 0){%>
                   <div class="row product-grid-4">
-                    <% products.reverse().forEach((e)=>{ %>
+                    <% products.forEach((e)=>{ %>
                     <div class="col-lg-4 col-md-4 col-12 col-sm-6">
                       <div class="product-cart-wrap mb-30">
 <!-- ejs starts -->
@@ -216,12 +236,12 @@
                               <img
                                 class="default-img"
                                 src="<%= e.images[0].path %>"
-                                alt=""
+                                alt="image"
                               />
                               <img
                                 class="hover-img"
                                 src="<%= e.images[1]?.path %>"
-                                alt=""
+                                alt="image"
                               />
                             </a>
                             <% } else { %>
@@ -264,7 +284,7 @@
                             <button
                               aria-label="Add To Cart"
                               class="action-btn hover-up CART"
-                              href=""
+                              type="button"
                               prdctId = "<%= e._id %>"
                               ><i class="fi-rs-shopping-bag-add"></i
                             ></button>
@@ -277,6 +297,15 @@
                     <% }) %>
    <!--End product-grid-4-->
                 </div>
+                <%}else{%>
+                  <div class="container">
+                    <div class="text-danger d-flex align-items-center justify-content-center bg-secondary text-light p-4">
+                      <div class="bg-white p-10">
+                       <h4 class="text-danger"> Sorry No Product Found</h4>
+                      </div>
+                    </div>
+                  </div>
+                  <% } %>
             </div>
           </div>
         </div>
@@ -284,69 +313,67 @@
 
     </main>
     <script>
-      document.addEventListener("DOMContentLoaded",async (event)=>{
-
-        const addToCartBtn = document.querySelectorAll(".CART")
-        addToCartBtn.forEach(element => {
-
-          element.addEventListener("click",async (event) => {
+      document.addEventListener("DOMContentLoaded", async (event) => {
+        const addToCartBtn = document.querySelectorAll(".CART");
+        addToCartBtn.forEach((element) => {
+          element.addEventListener("click", async (event) => {
             event.preventDefault();
-            const productId = element.getAttribute("prdctId")
-           
-                await axios({
-                method:"post",
-                url:"/user/add-to-cart",
-                data:{
-                productId : productId,
-                }
+            const productId = element.getAttribute("prdctId");
+      
+            try {
+              const response = await axios.post("/user/add-to-cart", {
+                productId: productId,
               })
-              .then((Response) => {
-                return Response.json();
-              })
-              .then((data) => {
-              console.log("this is response message");
-                console.log(data.message)
-                console.log("response message ends");
-              if(data.message){
-                  Swal.fire({
-                    title: data.message,
-                    icon: "success",
-                    showConfirmButton: false,
-                    timer: 2000,
-                    timerProgressBar: true,
-                  });
-                }else{
-                  console.log("this is response.error");
-                  console.log(data.error)
-                  console.log("response error ends");
-                  Swal.fire({
-                    title: "Please login for explore VeeLap.",
-                    text: data.error,
-                    icon: "error",
-                    confirmButtonText: "Ok",
-                    timer: 2000,
-                    timerProgressBar: true,
-                  });
-                }
-              })
-              .catch((error)=>{
-                console.log("this is catch error");
-                console.log(error);
-                console.log("this is catch error ends");
+      
+              const data = response.data;
+      
+              console.log("This is response message");
+              console.log(data.message);
+              console.log("Response message ends");
+      
+              if (data.message) {
                 Swal.fire({
-                  title: "Sorry!",
-                  text: error,
+                  title: data.message,
+                  icon: "success",
+                  showConfirmButton: false,
+                  timer: 2000,
+                  timerProgressBar: true,
+                });
+              }else if(data.productExsist){
+                setTimeout(()=>{
+                  window.location.href="/user/load-cart"                  
+                })
+              } else {
+                console.log("This is response.error");
+                console.log(data.error);
+                console.log("Response error ends");
+      
+                Swal.fire({
+                  title: data.error,
+                  text: "Sorry",
                   icon: "error",
                   confirmButtonText: "Ok",
                   timer: 2000,
                   timerProgressBar: true,
-                  });
-              })
-
-          })
-          
+                });
+              }
+            } catch (error) {
+              console.log("This is catch error");
+              console.log(error);
+              console.log("This is catch error ends");
+      
+              Swal.fire({
+                title: "Sorry!",
+                text: "An error occurred.",
+                icon: "error",
+                confirmButtonText: "Ok",
+                timer: 2000,
+                timerProgressBar: true,
+              });
+            }
+          });
         });
-
-        });
-    </script>
+      });
+      </script>
+      
 <%-include("./partials/footer.ejs")%>

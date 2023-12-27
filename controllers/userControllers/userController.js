@@ -287,6 +287,23 @@ const resetPassword = async (req, res) => {
     }
 }
 
+const editUserDetails = async (req, res) => {
+    try {
+        const { newPhoneNumber, newEmail, newUserName } = req.body
+        const userData = await userModel.findOne({ email: req.user });
+        if (newEmail != userData.email) {
+
+        } else {
+            await userModel.updateOne({ email: req.user }, { $set: { phoneNumber: newPhoneNumber, userName: newUserName } })
+            return res.redirect("/user/profile")
+        }
+        res.redirect("/user/logout")
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 module.exports = {
     loadLogin,
     loadSignup,
@@ -299,7 +316,8 @@ module.exports = {
     loadForgotPassword,
     sendOtpForgot,
     verifyForgotOtp,
-    resetPassword
+    resetPassword,
+    editUserDetails
 };
 
 
