@@ -15,11 +15,10 @@ const userStatus = async (req, res) => {
         let userData = await userModel.findById({ _id: Id })
         if (userData.status === 'Active') {
             userData.status = "Inactive"
-            await userData.save()
         } else {
             userData.status = "Active"
-            await userData.save()
         }
+        await userData.save()
         res.redirect("/admin/view-alluser")
     } catch (error) {
         console.log(error);

@@ -34,6 +34,7 @@ const filterAndSort = async (req, res) => {
             }, { $sort: { salesPrice: sort ? sort : 1 } }])
             return sortedFilter
         }
+
         // console.log(products);
         const category = await categoryModel.find({})
         res.render("user/home", { userEmail, loggedIn, products, category });
@@ -42,9 +43,46 @@ const filterAndSort = async (req, res) => {
     }
 }
 
+const searchProduct = async (req, res) => {
+    try {
+        const search = req.query.search;
+        const userEmail = req.cookies.userEmail;
+        const loggedIn = req.cookies.loggedIn;
+        let category = await categoryModel.find({});
+        let products = await productModel.find({});
+        let regexPattern;
+
+        if (search) {
+            regexPattern = new RegExp(search, "i");
+
+            products = await productModel.find({
+                $or: [
+                    { productName: { $regex: regexPattern } },
+                    { brand: { $regex: regexPattern } },
+                    {
+                        category: {
+                            $in: await categoryModel
+                                .find({ categoryName: { $regex: regexPattern } })
+                                .select('_id'),
+                        },
+                    },
+                ],
+            });
+        }
+
+
+        res.render("user/home", { userEmail, loggedIn, products, category });
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+
+
 
 module.exports = {
-    filterAndSort
+    filterAndSort,
+    searchProduct
 }
 
 // const filterAndSort = async (req, res) => {

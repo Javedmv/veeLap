@@ -11,13 +11,13 @@ const { loadCart, addToCart, removeProductFromCart, clearAllCart, updateQuantity
 
 const { productDetails } = require("../controllers/userControllers/product")
 
-const { filterAndSort } = require("../controllers/userControllers/filterAndSort")
+const { filterAndSort, searchProduct } = require("../controllers/userControllers/filterAndSort")
 
-const { loadUserProfile, loadAddAddress, submitAddress, loadEditAddress, postEditAddress, deleteAddress, loadOrderDetails, cancelOrder } = require("../controllers/userControllers/profile")
+const { loadUserProfile, loadAddAddress, submitAddress, loadEditAddress, postEditAddress, deleteAddress, loadOrderDetails, cancelOrder, returnOrder } = require("../controllers/userControllers/profile")
 
-const { loadCheckout } = require("../controllers/userControllers/checkout")
+const { loadCheckout, applyCoupon } = require("../controllers/userControllers/checkout")
 
-const { loadOrderSuccess, placeOrderCOD } = require("../controllers/userControllers/payment")
+const { loadOrderSuccess, placeOrderCOD, walletPayment, paymentRazorpay, updatePaymentStatus } = require("../controllers/userControllers/payment")
 // just rendering the pages
 userRouter.get("/login", loadLogin);
 userRouter.get("/signup", loadSignup);
@@ -73,7 +73,14 @@ userRouter.post("/edit-user-details", editUserDetails)
 userRouter.get("/checkout", loadCheckout)
 userRouter.get("/order/success", loadOrderSuccess)
 userRouter.post("/placeorder/cod", placeOrderCOD)
+userRouter.get("/applycoupon", applyCoupon)
+userRouter.post("/pay-wallet", walletPayment)
+userRouter.post("/pay-razorpay", paymentRazorpay)
+userRouter.post("/update-payment-status", updatePaymentStatus)
 
-
+//order
 userRouter.get("/cancel-order/:id", cancelOrder)
+userRouter.get("/return-order/:id", returnOrder)
+userRouter.get("/search", searchProduct)
+
 module.exports = userRouter

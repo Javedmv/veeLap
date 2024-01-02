@@ -128,7 +128,7 @@
             </a>
           </li>
           <li class="menu-item">
-            <a class="menu-link" href="/admin/view-allcategory">
+            <a class="menu-link" href="/admin/coupon-management">
               <i class="icon material-icons md-local_offer"></i>
               <span class="text">Coupon Management </span>
             </a>
@@ -319,7 +319,7 @@
                     <td class="text-center">₹<%=order.totalAmount%></td>
                     <td class="text-center">
                       <span
-                        class="badge rounded-pill alert-<%= order.orderStatus === 'Order Placed' ? 'dark' : order.orderStatus === 'Shipped' ? 'warning' : order.orderStatus === 'Delivered' ? 'success' : order.orderStatus === 'Cancelled' ? 'danger' : order.orderStatus === 'Returned'? 'secondary' : '' %>"
+                        class="badge rounded-pill alert-<%= order.orderStatus === 'Order Placed' ? 'danger' : order.orderStatus === 'Shipped' ? 'warning' : order.orderStatus === 'Delivered' ? 'success' : order.orderStatus === 'Cancelled' ? 'danger' : order.orderStatus === 'Returned'? 'secondary' : order.orderStatus ==='Order Failed'?'dark':'' %>"
                         ><%=order.orderStatus%>
                       </span>
                     </td>

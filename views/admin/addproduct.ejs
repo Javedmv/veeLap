@@ -128,7 +128,7 @@
             </a>
           </li>
           <li class="menu-item">
-            <a class="menu-link" href="/admin/view-allcategory">
+            <a class="menu-link" href="/admin/coupon-management">
               <i class="icon material-icons md-local_offer"></i>
               <span class="text">Coupon Management </span>
             </a>
@@ -713,15 +713,34 @@
         // Images
 
         if (!images || images.length < 2) {
-          errors["images"] = "At least two image is required.";
+          errors["images"] = "At least two image files are required.";
           document.getElementById("imagesError").textContent = errors["images"];
         } else {
-          clearErrorMessages();
+          // Validate file types
+          const allowedExtensions = ["jpg", "jpeg", "png"];
+          let allFilesValid = true;
+
+          for (let i = 0; i < images.length; i++) {
+            const file = images[i];
+            const fileExtension = file.name.split(".").pop().toLowerCase();
+
+            if (!allowedExtensions.includes(fileExtension)) {
+              allFilesValid = false;
+              break;
+            }
+          }
+
+          if (!allFilesValid) {
+            errors["images"] = "Only JPG, JPEG, and PNG images are allowed.";
+            document.getElementById("imagesError").textContent =
+              errors["images"];
+          } else {
+            clearErrorMessages();
+          }
         }
 
         return errors;
       }
-
       const form = document.getElementById("productForm");
       form.addEventListener("submit", (event) => {
         const errors = validateForm();
@@ -753,11 +772,30 @@
             const reader = new FileReader();
 
             reader.onload = function (e) {
+              const imgContainer = document.createElement("div");
+              imgContainer.classList.add(
+                "image-container",
+                "d-flex",
+                "flex-column",
+                "align-items-center"
+              );
+
               const img = document.createElement("img");
               img.src = e.target.result;
               img.style.maxWidth = "100%";
               img.style.maxHeight = "200px";
-              preview.appendChild(img);
+              imgContainer.appendChild(img);
+
+              const deleteButton = document.createElement("button");
+              deleteButton.innerHTML = "Delete";
+              deleteButton.classList.add("btn", "btn-danger", "mt-2"); // Add "mt-2" for top margin
+              deleteButton.addEventListener("click", function () {
+                // Remove the image container when the delete button is clicked
+                imgContainer.remove();
+              });
+
+              imgContainer.appendChild(deleteButton);
+              preview.appendChild(imgContainer);
             };
 
             reader.readAsDataURL(file);

@@ -295,7 +295,7 @@
                       
                     </div>
                     <% }) %>
-   <!--End product-grid-4-->
+                <!--End product-grid-4-->
                 </div>
                 <%}else{%>
                   <div class="container">
@@ -324,13 +324,7 @@
               const response = await axios.post("/user/add-to-cart", {
                 productId: productId,
               })
-      
               const data = response.data;
-      
-              console.log("This is response message");
-              console.log(data.message);
-              console.log("Response message ends");
-      
               if (data.message) {
                 Swal.fire({
                   title: data.message,
@@ -341,13 +335,9 @@
                 });
               }else if(data.productExsist){
                 setTimeout(()=>{
-                  window.location.href="/user/load-cart"                  
+                  window.location.href=`/user/load-cart?quantity=${data.quantity}&productId=${data.productId}`
                 })
               } else {
-                console.log("This is response.error");
-                console.log(data.error);
-                console.log("Response error ends");
-      
                 Swal.fire({
                   title: data.error,
                   text: "Sorry",
@@ -358,10 +348,6 @@
                 });
               }
             } catch (error) {
-              console.log("This is catch error");
-              console.log(error);
-              console.log("This is catch error ends");
-      
               Swal.fire({
                 title: "Sorry!",
                 text: "An error occurred.",

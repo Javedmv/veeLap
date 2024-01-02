@@ -5,7 +5,8 @@ const jwt = require("jsonwebtoken")
 const jwtKey = require("../../config/jwt");
 const productModel = require("../../models/productModel");
 const categoryModel = require("../../models/categoryModel");
-const Swal = require('sweetalert2')
+const Swal = require('sweetalert2');
+const walletModel = require("../../models/walletModel");
 
 
 const otpGenerator = {
@@ -35,7 +36,6 @@ const loadLogin = async (req, res) => {
 //get route for usersignup page
 const loadSignup = async (req, res) => {
     try {
-
         res.render("user/signup", { error: null });
     } catch (error) {
         console.log(error.message);
@@ -149,6 +149,10 @@ const submitSignup = async (req, res) => {
                 phoneNumber: phoneNumber,
                 password: password,
             });
+            const newUser = await userModel.findOne({ email: email })
+            await walletModel.create({
+                userId: newUser._id
+            })
             res.render("user/login", {
                 message: "User sign up successfully",
                 error: null,

@@ -330,7 +330,7 @@
                         </td>
                         <td class="text-center">
                           <span
-                            class="badge rounded-pill alert-<%= orderDetails.orderStatus === 'Order Placed' ? 'dark' : orderDetails.orderStatus === 'Shipped' ? 'warning' : orderDetails.orderStatus === 'Delivered' ? 'success' : orderDetails.orderStatus === 'Cancelled' ? 'danger' : orderDetails.orderStatus === 'Returned'? 'secondary' : '' %>"
+                            class="badge rounded-pill alert-<%= orderDetails.orderStatus === 'Order Placed' ? 'info' : orderDetails.orderStatus === 'Shipped' ? 'warning' : orderDetails.orderStatus === 'Delivered' ? 'success' : orderDetails.orderStatus === 'Cancelled' ? 'danger' : orderDetails.orderStatus === 'Returned'? 'secondary' : orderDetails.orderStatus === 'Order Failed'? 'dark' : '' %>"
                           >
                             <%= orderDetails.orderStatus %>
                           </span>
@@ -346,8 +346,7 @@
                           <%= orderDetails.paymentMethod %>
                         </td>
                         <td class="text-center">
-                          ₹<%= item.price * item.quantity %> for <%=
-                          item.quantity%> item
+                          ₹<%= item.price %> for <%= item.quantity%> item
                         </td>
                       </tr>
 
@@ -364,15 +363,31 @@
                   </div>
 
                   <div class="d-flex justify-content-center align-items-center">
-                    <div class="mx-3">
-                      <%console.log( orderDetails._id)%>
-                      <a
-                        href="/user/cancel-order/<%= orderDetails._id%>"
-                        class="btn btn-sm"
-                        style="background-color: #e10f0f; border: #e10f0f"
-                        >Cancel Order</a
-                      >
-                    </div>
+                    <%if(orderDetails.orderStatus !== "Cancelled" &&
+                    orderDetails.orderStatus !== "Returned" ){%>
+
+                    <span>
+                      <%if(orderDetails.orderStatus == "Delivered"){%>
+                      <div class="mx-3">
+                        <a
+                          href="/user/return-order/<%= orderDetails._id%>"
+                          class="btn btn-sm"
+                          style="background-color: #e10f0f; border: #e10f0f"
+                          >Return Order</a
+                        >
+                      </div>
+                      <%}else{%>
+                      <div class="mx-3">
+                        <a
+                          href="/user/cancel-order/<%= orderDetails._id%>"
+                          class="btn btn-sm"
+                          style="background-color: #e10f0f; border: #e10f0f"
+                          >Cancel Order</a
+                        >
+                      </div>
+                      <%}%>
+                    </span>
+                    <%}%>
 
                     <div class="mx-3">
                       <a href="/user/" class="btn btn-sm">Continue Shopping</a>

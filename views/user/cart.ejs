@@ -505,7 +505,6 @@
               event.preventDefault()
               let newQuantity = parseInt(qtyValue.textContent,10) + 1;
               qtyValue.textContent = newQuantity
-              console.log(newQuantity);
               await fetch("/user/update-quantity",{
                 method:"POST",
                 headers:{

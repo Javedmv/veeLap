@@ -6,15 +6,29 @@ const productModel = require("../../models/productModel");
 const loadCart = async (req, res) => {
     try {
         const loggedIn = req.cookies.loggedIn
+        const userEmail = req.cookies.userEmail
+        const userData = await userModel.findOne({ email: userEmail })
+        let products = await cartModel.findOne({ userId: userData._id })
+            .populate({
+                path: 'products.productId', model: 'Product'
+            })
+            .exec()
+
+
         if (loggedIn) {
-            const userEmail = req.cookies.userEmail
-            const userData = await userModel.findOne({ email: userEmail })
-            const products = await cartModel.findOne({ userId: userData._id })
-                .populate({
-                    path: 'products.productId', model: 'Product'
-                })//  the field is named 'category' in your products schema
-                .exec()
-            // console.log(products);1``1111111111`
+            if (req.query.quantity && req.query.productId) {
+                const newQuantity = req.query.quantity
+                console.log(newQuantity);
+                const queryPrductId = req.query.productId
+                for (let i = 0; i < products.products.length; i++) {
+                    const product = products.products[i];
+                    const productIds = product.productId._id;
+                    if (queryPrductId == productIds) {
+                        product.quantity = newQuantity
+                    }
+                }
+
+            }
             let grandTotal = 0;
 
             for (let i = 0; i < products.products.length; i++) {
@@ -36,7 +50,6 @@ const addToCart = async (req, res) => {
             const userData = await userModel.findOne({ email: user });
             const userId = userData._id;
             let product = await productModel.findOne({ _id: productId });
-
             if (product.stock <= 0) {
                 return res.status(200).json({ error: "product is out of stock" });
             } else {
@@ -52,13 +65,11 @@ const addToCart = async (req, res) => {
                     if (existingProductIndex !== -1) {
                         let productItem = userCart.products[existingProductIndex];
                         productItem.quantity += 1;
-                        console.log("again added to cart okay");
-                        return res.status(200).json({ productExsist: true })
+                        await userCart.save()
+                        return res.status(200).json({ productExsist: true, quantity: productItem.quantity, productId: productItem.productId })
                     } else {
                         userCart.products.push({ productId: product._id, quantity: 1 });
-                        console.log("first time");
                     }
-                    // save the changes to the database
                     await userCart.save();
                 } else {
                     await cartModel.create({

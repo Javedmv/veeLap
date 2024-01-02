@@ -2,18 +2,20 @@ const addressModel = require("../../models/addressModel");
 const orderModel = require("../../models/orderModel");
 const productModel = require("../../models/productModel");
 const userModel = require("../../models/userModel");
+const walletModel = require("../../models/walletModel")
 
 const loadUserProfile = async (req, res) => {
     try {
         const loggedIn = req.cookies.loggedIn
         const user = await userModel.findOne({ email: req.user })
         const address = await addressModel.findOne({ userId: user._id })
+        const wallet = await walletModel.findOne({ userId: user._id })
         const orders = await orderModel.find({ userId: user._id })
             .populate({
                 path: "products.productId",
                 model: "Product"
             }).exec()
-        res.render("user/userProfile", { loggedIn, user, address, orders })
+        res.render("user/userProfile", { loggedIn, user, address, orders, wallet })
     } catch (error) {
         console.log(error);
     }
@@ -35,7 +37,6 @@ const loadAddAddress = async (req, res) => {
 const submitAddress = async (req, res) => {
     try {
         const { phone, pincode, state, landMark, city, name, addressType } = req.body
-        console.log(req.body);
         const { isCheckout } = req.query
         const user = await userModel.findOne({ email: req.user }, { _id: 1 })
         const userAddress = await addressModel.findOne({ userId: user })
@@ -93,8 +94,6 @@ const postEditAddress = async (req, res) => {
         const { addressType, name, city, landMark, state, pincode, phone } = req.body
         const addressId = req.params.id
         const currAddress = await addressModel.findOne({ "address._id": addressId })
-        console.log(addressId);
-        console.log(currAddress);
         if (currAddress && currAddress.address) {
             const matchingAddress = currAddress.address.find(
                 (item) => item._id == addressId
@@ -147,8 +146,7 @@ const loadOrderDetails = async (req, res) => {
                 path: "products.productId",
                 model: "Product"
             })
-        console.log(orderDetails);
-        console.log(orderRefId);
+
         res.render("user/orderDetails", { loggedIn, orderDetails })
     } catch (error) {
         console.log(error);
@@ -161,18 +159,43 @@ const cancelOrder = async (req, res) => {
         const userData = await userModel.findOne({ email: req.user })
         const userOrder = await orderModel.findOne({ userId: userData._id })
         let cancelledOrder = await orderModel.findOne({ _id: orderId })
-        console.log(cancelledOrder);
         await orderModel.updateOne({ _id: orderId }, { $set: { orderStatus: "Cancelled" } })
         for (const item of cancelledOrder.products) {
             await productModel.updateOne({ _id: item.productId }, {
                 $inc: { stock: item.quantity }
             })
         }
+
+        if (cancelledOrder.paymentStatus == "Success") {
+            const wallet = await walletModel.updateOne({ userId: userData._id }, { $inc: { balance: cancelledOrder.totalAmount } })
+        }
+        cancelledOrder.save()
         res.redirect(`/user/order-status-details?orderRefId=${cancelledOrder.referenceId}`)
     } catch (error) {
         console.log(error);
     }
 }
+const returnOrder = async (req, res) => {
+    try {
+        const orderId = req.params.id
+        const userData = await userModel.findOne({ email: req.user })
+        const userOrder = await orderModel.findOne({ userId: userData._id })
+        const returnedOrder = await orderModel.findOne({ _id: orderId })
+        await orderModel.updateOne({ _id: orderId }, { $set: { orderStatus: "Returned" } })
+        for (const item of returnedOrder.products) {
+            await productModel.updateOne({ _id: item.productId }, {
+                $inc: { stock: item.quantity }
+            })
+        }
+        if (returnedOrder.paymentStatus == "Success") {
+            const wallet = await walletModel.updateOne({ userId: userData._id }, { $inc: { balance: returnedOrder.totalAmount } })
+        }
+        res.redirect(`/user/order-status-details?orderRefId=${returnedOrder.referenceId}`)
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 
 module.exports = {
     loadUserProfile,
@@ -182,5 +205,6 @@ module.exports = {
     postEditAddress,
     deleteAddress,
     loadOrderDetails,
-    cancelOrder
+    cancelOrder,
+    returnOrder
 }

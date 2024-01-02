@@ -382,6 +382,18 @@
                         >
                       </li>
                       <li class="nav-item">
+                        <a
+                          class="nav-link"
+                          id="wallet"
+                          data-bs-toggle="tab"
+                          href="#wallet-details"
+                          role="tab"
+                          aria-controls="wallet"
+                          aria-selected="true"
+                          ><i class="fi-rs-user mr-10"></i>Wallet</a
+                        >
+                      </li>
+                      <li class="nav-item">
                         <a class="nav-link" href="/user/logout"
                           ><i class="fi-rs-sign-out mr-10"></i>Logout</a
                         >
@@ -455,7 +467,7 @@
                                         <td><%= order.orderDate.toLocaleDateString() %></td>
                                         <% if (productInnerIndex === 0) { %>
                                         <td class="text-center"  rowspan="<%= order.products.length %>">
-                                          <span class="badge rounded-pill alert-<%= order.orderStatus === 'Order Placed' ? 'dark' : order.orderStatus === 'Shipped' ? 'warning' : order.orderStatus === 'Delivered' ? 'success' : order.orderStatus === 'Cancelled' ? 'danger' : order.orderStatus === 'Returned'? 'secondary' : '' %>">
+                                          <span class="badge rounded-pill alert-<%= order.orderStatus === 'Order Placed' ? 'info' : order.orderStatus === 'Shipped' ? 'warning' : order.orderStatus === 'Delivered' ? 'success' : order.orderStatus === 'Cancelled' ? 'danger' : order.orderStatus === 'Returned'? 'secondary' : order.orderStatus === 'Order Failed'? 'dark' : '' %>">
                                             <%=order.orderStatus%>
                                           </span>
                                         </td>
@@ -471,8 +483,6 @@
                                   <% }); %>
                                 <% } %>
                               </tbody>
-                              
-                              
                             </table>
                           </div>
                         </div>
@@ -495,6 +505,7 @@
                     >
                     
                     <div class="row">
+                      <%if(address){%>
                     <% address.address.forEach((add,index) => {%>
                         <div class="col-lg-6 d-block align-items-spacebetween justify-content-spacebetween ">
                           <div class="card mb-3 mb-lg-0 "<% if (index === 2) { %>style="margin-top: 20px;"<% } %>>
@@ -519,6 +530,15 @@
                           </div>
                         </div>
                         <%  }) %>
+                        <%}else{%>
+                          <div class="container">
+                            <div class="text-danger d-flex align-items-center justify-content-center bg-secondary text-light p-4">
+                              <div class="bg-white p-10">
+                               <h4 class="text-danger"> Sorry no address found</h4>
+                              </div>
+                            </div>
+                          </div>
+                          <%}%>
                         
                         <div class="d-flex align-items-center justify-content-end mt-20">
                           <a href="/user/add-address" class="btn sm-btn">
@@ -574,21 +594,32 @@
                                       <button type="submit" class="btn btn-primary btn-sm edit-user-save">Save Changes</button>
                                     </div>
                                 </form>
+                              </div>
                             </div>
                           </div>
+                        </div> 
+                        <div class="tab-pane fade" id="wallet-details" role="tabpanel" aria-labelledby="wallet-details">
+                          <div id="walletDetails">
+                            <div class="card col-lg-5 mx-auto">
+                              <div class="card-header text-center">
+                                  <h5 class="d-block align-items-center">Wallet</h5>
+                                </div>
+                                <div class="card-body">
+                                  <div class="" style="font-size: large;">Balance: ₹<span><%=wallet.balance%>  </span></div>
+                                  <div>
+                                 <p>your wallet balance will be redeemed on your next order</p>
+                            </div>
+                                </div>
+                              </div>
+                          </div>
+                      </div>
                     </div>
-                    
-                    
-                      
-                    </div> 
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-    </main>
+          </section>
+        </main>
     <script>
       document.addEventListener("DOMContentLoaded",function(){
         document.getElementById("editAccountBtn").addEventListener("click",function(){

@@ -1,5 +1,6 @@
 ﻿<%-include("./partials/header.ejs")%>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <body>
   <div class="mobile-header-active mobile-header-wrapper-style">
@@ -303,106 +304,6 @@
     <section class="mt-50 mb-50">
       <div class="container">
         <div class="row">
-          <div class="col-lg-6 mb-sm-15">
-            <div class="toggle_info">
-              <span
-                ><i class="fi-rs-user mr-10"></i
-                ><span class="text-muted">Already have an account?</span>
-                <a
-                  href="#loginform"
-                  data-bs-toggle="collapse"
-                  class="collapsed"
-                  aria-expanded="false"
-                  >Click here to login</a
-                ></span
-              >
-            </div>
-            <div class="panel-collapse collapse login_form" id="loginform">
-              <div class="panel-body">
-                <p class="mb-30 font-sm">
-                  If you have shopped with us before, please enter your details
-                  below. If you are a new customer, please proceed to the
-                  Billing &amp; Shipping section.
-                </p>
-                <form method="post">
-                  <div class="form-group">
-                    <input
-                      type="text"
-                      name="email"
-                      placeholder="Username Or Email"
-                    />
-                  </div>
-                  <div class="form-group">
-                    <input
-                      type="password"
-                      name="password"
-                      placeholder="Password"
-                    />
-                  </div>
-                  <div class="login_footer form-group">
-                    <div class="chek-form">
-                      <div class="custome-checkbox">
-                        <input
-                          class="form-check-input"
-                          type="checkbox"
-                          name="checkbox"
-                          id="remember"
-                          value=""
-                        />
-                        <label class="form-check-label" for="remember"
-                          ><span>Remember me</span></label
-                        >
-                      </div>
-                    </div>
-                    <a href="#">Forgot password?</a>
-                  </div>
-                  <div class="form-group">
-                    <button class="btn btn-md" name="login">Log in</button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-          <!-- coupon -->
-          <div class="col-lg-6">
-            <div class="toggle_info">
-              <span
-                ><i class="fi-rs-label mr-10"></i
-                ><span class="text-muted">Have a coupon?</span>
-                <a
-                  href="#coupon"
-                  data-bs-toggle="collapse"
-                  class="collapsed"
-                  aria-expanded="false"
-                  >Click here to enter your code</a
-                ></span
-              >
-            </div>
-            <div class="panel-collapse collapse coupon_form" id="coupon">
-              <div class="panel-body">
-                <p class="mb-30 font-sm">
-                  If you have a coupon code, please apply it below.
-                </p>
-                <form method="post">
-                  <div class="form-group">
-                    <input type="text" placeholder="Enter Coupon Code..." />
-                  </div>
-                  <div class="form-group">
-                    <button class="btn btn-md" name="login">
-                      Apply Coupon
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-12">
-            <div class="divider mt-10 mb-10"></div>
-          </div>
-        </div>
-        <div class="row">
           <div class="col-lg-4">
             <div
               class="mt-5 mb-15 d-flex align-items-center justify-content-between"
@@ -423,19 +324,13 @@
             <div class="col-lg-10 ml-30">
               <% if (userAddress) { %> <%
               userAddress.address.forEach((address,index)=> { %>
-              <%console.log("-------------------------------------")%>
-              <%console.log(address.name)%>
               <div
                 class="card mb-3 mb-lg-0 mt-20 col-12 <%= (index % 2 == 1) ? '' : '' %>"
               >
                 <div class="card-header">
-                  <input
-                    type="radio"
-                    name="address"
-                    id="<%= address._id %>"
-                    style="height: 1rem"
-                    value="<%= address._id %>"
-                    class="selected-address"
+                  <input type="radio" name="address" id="<%= address._id %>"
+                  style="height: 1rem" value="<%= address._id %>"
+                  class="selected-address" <%= (index === 0) ? 'checked' : '' %>
                   />
                   <h5 class="mb-0 d-flex align-items-center">
                     <%= address.addressType %>
@@ -509,26 +404,43 @@
                       </td>
                     </tr>
                     <% }); } %>
-
                     <tr>
+                      <th colspan="2">SubTotal</th>
+                      <td class="product-grandTotal-td" colspan="2">
+                        <span>₹</span>
+                        <span class="sub-total" id="SUBTOTAL">
+                          <%= grandTotal %>
+                        </span>
+                      </td>
+                    </tr>
+                    <tr id="couponRow">
                       <th colspan="2">Shipping</th>
                       <td colspan="2"><em>Free Shipping</em></td>
                     </tr>
                     <tr>
                       <th colspan="2">Total</th>
                       <td colspan="2" class="product-subtotal">
-                        <span class="font-xl text-brand fw-900 grandTotal"
-                          >₹<%= grandTotal%></span
+                        <span class="font-xl text-brand fw-900">₹</span>
+                        <span
+                          class="font-xl text-brand fw-900 grandTotal"
+                          id="GRANDTOTAL"
+                          ><%= grandTotal%></span
                         >
                       </td>
                     </tr>
+                    <%#
+                    <tr>
+                      <th colspan="2">SubTotal</th>
+                      <td colspan="2"></td>
+                    </tr>
+                    %>
                   </tbody>
                 </table>
               </div>
               <div class="bt-1 border-color-1 mt-30 mb-30"></div>
               <div class="payment_method">
                 <div class="mb-25">
-                  <h5>Payment</h5>
+                  <h5>Payment Method:</h5>
                 </div>
                 <div class="payment_option">
                   <%#
@@ -608,14 +520,26 @@
                   </div>
                   %>
                   <div
-                    class="bt-1 border-color-1 d-flex justify-content-between"
+                    class="bt-1 border-color-1 d-block justify-content-center"
                   >
                     <button
-                      class="btn btn-fill-out btn-block btn-small place-order-cod"
+                      class="btn btn-fill-out btn-block btn-small place-order-cod mb-10"
+                      style="width: 10rem"
                     >
-                      Place Order ( COD )
+                      Place Order (COD)
                     </button>
-
+                    <button
+                      class="btn btn-fill-out btn-block btn-small payWallet mb-10"
+                      style="width: 10rem"
+                    >
+                      Wallet
+                    </button>
+                    <button
+                      class="btn btn-fill-out btn-block btn-small razorpay"
+                      style="width: 10rem"
+                    >
+                      Razorpay
+                    </button>
                     <%#
                     <a
                       href="/placeorder/wallet"
@@ -631,89 +555,517 @@
                   </div>
                 </div>
               </div>
+
               <%#
               <a href="#" class="btn btn-fill-out btn-block mt-30"
                 >Place Order</a
               >%>
             </div>
           </div>
+          <div class="row mt-10 mb-10">
+            <div class="col-12">
+              <div class="divider mt-10 mb-10"></div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-lg-6 mb-sm-15">
+              <div class="toggle_info">
+                Apply Coupon:
+                <a
+                  data-bs-toggle="modal"
+                  data-bs-target="#couponModal"
+                  class="pl-10 font-sm"
+                  >Click here</a
+                >
+              </div>
+              <div
+                class="modal fade"
+                id="couponModal"
+                tabindex="-1"
+                aria-labelledby="couponModalLabel"
+                aria-hidden="true"
+              >
+                <div class="modal-dialog modal-dialog-scrollable">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="couponModalLabel">
+                        Coupons for you
+                      </h5>
+                      <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"
+                      ></button>
+                    </div>
+                    <div class="modal-body">
+                      <%if(coupons.length > 0){%> <%coupons.forEach(coupon =>
+                      {%>
+                      <div class="col mt-15">
+                        <div class="card coupon-card border">
+                          <div class="text-center mt-10 ml-10 mr-10 mb-10">
+                            <div class="d-flex flex-row text-center">
+                              <img
+                                src="https://icon-library.com/images/coupon-icon-png/coupon-icon-png-21.jpg"
+                                width="70"
+                              />
+
+                              <div
+                                class="d-flex justify-content-center align-items-center flex-column ml-1"
+                              >
+                                <h1 class="mb-0 amount">
+                                  ₹<%=coupon.discountAmount%>
+                                </h1>
+                                <span class="discount">OFFER</span>
+                                <p>
+                                  on minimum purchase of
+                                  ₹<%=coupon.minimumPurchase%>
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                          <hr class="line" />
+                          <div class="mt-10 ml-10 mr-10 mb-10">
+                            <h5 class="mb-0">
+                              Coupon code:
+                              <span class="bold" style="color: orange"
+                                ><%=coupon.couponCode%></span
+                              >
+                            </h5>
+                            <p>
+                              Terms and conditons:<br />
+                              <span class="text" style="word-wrap: break-word">
+                                <%=coupon.description%>
+                              </span>
+                            </p>
+                            <div class="mt-4 d-flex justify-content-between">
+                              <span class="text"
+                                >Expires on:
+                                <span>
+                                  <%=coupon.expiryDate.toISOString().slice(0,
+                                  10)%>
+                                </span>
+                              </span>
+                              <a
+                                class="btn btn-sm font-sm rounded btn-dark copy-button"
+                                onclick="copyToClipboard('<%= coupon.couponCode %>')"
+                              >
+                                Copy
+                              </a>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <%})%> <%}else{%>
+                      <div>
+                        <h3>Oops! No coupons available now</h3>
+                      </div>
+                      <%}%>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- coupon -->
+            <div class="col-lg-6">
+              <div class="toggle_info">
+                <span
+                  ><i class="fi-rs-label mr-10"></i
+                  ><span class="text-muted">Have a coupon?</span>
+                  <a
+                    href="#coupon"
+                    data-bs-toggle="collapse"
+                    class="collapsed"
+                    aria-expanded="false"
+                    >Click here to enter your code</a
+                  ></span
+                >
+              </div>
+              <div class="panel-collapse collapse coupon_form" id="coupon">
+                <div class="panel-body">
+                  <p class="mb-30 font-sm">
+                    If you have a coupon code, please apply it below.
+                  </p>
+                  <form>
+                    <div class="form-group">
+                      <input
+                        type="text"
+                        id="couponCODE"
+                        placeholder="Enter Coupon Code..."
+                      />
+                    </div>
+                    <div class="form-group">
+                      <button class="btn btn-md" id="APPLYCOUPON" name="login">
+                        Apply Coupon
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
   </main>
+
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       const grandTotal = document.querySelector(".grandTotal").textContent;
-
+      let discount;
+      let couponCODE;
       document
         .querySelector(".place-order-cod")
         .addEventListener("click", async (event) => {
-          const selectedAddressRadioButtons =
-            document.querySelectorAll(".selected-address");
+          const grandTotal = document.querySelector(".grandTotal").textContent;
+          const selectedAddressRadioButtons = document.querySelector(
+            "input[name=address]:checked"
+          );
           let selectedAddressValue = null;
 
-          for (let radioButton of selectedAddressRadioButtons) {
-            if (radioButton.checked) {
-              selectedAddressValue = radioButton.value;
+          if (selectedAddressRadioButtons) {
+            selectedAddressValue = selectedAddressRadioButtons.value;
 
-              await fetch(
-                `/user/placeorder/cod?addressId=${selectedAddressValue}&grandTotal=${grandTotal}`,
-                {
-                  method: "post",
-                  body: JSON.stringify({ addressId: selectedAddressValue }),
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
+            await fetch(
+              `/user/placeorder/cod?addressId=${selectedAddressValue}&grandTotal=${grandTotal}&discount=${discount}&couponcode=${couponCODE}`,
+              {
+                method: "post",
+                body: JSON.stringify({ addressId: selectedAddressValue }),
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              }
+            )
+              .then((response) => response.json())
+              .then((data) => {
+                if (data.codOutOfStock) {
+                  Swal.fire({
+                    position: "top-center",
+                    icon: "error",
+                    title:
+                      " Product is Out of stock. Please check your cart..!",
+                    showConfirmButton: false,
+                    timer: 1500,
+                  });
+                  setTimeout(() => {
+                    window.location.href = "/user/load-cart";
+                  }, 1500);
+                } else {
+                  Swal.fire({
+                    position: "top-center",
+                    icon: "success",
+                    title: "Order placed successfully",
+                    showConfirmButton: false,
+                    timer: 1500,
+                  });
+                  setTimeout(() => {
+                    window.location.href = "/user/order/success";
+                  }, 1500);
                 }
-              )
-                .then((response) => response.json())
-                .then((data) => {
-                  console.log("this is resposnse if data");
-                  if (data.codOutOfStock) {
-                    console.log("Out of stock");
-                    Swal.fire({
-                      position: "top-center",
-                      icon: "error",
-                      title:
-                        " Product is Out of stock. Please check your cart..!",
-                      showConfirmButton: false,
-                      timer: 1500,
-                    });
-                    setTimeout(() => {
-                      window.location.href = "/user/load-cart";
-                    }, 1500);
-                  } else {
-                    console.log("Order placed successfully");
-                    Swal.fire({
-                      position: "top-center",
-                      icon: "success",
-                      title: "Order placed successfully",
-                      showConfirmButton: false,
-                      timer: 1500,
-                    });
-                    setTimeout(() => {
-                      console.log("inside the setTimeout");
-                      window.location.href = "/user/order/success";
-                    }, 1500);
-                  }
-                })
-                .catch((error) => {
-                  console.log(error);
-                });
-            }
-            if (selectedAddressValue !== null) {
-              console.log("Selected Address ID:", selectedAddressValue);
-            } else {
-              Swal.fire({
-                icon: "error",
-                title: "Oops...",
-                text: "No Address is Selected!",
+              })
+              .catch((error) => {
+                console.log(error);
               });
-            }
+          }
+          if (selectedAddressValue !== null) {
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "No Address is Selected!",
+            });
           }
         });
-    });
-  </script>
 
+      const subTotal = document.getElementById("SUBTOTAL");
+      const applyBtn = document.getElementById("APPLYCOUPON");
+      const couponRow = document.getElementById("couponRow");
+      const updatedTotal = document.querySelector(".grandTotal");
+      applyBtn.addEventListener("click", async function (event) {
+        event.preventDefault();
+        const checkCoupon = document.getElementById("couponCODE").value;
+        const couponCode = validateCouponCode(checkCoupon);
+        if (couponCode) {
+          await fetch(
+            `/user/applycoupon?code=${couponCode}&Total=${grandTotal}`
+          )
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.error) {
+                Swal.fire({
+                  position: "center",
+                  icon: "error",
+                  title: data.error,
+                  showConfirmButton: false,
+                  timer: 1500,
+                });
+              } else if (data.message) {
+                Swal.fire({
+                  position: "center",
+                  icon: "success",
+                  title: data.message,
+                  showConfirmButton: false,
+                  timer: 1500,
+                });
+                const grandTotalValue = parseInt(data.grandTotal, 10);
+                const updatedTotalValue = parseInt(data.updatedTotal, 10);
+                couponCODE = data.code;
+                discount = data.discountAmount;
+                subTotal.innerText = grandTotalValue;
+                updatedTotal.innerText = updatedTotalValue;
+                couponRow.innerHTML = `<tr id="couponRow">
+                              <th colspan="2">Coupon Discount</th>
+                              <td colspan="2"><em>₹${discount}</em></td>
+                            </tr>`;
+              }
+            });
+        }
+      });
+
+      const payWallet = document.querySelector(".payWallet");
+      payWallet.addEventListener("click", async function (event) {
+        event.preventDefault();
+        const selectedAddressRadioButtons = document.querySelector(
+          "input[name=address]:checked"
+        );
+        let selectedAddressValue = null;
+
+        if (selectedAddressRadioButtons) {
+          selectedAddressValue = selectedAddressRadioButtons.value;
+
+          await fetch(
+            `/user/pay-wallet?couponCode=${couponCODE}&grandTotal=${grandTotal}&discount=${discount}`,
+            {
+              method: "post",
+              body: JSON.stringify({ addressId: selectedAddressValue }),
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          )
+            .then((response) => response.json())
+            .then((data) => {
+              // Handle the response data inside this block
+              if (data.codOutOfStock) {
+                Swal.fire({
+                  position: "top-center",
+                  icon: "error",
+                  title: " Product is Out of stock. Please check your cart..!",
+                  showConfirmButton: false,
+                  timer: 1500,
+                });
+                setTimeout(() => {
+                  window.location.href = "/user/load-cart";
+                }, 1500);
+              } else if (data.walletBalance) {
+                Swal.fire({
+                  position: "top-center",
+                  icon: "error",
+                  title: "insufficient balance in your wallet",
+                  showConfirmButton: false,
+                  timer: 1500,
+                });
+              } else {
+                Swal.fire({
+                  position: "top-center",
+                  icon: "success",
+                  title: "Order placed successfully",
+                  showConfirmButton: false,
+                  timer: 1500,
+                });
+                setTimeout(() => {
+                  window.location.href = "/user/order/success";
+                }, 1500);
+              }
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        }
+        if (selectedAddressValue !== null) {
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "No Address is Selected!",
+          });
+        }
+      });
+
+      const razorPayBtn = document.querySelector(".razorpay");
+      console.log("here1");
+      razorPayBtn.addEventListener("click", async function (event) {
+        const selectedAddressRadioButtons = document.querySelector(
+          "input[name=address]:checked"
+        );
+        let selectedAddressValue = null;
+
+        if (selectedAddressRadioButtons) {
+          selectedAddressValue = selectedAddressRadioButtons.value;
+          await fetch("/user/pay-razorpay", {
+            method: "post",
+            body: JSON.stringify({
+              addressId: selectedAddressValue,
+              grandTotal,
+              discount: discount,
+              couponCode: couponCODE,
+            }),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
+            .then((response) => {
+              console.log("logging response");
+              return response.json();
+            })
+            .then((data) => {
+              console.log("return form response in postive");
+              if (data.completed) {
+                const razorOrderID = data.razorOrderId;
+                const orderId = data.orderId;
+                console.log("reached here", razorOrderID);
+                var options = {
+                  amount: razorOrderID.amount,
+                  key: "rzp_test_GGrk1vYqKj8uDF",
+                  order_id: razorOrderID,
+                  handler: (response) => {
+                    console.log("this is responser");
+                    console.log(response);
+                    Swal.fire({
+                      position: "top-end",
+                      icon: "success",
+                      title: "Payment successful",
+                      showConfirmButton: false,
+                      timer: 1500,
+                    });
+                    // console.log(response);
+                    //payment successfull
+                    setTimeout(() => {
+                      handlePaymentSuccess(razorOrderID, response, orderId);
+                    }, 1500);
+                  },
+                };
+                console.log(" new razorpay");
+                var rzp1 = new Razorpay(options);
+                rzp1.open();
+                rzp1.on("payment.failed", (response) => {
+                  console.log("Payment Failed");
+                  console.log(response);
+                  Swal.fire({
+                    position: "top-end",
+                    icon: "error",
+                    title: "Payment failed",
+                    showConfirmButton: false,
+                    timer: 1500,
+                  });
+                  setTimeout(() => {
+                    handlePaymentFailure(razorOrderID, response, orderId);
+                  }, 1500);
+                });
+              } else if (data.onlineOutOfStock) {
+                Swal.fire({
+                  position: "top-center",
+                  icon: "error",
+                  title: " Product is Out of stock. Please check your cart..!",
+                  showConfirmButton: false,
+                  timer: 1500,
+                });
+                setTimeout(() => {
+                  window.location.href = "/user/load-cart";
+                }, 1500);
+              } else {
+                Swal.fire({
+                  position: "top-center",
+                  icon: "error",
+                  title: "something went wrong",
+                  showConfirmButton: false,
+                  timer: 1500,
+                });
+              }
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "No Address is Selected!",
+          });
+        }
+      });
+    });
+
+    {
+      // Function to update the payment status in the database
+      function updatePaymentStatus(
+        paymentStatus,
+        razorOrderId,
+        response,
+        orderId
+      ) {
+        const url = `/user/update-payment-status?paymentStatus=${paymentStatus}&razorOrderId=${razorOrderId}&orderId=${orderId}`;
+
+        fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Failed to update payment status");
+            }
+            return response.json();
+          })
+          .then((data) => {
+            if (data.paymentStatus == "Success") {
+              window.location.href = `/user/order/success`;
+            } else {
+              window.location.href = "/user/load-cart";
+            }
+          })
+          .catch((error) => {
+            console.error("Failed to update payment status", error);
+            window.location.href = "/user/login";
+          });
+      }
+      //function to handle payment success
+      function handlePaymentSuccess(razorOrderId, response, orderId) {
+        updatePaymentStatus("Success", razorOrderId, response, orderId);
+      }
+
+      //function to handle payment failure
+      function handlePaymentFailure(razorOrderId, response, orderId) {
+        updatePaymentStatus("Failed", razorOrderId, response, orderId);
+      }
+
+      function validateCouponCode(code) {
+        if (code.trim() == "") {
+          Swal.fire({
+            icon: "error",
+            text: "please enter a valid Coupon Code",
+          });
+        }
+        return code;
+      }
+      function copyToClipboard(code) {
+        navigator.clipboard
+          .writeText(code)
+          .then(() => {
+            Swal.fire({
+              position: "center",
+              icon: "success",
+              title: "Coupon Code copied to Clipboard",
+              showConfirmButton: false,
+              timer: 1500,
+            });
+          })
+          .catch((err) => {
+            console.error("Unable to copy to clipboard", error);
+          });
+      }
+    }
+  </script>
   <%-include("./partials/footer.ejs")%>
 </body>

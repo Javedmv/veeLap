@@ -49,7 +49,7 @@ const changeOrderStatus = async (req, res) => {
                 order.orderStatus = orderStatus
                 order.paymentStatus = "Success"
             } else {
-                return res.status(200).json({ success: false, message: "Please select correct order status", detail: "the order is already delivered" })
+                return res.status(200).json({ success: false, message: "Please select correct order status", detail: "the order has not yet Shipped" })
             }
         } else if (orderStatus == "Cancelled") {
             if (order.orderStatus == "Order Placed" || order.orderStatus == "Shipped") {

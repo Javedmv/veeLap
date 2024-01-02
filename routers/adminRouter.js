@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const path = require("path");
 const admin_Router = express();
+const { verifyAdminToken } = require("../middleware/adminAuth")
 // const { upload } = require('../middleware/multer')
 // const session = require("express-session");
 
@@ -19,10 +20,10 @@ const upload = multer({ storage });
 const {
     loadAdminLogin,
     verifyAdmin,
-    loadDashboard
+    loadDashboard,
+    adminLogout
 
 } = require("../controllers/adminControllers/adminController")
-
 const { loadCategory, addCategory, editCategory, loadEditCategory, statusCategory, deleteCategory } = require("../controllers/adminControllers/categoryManagement")
 const { loadUser, userStatus } = require("../controllers/adminControllers/userManagement");
 const { loadAddProducts, addProduct, loadProduct, loadEditProducts, deleteSingleImage, editAddImage, editSubmitProduct, deleteProduct } = require("../controllers/adminControllers/productManagement");
@@ -31,8 +32,12 @@ const { loadCouponManagement, loadAddCoupon, loadEditCoupon, addNewCoupon, unblo
 
 admin_Router.get("/login", loadAdminLogin);
 admin_Router.post("/verify-admin", verifyAdmin);
+
+admin_Router.use(verifyAdminToken)
+
 admin_Router.get("/", loadDashboard);
 
+admin_Router.get("/logout", adminLogout)
 // category
 admin_Router.get("/view-allcategory", loadCategory);
 admin_Router.post("/add-category", addCategory);

@@ -1,4 +1,7 @@
 const adminModel = require("../../models/adminModel");
+const jwt = require("jsonwebtoken")
+const jwtKey = require("../../config/jwtAdmin")
+
 
 const loadAdminLogin = async (req, res) => {
     try {
@@ -12,9 +15,11 @@ const verifyAdmin = async (req, res) => {
     try {
         const { email, password } = req.body
         const adminData = await adminModel.findOne({ email: email });
-        console.log(adminData)
         if (adminData) {
             if (adminData.password == password) {
+                const token = jwt.sign(email, jwtKey.secretKey)
+                res.cookie("tokenadmin", token, { maxAge: 24 * 60 * 60 * 1000 })
+                res.cookie("logged", true, { maxAge: 24 * 60 * 60 * 1000 });
                 res.redirect("/admin/");
             } else {
                 res.render("admin/adminlogin", { message: "invalid password" });
@@ -35,6 +40,16 @@ const loadDashboard = async (req, res) => {
     }
 };
 
+const adminLogout = async (req, res) => {
+    try {
+        res.clearCookie("tokenadmin");
+        res.clearCookie("logged");
+        res.redirect("/admin/login")
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 
 
 
@@ -42,5 +57,6 @@ const loadDashboard = async (req, res) => {
 module.exports = {
     loadAdminLogin,
     verifyAdmin,
-    loadDashboard
+    loadDashboard,
+    adminLogout
 } 
