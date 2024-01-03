@@ -13,7 +13,7 @@ const { productDetails } = require("../controllers/userControllers/product")
 
 const { filterAndSort, searchProduct } = require("../controllers/userControllers/filterAndSort")
 
-const { loadUserProfile, loadAddAddress, submitAddress, loadEditAddress, postEditAddress, deleteAddress, loadOrderDetails, cancelOrder, returnOrder } = require("../controllers/userControllers/profile")
+const { loadUserProfile, loadAddAddress, submitAddress, loadEditAddress, postEditAddress, deleteAddress, loadOrderDetails, cancelOrder, returnOrder, singleCancelOrder } = require("../controllers/userControllers/profile")
 
 const { loadCheckout, applyCoupon } = require("../controllers/userControllers/checkout")
 
@@ -82,5 +82,6 @@ userRouter.post("/update-payment-status", updatePaymentStatus)
 userRouter.get("/cancel-order/:id", cancelOrder)
 userRouter.get("/return-order/:id", returnOrder)
 userRouter.get("/search", searchProduct)
+userRouter.post("/single-cancel-order", singleCancelOrder)
 
 module.exports = userRouter

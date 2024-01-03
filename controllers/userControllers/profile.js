@@ -2,7 +2,8 @@ const addressModel = require("../../models/addressModel");
 const orderModel = require("../../models/orderModel");
 const productModel = require("../../models/productModel");
 const userModel = require("../../models/userModel");
-const walletModel = require("../../models/walletModel")
+const walletModel = require("../../models/walletModel");
+const { emit } = require("../../routers/adminRouter");
 
 const loadUserProfile = async (req, res) => {
     try {
@@ -195,7 +196,35 @@ const returnOrder = async (req, res) => {
         console.log(error);
     }
 }
+const singleCancelOrder = async (req, res) => {
+    try {
+        const { orderId, productStatusId } = req.query
+        console.log(productStatusId);
+        const userData = await userModel.findOne({ email: req.user })
+        const wallet = await walletModel.findOne({ userId: userData._id })
+        const orderData = await orderModel.findOne({ _id: orderId })
+            .populate({
+                path: "products.productId",
+                model: "Product"
+            })
+        orderData.products.forEach(async (product) => {
+            if (product._id == productStatusId) {
+                product.singleProductStatus = "Cancelled"
+                console.log(product.productId._id);
+                await productModel.updateOne({ _id: product.productId._id }, { $inc: { stock: product.quantity } })
+                console.log(orderData.paymentMethod)
+                if (orderData.paymentStatus == "Success") {
+                    // wallet.balance += product.productId.
+                    // need to add a field in the order model and save the coupon applied amount to that field make sure other tihings are correct
+                }
+            }
+        })
+        // orderData.save()
 
+    } catch (error) {
+        console.log(error);
+    }
+}
 
 module.exports = {
     loadUserProfile,
@@ -206,5 +235,6 @@ module.exports = {
     deleteAddress,
     loadOrderDetails,
     cancelOrder,
-    returnOrder
+    returnOrder,
+    singleCancelOrder
 }

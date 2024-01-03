@@ -18,9 +18,12 @@ const loadAddProducts = async (req, res) => {
 
 const addProduct = async (req, res) => {
     try {
+        console.log(req.files, "------------------------thisi si th efile of images----------------------");
+        console.log(req.body, "this is the body");
         const { brand, productName, modelYear, ramSize, storage, operatingSystem,
             fullDescription, detailedDescription, category, stock, regularPrice, salesPrice, status } = req.body
-        console.log(category);
+        // console.log(category);
+        console.log(status);
         if (req.files) {
             const prductImg = req.files
             let imageArr = [];
@@ -63,9 +66,9 @@ const addProduct = async (req, res) => {
                 status: status || "Active",
                 images: imageArr,
             })
-            // console.log("image added success");
+            console.log("image added success");
         }
-        res.redirect("/admin/view-all-products")
+        res.status(200).json({ productAdded: true })
     } catch (error) {
         console.log(error);
     }

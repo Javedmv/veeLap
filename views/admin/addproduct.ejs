@@ -268,12 +268,7 @@
                 <h6>Fill out all the fields to add the product.</h6>
               </div>
               <div class="card-body">
-                <form
-                  id="productForm"
-                  method="post"
-                  action="/admin/add-product"
-                  enctype="multipart/form-data"
-                >
+                <form id="productForm">
                   <div class="row">
                     <div class="col-lg-6">
                       <div class="mb-4">
@@ -411,7 +406,7 @@
                       placeholder="Type here"
                       class="form-control"
                       rows="4"
-                      id="full_description"
+                      id="detailed_Description"
                       name="detailedDescription"
                     ></textarea>
 
@@ -527,7 +522,7 @@
                             multiple
                             id="images"
                             name="productImages"
-                            onchange="previewImage()"
+                            onchange="previewImage(event)"
                           />
                           <div
                             id="imagesError"
@@ -717,7 +712,7 @@
           document.getElementById("imagesError").textContent = errors["images"];
         } else {
           // Validate file types
-          const allowedExtensions = ["jpg", "jpeg", "png"];
+          const allowedExtensions = ["jpg", "jpeg", "png", "webp"];
           let allFilesValid = true;
 
           for (let i = 0; i < images.length; i++) {
@@ -741,18 +736,90 @@
 
         return errors;
       }
+      let formData = [];
+
       const form = document.getElementById("productForm");
-      form.addEventListener("submit", (event) => {
+      form.addEventListener("submit", async (event) => {
         const errors = validateForm();
         if (Object.keys(errors).length > 0) {
           // Display errors to the user
           console.error(errors);
           event.preventDefault();
         } else {
-          // Submit the form
-          form.submit();
+          event.preventDefault();
+          const imageData = new FormData();
+          for (let image of formData) {
+            imageData.append("productImages", image);
+          } // Submit the form
+          const brand = document.getElementById("brand").value;
+          const productName = document.getElementById("product_name").value;
+          const modelYear = document.getElementById("model_year").value;
+          const ramSize = document.getElementById("ram_size").value;
+          const storage = document.getElementById("storage").value;
+          const operatingSystem =
+            document.getElementById("operating_system").value;
+          const fullDescription =
+            document.getElementById("full_description").value;
+          const category = document.getElementById("category").value;
+          const salesPrice = document.getElementById("sales_price").value;
+          const regularPrice = document.getElementById("regular_price").value;
+          const stock = document.getElementById("stock").value;
+          const detailedDescription = document.getElementById(
+            "detailed_Description"
+          ).value;
+          const status = document.getElementById("Status").value;
+          imageData.append("status", status);
+          imageData.append("salesPrice", salesPrice);
+          imageData.append("regularPrice", regularPrice);
+          imageData.append("stock", stock);
+          imageData.append("category", category);
+          imageData.append("detailedDescription", detailedDescription);
+          imageData.append("fullDescription", fullDescription);
+          imageData.append("operatingSystem", operatingSystem);
+          imageData.append("storage", storage);
+          imageData.append("ramSize", ramSize);
+          imageData.append("modelYear", modelYear);
+          imageData.append("productName", productName);
+          imageData.append("brand", brand);
+          for (var pair of imageData.entries()) {
+            // console.log(pair, "----------------------------------------------");
+          }
+
+          await fetch("/admin/add-product", {
+            method: "post",
+            body: imageData,
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error(
+                  `Network response was not ok: ${response.status}`
+                );
+              }
+              return response.json();
+            })
+            .then((data) => {
+              // console.log(data);
+              if (data.productAdded) {
+                Swal.fire({
+                  position: "top-center",
+                  icon: "success",
+                  title: "The product has been added Successfully.",
+                  showConfirmButton: false,
+                  timer: 1500,
+                });
+                setTimeout(() => {
+                  window.location.href = "/admin/view-all-products";
+                }, 1500);
+              } else {
+                console.error("Product was not added successfully.");
+              }
+            })
+            .catch((error) => {
+              console.error("Error during fetch:", error);
+            });
         }
       });
+
       function clearErrorMessages() {
         const errorElements = document.querySelectorAll(".error-message");
         errorElements.forEach((element) => {
@@ -760,16 +827,21 @@
         });
       }
 
-      function previewImage() {
+      function previewImage(event) {
         const preview = document.getElementById("image-preview");
         const fileInput = document.getElementById("images");
-        const files = fileInput.files;
+        const files = event.target.files;
+        // console.log(files);
+        // console.log(typeof files);
 
         preview.innerHTML = "";
+        // console.log(event.target.files, "this ");
+        // console.log(typeof files, "this is the filet");
 
         for (const file of files) {
           if (file.type.startsWith("image/")) {
             const reader = new FileReader();
+            formData.push(file);
 
             reader.onload = function (e) {
               const imgContainer = document.createElement("div");
@@ -779,21 +851,24 @@
                 "flex-column",
                 "align-items-center"
               );
-
               const img = document.createElement("img");
               img.src = e.target.result;
+              img.id = file.name;
               img.style.maxWidth = "100%";
               img.style.maxHeight = "200px";
               imgContainer.appendChild(img);
 
               const deleteButton = document.createElement("button");
               deleteButton.innerHTML = "Delete";
-              deleteButton.classList.add("btn", "btn-danger", "mt-2"); // Add "mt-2" for top margin
-              deleteButton.addEventListener("click", function () {
-                // Remove the image container when the delete button is clicked
+              deleteButton.classList.add("btn", "btn-danger", "mb-2"); // Add "mt-2" for top margin
+              deleteButton.id = file.name;
+              deleteButton.addEventListener("click", function (event) {
                 imgContainer.remove();
+                const filteredImage = formData.filter(
+                  (image) => image.name !== event.srcElement.id
+                );
+                formData = filteredImage;
               });
-
               imgContainer.appendChild(deleteButton);
               preview.appendChild(imgContainer);
             };
@@ -803,7 +878,7 @@
         }
       }
     </script>
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.16.6/dist/sweetalert2.all.min.js"></script>
     <script src="/adminassets/js/vendors/jquery-3.6.0.min.js"></script>
     <script src="/adminassets/js/vendors/bootstrap.bundle.min.js"></script>
     <script src="/adminassets/js/vendors/select2.min.js"></script>

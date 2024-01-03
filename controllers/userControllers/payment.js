@@ -32,13 +32,20 @@ const placeOrderCOD = async (req, res) => {
         const loggedIn = req.cookies.loggedIn
         const userData = await userModel.findOne({ email: req.user })
         const userAddress = await addressModel.findOne({ userId: userData._id })
-        const userCart = await cartModel.findOne({ userId: userData._id })
+        const userCart = await cartModel.find({ userId: userData._id })
             .populate({
                 path: "products.productId",
                 model: "Product"
             }).exec()
         let orderTotal = 0;//total amount
         let orderProducts = [];
+        let totalProductQuantity = 0;
+        // for (let item of userCart.products) {
+
+        // }
+        // console.log(totalProductQuantity);
+
+
         for (const item of userCart.products) {
             if (item.productId.stock < item.quantity) {
                 return res.status(200).json({ codOutOfStock: true })
@@ -47,16 +54,19 @@ const placeOrderCOD = async (req, res) => {
             const orderedItem = {
                 productId: item.productId._id,
                 quantity: item.quantity,
-                price: item.productId.salesPrice * item.quantity
+                price: item.productId.salesPrice * item.quantity,
+                // singleProductStatus: "Order Placed",
+                // productAmount:
             }
-            await productModel.updateOne({ _id: orderedItem.productId }, { $inc: { stock: -orderedItem.quantity } })
+            console.log(item.quantity, "this is the item of prodcts");
+            // await productModel.updateOne({ _id: orderedItem.productId }, { $inc: { stock: -orderedItem.quantity } })
             orderTotal += orderedItem.price
             orderProducts.push(orderedItem)
         }
 
         if (discount != "undefined") {
             orderTotal -= discount
-            await couponModel.updateOne({ couponCode: couponcode }, { $push: { redeemedUser: userData._id } })
+            // await couponModel.updateOne({ couponCode: couponcode }, { $push: { redeemedUser: userData._id } })
         }
 
         let delAddress;
@@ -85,7 +95,7 @@ const placeOrderCOD = async (req, res) => {
             address: delAddress
         })
         await newOrder.save()
-        await cartModel.updateOne({ userId: userData._id }, { $set: { products: [] } });
+        // await cartModel.updateOne({ userId: userData._id }, { $set: { products: [] } });
         return res.status(200).json({ codOutOfStock: false })
     } catch (error) {
         console.log(error);

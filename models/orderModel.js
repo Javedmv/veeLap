@@ -22,6 +22,15 @@ const orderModel = mongoose.Schema({
                 type: Number,
                 required: true
             },
+            singleProductStatus: {
+                type: String,
+                enum: ["Order Placed", "Shipped", "Delivered", "Cancelled", "Returned", "Order Failed"],
+                default: "Order Placed"
+            },
+            productAmount: {
+                type: Number,
+                default: 0
+            }
         }
     ],
     orderDate: {

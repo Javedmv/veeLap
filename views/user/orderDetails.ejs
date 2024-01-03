@@ -294,15 +294,17 @@
                         <th class="text-center">
                           Order placed<i class="text-secondary"> (date)</i>
                         </th>
-                        <th class="text-center">Status</th>
+                        <th class="text-center">Product Status</th>
                         <th class="text-center">PaymentStatus</th>
                         <th class="text-center">PaymentMethod</th>
                         <th class="text-center">Total</th>
+                        <th class="text-center">Action</th>
                         <!-- <th>Action</th> -->
                       </tr>
                     </thead>
                     <tbody>
-                      <% if (!orderDetails || orderDetails.length === 0) { %>
+                      <%console.log(orderDetails)%> <% if (!orderDetails ||
+                      orderDetails.length === 0) { %>
                       <h6 class="text-center" style="font-size: large">
                         No orders
                       </h6>
@@ -314,7 +316,7 @@
                           <img
                             src="<%= item.productId.images[0]?.path  %>"
                             class="img-sm"
-                            alt="Item"
+                            alt="image"
                             height="68"
                             width="68"
                           />
@@ -330,9 +332,9 @@
                         </td>
                         <td class="text-center">
                           <span
-                            class="badge rounded-pill alert-<%= orderDetails.orderStatus === 'Order Placed' ? 'info' : orderDetails.orderStatus === 'Shipped' ? 'warning' : orderDetails.orderStatus === 'Delivered' ? 'success' : orderDetails.orderStatus === 'Cancelled' ? 'danger' : orderDetails.orderStatus === 'Returned'? 'secondary' : orderDetails.orderStatus === 'Order Failed'? 'dark' : '' %>"
+                            class="badge rounded-pill alert-<%= item.singleProductStatus === 'Order Placed' ? 'info' : item.singleProductStatus === 'Shipped' ? 'warning' : item.singleProductStatus === 'Delivered' ? 'success' : item.singleProductStatus === 'Cancelled' ? 'danger' : item.singleProductStatus === 'Returned'? 'secondary' : item.singleProductStatus === 'Order Failed'? 'dark' : '' %>"
                           >
-                            <%= orderDetails.orderStatus %>
+                            <%= item.singleProductStatus %>
                           </span>
                         </td>
                         <td class="text-center">
@@ -348,11 +350,45 @@
                         <td class="text-center">
                           ₹<%= item.price %> for <%= item.quantity%> item
                         </td>
+                        <td class="text-center">
+                          <button
+                            class="btn-sm btn-danger singleCancelBtn"
+                            product-id="<%=item._id%>"
+                            order_id="<%=orderDetails._id%>"
+                          >
+                            Cancel
+                          </button>
+                        </td>
                       </tr>
 
                       <% }); %>
                     </tbody>
                   </table>
+                  <script>
+                    document.addEventListener("DOMContentLoaded", function () {
+                      const cancelBtns =
+                        document.querySelectorAll(".singleCancelBtn");
+                      cancelBtns.forEach(function (cancelBtn) {
+                        cancelBtn.addEventListener(
+                          "click",
+                          async function (event) {
+                            event.preventDefault();
+                            const productId = this.getAttribute("product-id");
+                            const orderId = this.getAttribute("order_id");
+                            await fetch(
+                              `/user/single-cancel-order?orderId=${orderId}&productStatusId=${productId}`,
+                              {
+                                method: "post",
+                                headers: {
+                                  "Content-Type": "application/json",
+                                },
+                              }
+                            ).then(() => {});
+                          }
+                        );
+                      });
+                    });
+                  </script>
                   <div>
                     <h5 class="d-flex justify-content-end p-10">
                       Total Amount: ₹ <%= orderDetails.totalAmount %>
