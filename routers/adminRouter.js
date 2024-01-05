@@ -29,6 +29,7 @@ const { loadUser, userStatus } = require("../controllers/adminControllers/userMa
 const { loadAddProducts, addProduct, loadProduct, loadEditProducts, deleteSingleImage, editAddImage, editSubmitProduct, deleteProduct } = require("../controllers/adminControllers/productManagement");
 const { loadOrder, loadOrderDetails, changeOrderStatus } = require("../controllers/adminControllers/orderManagement")
 const { loadCouponManagement, loadAddCoupon, loadEditCoupon, addNewCoupon, unblockCoupon, blockCoupon, postEditCoupon } = require("../controllers/adminControllers/couponManagement")
+const { loadOfferManagement, loadAddOffer, addOffer } = require("../controllers/adminControllers/offerMangement")
 
 admin_Router.get("/login", loadAdminLogin);
 admin_Router.post("/verify-admin", verifyAdmin);
@@ -78,5 +79,8 @@ admin_Router.get("/block-coupon", blockCoupon)
 admin_Router.get("/unblock-coupon", unblockCoupon)
 admin_Router.post("/edit-post-coupon/:id", postEditCoupon)
 
+//offer Management
+admin_Router.get("/view-offer-management", loadOfferManagement)
+admin_Router.get("/load-add-product", loadAddOffer)
 
 module.exports = admin_Router

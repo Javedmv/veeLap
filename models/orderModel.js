@@ -27,6 +27,7 @@ const orderModel = mongoose.Schema({
                 enum: ["Order Placed", "Shipped", "Delivered", "Cancelled", "Returned", "Order Failed"],
                 default: "Order Placed"
             },
+            //this is the coupon applied amount
             productAmount: {
                 type: Number,
                 default: 0

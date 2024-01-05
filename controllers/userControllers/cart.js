@@ -14,7 +14,6 @@ const loadCart = async (req, res) => {
             })
             .exec()
 
-
         if (loggedIn) {
             if (req.query.quantity && req.query.productId) {
                 const newQuantity = req.query.quantity

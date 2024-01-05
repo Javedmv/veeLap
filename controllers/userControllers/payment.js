@@ -32,7 +32,7 @@ const placeOrderCOD = async (req, res) => {
         const loggedIn = req.cookies.loggedIn
         const userData = await userModel.findOne({ email: req.user })
         const userAddress = await addressModel.findOne({ userId: userData._id })
-        const userCart = await cartModel.find({ userId: userData._id })
+        const userCart = await cartModel.findOne({ userId: userData._id })
             .populate({
                 path: "products.productId",
                 model: "Product"
@@ -40,33 +40,39 @@ const placeOrderCOD = async (req, res) => {
         let orderTotal = 0;//total amount
         let orderProducts = [];
         let totalProductQuantity = 0;
-        // for (let item of userCart.products) {
-
-        // }
-        // console.log(totalProductQuantity);
-
+        if (Array.isArray(userCart.products)) {
+            userCart.products.forEach(item => {
+                if (item.quantity) {
+                    totalProductQuantity += item.quantity;
+                }
+            });
+        } else {
+            console.error("userCart.products is not an array");
+        }
 
         for (const item of userCart.products) {
             if (item.productId.stock < item.quantity) {
                 return res.status(200).json({ codOutOfStock: true })
             }
-
+            let couponAmount;
+            if (discount) {
+                couponAmount = discount / totalProductQuantity
+            }
             const orderedItem = {
                 productId: item.productId._id,
                 quantity: item.quantity,
                 price: item.productId.salesPrice * item.quantity,
-                // singleProductStatus: "Order Placed",
-                // productAmount:
+                singleProductStatus: "Order Placed",
+                productAmount: Math.trunc(couponAmount * item.quantity) || 0
             }
-            console.log(item.quantity, "this is the item of prodcts");
-            // await productModel.updateOne({ _id: orderedItem.productId }, { $inc: { stock: -orderedItem.quantity } })
+            await productModel.updateOne({ _id: orderedItem.productId }, { $inc: { stock: -orderedItem.quantity } })
             orderTotal += orderedItem.price
             orderProducts.push(orderedItem)
         }
 
         if (discount != "undefined") {
             orderTotal -= discount
-            // await couponModel.updateOne({ couponCode: couponcode }, { $push: { redeemedUser: userData._id } })
+            await couponModel.updateOne({ couponCode: couponcode }, { $push: { redeemedUser: userData._id } })
         }
 
         let delAddress;
@@ -95,7 +101,7 @@ const placeOrderCOD = async (req, res) => {
             address: delAddress
         })
         await newOrder.save()
-        // await cartModel.updateOne({ userId: userData._id }, { $set: { products: [] } });
+        await cartModel.updateOne({ userId: userData._id }, { $set: { products: [] } });
         return res.status(200).json({ codOutOfStock: false })
     } catch (error) {
         console.log(error);
@@ -119,20 +125,41 @@ const walletPayment = async (req, res) => {
 
             let orderTotal = 0;//total amount
             let orderProducts = [];
+            let totalProductQuantity = 0;
+            if (Array.isArray(userCart.products)) {
+                userCart.products.forEach(item => {
+                    if (item.quantity) {
+                        totalProductQuantity += item.quantity;
+                    }
+                });
+            } else {
+                console.error("userCart.products is not an array");
+            }
+
+
             for (const item of userCart.products) {
                 if (item.productId.stock < item.quantity) {
                     return res.status(200).json({ codOutOfStock: true, walletBalance: false })
                 }
 
+                let couponAmount;
+                if (discount) {
+                    couponAmount = discount / totalProductQuantity
+                }
+
                 const orderedItem = {
                     productId: item.productId._id,
                     quantity: item.quantity,
-                    price: item.productId.salesPrice * item.quantity
+                    price: item.productId.salesPrice * item.quantity,
+                    singleProductStatus: "Order Placed",
+                    productAmount: Math.trunc(couponAmount * item.quantity) || 0
                 }
                 await productModel.updateOne({ _id: orderedItem.productId }, { $inc: { stock: -orderedItem.quantity } })
                 orderTotal += orderedItem.price
                 orderProducts.push(orderedItem)
-            } if (discount != "undefined") {
+            }
+
+            if (discount != "undefined") {
                 orderTotal -= discount
                 await couponModel.updateOne({ couponCode: couponCode }, { $push: { redeemedUser: userData._id } })
             }
@@ -189,16 +216,33 @@ const paymentRazorpay = async (req, res) => {
 
         let orderTotal = 0;//total amount
         let orderProducts = [];
+        let totalProductQuantity = 0;
+        if (Array.isArray(userCart.products)) {
+            userCart.products.forEach(item => {
+                if (item.quantity) {
+                    totalProductQuantity += item.quantity;
+                }
+            });
+        } else {
+            console.error("userCart.products is not an array");
+        }
 
         for (const item of userCart.products) {
             if (item.productId.stock < item.quantity) {
                 return res.status(200).json({ completed: false, onlineOutOfStock: true })
             }
 
+            let couponAmount;
+            if (discount) {
+                couponAmount = discount / totalProductQuantity
+            }
+
             const orderedItem = {
                 productId: item.productId._id,
                 quantity: item.quantity,
-                price: item.productId.salesPrice * item.quantity
+                price: item.productId.salesPrice * item.quantity,
+                singleProductStatus: "Order Placed",
+                productAmount: Math.trunc(couponAmount * item.quantity) || 0
             }
             await productModel.updateOne({ _id: orderedItem.productId }, { $inc: { stock: -orderedItem.quantity } })
             orderTotal += orderedItem.price
@@ -209,9 +253,7 @@ const paymentRazorpay = async (req, res) => {
         } else {
             orderTotal = grandTotal
         }
-        console.log("this is the user cart");
-        console.log(userCart);
-        console.log("cart end here---------------------------------------------");
+
         let delAddress;
         userAddress.address.forEach((address) => {
             if (addressId == address._id) {
@@ -245,8 +287,7 @@ const paymentRazorpay = async (req, res) => {
             paymentMethod: "Online payment",
             address: delAddress
         })
-        console.log(newOrder.id, "this is the id of the new orderId");
-        console.log(order._id, "this is the id of the order --------------------------------");
+
         await order.save()
         res.status(200).json({ completed: true, razorOrderId: newOrder, orderId: order._id })
     } catch (error) {
@@ -257,7 +298,6 @@ const paymentRazorpay = async (req, res) => {
 const updatePaymentStatus = async (req, res) => {
     try {
         const { paymentStatus, razorOrderId, orderId } = req.query
-        console.log(req.query);
         const userData = await userModel.findOne({ email: req.user })
         await orderModel.findByIdAndUpdate(orderId, {
             paymentStatus
@@ -269,8 +309,13 @@ const updatePaymentStatus = async (req, res) => {
             const order = await orderModel.findById({ _id: orderId });
             if (order) {
                 await orderModel.findByIdAndUpdate(orderId, {
-                    orderStatus: "Order Failed"
-                })
+                    $set: {
+                        'products.$[].singleProductStatus': 'Order Failed'
+                    },
+                    orderStatus: 'Order Failed',
+                    paymentStatus: 'Failed'
+                });
+
                 for (const product of order.products) {
                     await productModel.updateOne(
                         { _id: product.productId },

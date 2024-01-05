@@ -294,7 +294,7 @@
                         <th class="text-center">
                           Order placed<i class="text-secondary"> (date)</i>
                         </th>
-                        <th class="text-center">Product Status</th>
+                        <th class="text-center">Status</th>
                         <th class="text-center">PaymentStatus</th>
                         <th class="text-center">PaymentMethod</th>
                         <th class="text-center">Total</th>
@@ -303,8 +303,7 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <%console.log(orderDetails)%> <% if (!orderDetails ||
-                      orderDetails.length === 0) { %>
+                      <% if (!orderDetails || orderDetails.length === 0) { %>
                       <h6 class="text-center" style="font-size: large">
                         No orders
                       </h6>
@@ -351,13 +350,16 @@
                           ₹<%= item.price %> for <%= item.quantity%> item
                         </td>
                         <td class="text-center">
+                          <% if (item.singleProductStatus == "Cancelled") { %>
+                          <span class="text-danger">Cancelled</span> <% } else {
+                          %>
                           <button
                             class="btn-sm btn-danger singleCancelBtn"
-                            product-id="<%=item._id%>"
-                            order_id="<%=orderDetails._id%>"
+                            product-id="<%= item._id %>"
+                            order_id="<%= orderDetails._id %>"
                           >
-                            Cancel
-                          </button>
+                            Cancel</button
+                          ><% } %>
                         </td>
                       </tr>
 
@@ -383,7 +385,34 @@
                                   "Content-Type": "application/json",
                                 },
                               }
-                            ).then(() => {});
+                            )
+                              .then((response) => response.json())
+                              .then((data) => {
+                                if (data.orderRefId) {
+                                  Swal.fire({
+                                    title: "Prduct cancel successfully",
+                                    icon: "success",
+                                    confirmButtonText: "OK",
+                                    timer: 1500,
+                                    showConfirmButton: false,
+                                  });
+                                  console.log(data.orderRefId);
+                                  setTimeout(() => {
+                                    window.location.href = `/user/order-status-details?orderRefId=${data.orderRefId}`;
+                                  }, 1400);
+                                } else {
+                                  Swal.fire({
+                                    title: "Product already Cancelled",
+                                    icon: "error",
+                                    confirmButtonText: "OK",
+                                    timer: 1500,
+                                    showConfirmButton: false,
+                                  });
+                                }
+                              })
+                              .catch((error) => {
+                                console.error(error);
+                              });
                           }
                         );
                       });

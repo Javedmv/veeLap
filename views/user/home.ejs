@@ -249,13 +249,15 @@
                             <% } %>
                           </div>
                           <div class="product-action-1">
-                            <a
+                            <button
+                              type="button"
                               aria-label="Add To Wishlist"
-                              class="action-btn hover-up"
-                              href="shop-wishlist.html"
+                              class="action-btn hover-up WISHLIST"
+                              prdctId = "<%= e._id %>"
                               ><i class="fi-rs-heart"></i
-                            ></a>
+                            ></button>
                           </div>
+                          
                           <!-- <div
                             class="product-badges product-badges-position product-badges-mrg"
                           >
@@ -297,6 +299,9 @@
                     <% }) %>
                 <!--End product-grid-4-->
                 </div>
+                
+
+                </div>
                 <%}else{%>
                   <div class="container">
                     <div class="text-danger d-flex align-items-center justify-content-center bg-secondary text-light p-4">
@@ -308,10 +313,39 @@
                   <% } %>
             </div>
           </div>
+          <div class="page-buttons d-flex justify-content-center mt-4">
+            <nav aria-label="Page navigation">
+              <ul class="pagination">
+                <% for (let i = 1; i <= totalPages; i++) { %>
+                  <% if (i === page) { %>
+                
+
+                    <li class="page-item <% (i === page) ? 'active' : '' %>" aria-current="page">
+                      <span class="page-link">
+                        <%= i %>
+                        <span class="visually-hidden">(current)</span>
+                      </span>
+                    </li>
+                  <% } else { %>
+                    <li class="page-item">
+                      <a class="page-link" href="/user/?page=<%= i %>">
+                        <%= i %> 
+                      </a>
+                    </li>
+                  <% } %>
+                <% } %>
+              </ul>
+            </nav>
+          </div>
+          
+          
+          
         </div>
       </section>
 
     </main>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
     <script>
       document.addEventListener("DOMContentLoaded", async (event) => {
         const addToCartBtn = document.querySelectorAll(".CART");
@@ -359,6 +393,37 @@
             }
           });
         });
+         const wishlistBtn = document.querySelectorAll(".WISHLIST")
+          wishlistBtn.forEach((element) =>{
+            element.addEventListener("click",async function(event){
+              event.preventDefault();
+              const productId = element.getAttribute("prdctId");
+              try {
+                const response = await axios.post(`/user/add-to-wishlist?productId=${productId}`)
+                const data = response.data
+                if(data){
+                  Swal.fire({
+                  title:(data.message)?'success':'Sorry',
+                  text: (data.message)?data.message:data.error,
+                  icon: (data.message)?'success':'error',
+                  confirmButtonText: "Ok",
+                  timer: 1500,
+                  timerProgressBar: true,
+                });
+                }
+              } catch (error) {
+                Swal.fire({
+                title: "Sorry!",
+                text: error,
+                icon: "error",
+                confirmButtonText: "Ok",
+                timer: 2000,
+                timerProgressBar: true,
+                })
+              }
+
+          }) 
+        })
       });
       </script>
       

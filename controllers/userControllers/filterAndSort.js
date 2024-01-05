@@ -9,12 +9,22 @@ const filterAndSort = async (req, res) => {
         let { sort, categories } = req.body
         const loggedIn = req.cookies.loggedIn
         const userEmail = req.cookies.userEmail
+        const page = req.query.page || 1;
+        const no_doc_on_each_pages = 3;
+        const totalProducts = await productModel.countDocuments({
+            status: "Active",
+        });
+        const totalPages = Math.ceil(totalProducts / no_doc_on_each_pages)
+        const skip = (page - 1) * no_doc_on_each_pages
+
         sort = (sort == "highToLow") ? -1 : 1;
         if (sort && categories) {
             products = await categoryResult(sort, categories)
         } else {
-            products = await productModel.find({})
+            products = await productModel.find({ status: "Active" })
                 .sort({ salesPrice: sort })
+                .skip(skip)
+                .limit(no_doc_on_each_pages)
                 .exec();
         }
 
@@ -31,13 +41,14 @@ const filterAndSort = async (req, res) => {
             },
             {
                 $unwind: '$categoryData' // Unwind the array created by $lookup (optional, depending on your use case)
-            }, { $sort: { salesPrice: sort ? sort : 1 } }])
+            }, { $sort: { salesPrice: sort ? sort : 1 } }]).skip(skip)
+                .limit(no_doc_on_each_pages)
             return sortedFilter
         }
 
         // console.log(products);
         const category = await categoryModel.find({})
-        res.render("user/home", { userEmail, loggedIn, products, category });
+        res.render("user/home", { userEmail, loggedIn, products, category, totalPages, page });
     } catch (error) {
         console.log(error);
     }
@@ -48,30 +59,28 @@ const searchProduct = async (req, res) => {
         const search = req.query.search;
         const userEmail = req.cookies.userEmail;
         const loggedIn = req.cookies.loggedIn;
+        const page = req.query.page || 1;
+        const no_doc_on_each_pages = 3;
+        const totalProducts = await productModel.countDocuments({
+            status: "Active",
+        });
+        const totalPages = Math.ceil(totalProducts / no_doc_on_each_pages)
+        const skip = (page - 1) * no_doc_on_each_pages
         let category = await categoryModel.find({});
-        let products = await productModel.find({});
+        let products = await productModel.find({ status: "Active" })
         let regexPattern;
 
         if (search) {
             regexPattern = new RegExp(search, "i");
 
-            products = await productModel.find({
-                $or: [
-                    { productName: { $regex: regexPattern } },
-                    { brand: { $regex: regexPattern } },
-                    {
-                        category: {
-                            $in: await categoryModel
-                                .find({ categoryName: { $regex: regexPattern } })
-                                .select('_id'),
-                        },
-                    },
-                ],
-            });
+            products = await productModel.find(
+
+                { productName: { $regex: regexPattern } }
+
+
+            ).skip(skip).limit(no_doc_on_each_pages)
         }
-
-
-        res.render("user/home", { userEmail, loggedIn, products, category });
+        res.render("user/home", { userEmail, loggedIn, products, category, page, totalPages });
     } catch (error) {
         console.log(error);
     }

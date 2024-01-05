@@ -1,7 +1,7 @@
 ﻿<%-include("./partials/header.ejs")%>
 
 <body>
-  <div class="mobile-header-active mobile-header-wrapper-style">
+  <!-- <div class="mobile-header-active mobile-header-wrapper-style">
     <div class="mobile-header-wrapper-inner">
       <div class="mobile-header-top">
         <div class="mobile-header-logo">
@@ -80,8 +80,8 @@
               </ul>
             </div>
           </div>
-          <!-- mobile menu start -->
-          <nav>
+       
+           <nav>
             <ul class="mobile-menu">
               <li class="menu-item-has-children">
                 <span class="menu-expand"></span><a href="index.html">Home</a>
@@ -256,9 +256,10 @@
               </li>
             </ul>
           </nav>
-          <!-- mobile menu end -->
+      
+        
         </div>
-        <div class="mobile-header-info-wrap mobile-header-border">
+      <div class="mobile-header-info-wrap mobile-header-border">
           <div class="single-mobile-header-info mt-30">
             <a href="page-contact.html"> Our location </a>
           </div>
@@ -268,7 +269,7 @@
           <div class="single-mobile-header-info">
             <a href="#">(+01) - 2345 - 6789 </a>
           </div>
-        </div>
+        </div> 
         <div class="mobile-social-icon">
           <h5 class="mb-15 text-grey-4">Follow Us</h5>
           <a href="#"
@@ -299,7 +300,8 @@
         </div>
       </div>
     </div>
-  </div>
+  </div> -->
+
   <main class="main">
     <div class="page-header breadcrumb-wrap">
       <div class="container">
@@ -315,118 +317,74 @@
           <div class="col-12">
             <div class="table-responsive">
               <table class="table shopping-summery text-center">
+                <%if(wishlist.products.length > 0) {%>
                 <thead>
                   <tr class="main-heading">
-                    <th scope="col" colspan="2">Product</th>
-                    <th scope="col">Price</th>
-                    <th scope="col">Stock Status</th>
-                    <th scope="col">Action</th>
-                    <th scope="col">Remove</th>
+                    <th>Image</th>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                    <th>Remove</th>
                   </tr>
                 </thead>
                 <tbody>
+                  <%wishlist.products.forEach((product)=>{%>
                   <tr>
                     <td class="image product-thumbnail">
                       <img
-                        src="../../public/userassets/imgs/shop/product-1-1.jpg"
-                        alt="#"
+                        src="<%=product.productId.images[0]?.path%>"
+                        alt="image"
                       />
                     </td>
-                    <td class="product-des product-name">
+                    <td class="product-des product-name" width="48%">
                       <h5 class="product-name">
-                        <a href="shop-product-right.html"
-                          >J.Crew Mercantile Women's Short-Sleeve</a
-                        >
+                        <a href=""><%=product.productId.productName%></a>
                       </h5>
-                      <p class="font-xs">
-                        Maboriosam in a tonto nesciung eget<br />
-                        distingy magndapibus.
-                      </p>
+                      <p class="font-xs"><%=product.productId.description%></p>
                     </td>
                     <td class="price" data-title="Price">
-                      <span>$65.00 </span>
+                      <span><%=product.productId.salesPrice%></span>
                     </td>
                     <td class="text-center" data-title="Stock">
-                      <span class="color3 font-weight-bold">In Stock</span>
-                    </td>
-                    <td class="text-right" data-title="Cart">
-                      <button class="btn btn-sm">
-                        <i class="fi-rs-shopping-bag mr-5"></i>Add to cart
-                      </button>
-                    </td>
-                    <td class="action" data-title="Remove">
-                      <a href="#"><i class="fi-rs-trash"></i></a>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="image">
-                      <img
-                        src="../../public/userassets/imgs/shop/product-2-1.jpg"
-                        alt="#"
-                      />
-                    </td>
-                    <td class="product-des">
-                      <h5 class="product-name">
-                        <a href="shop-product-right.html"
-                          >Amazon Essentials Women's Tank</a
-                        >
-                      </h5>
-                      <p class="font-xs">
-                        Sit at ipsum amet clita no est,<br />
-                        sed amet sadipscing et gubergren
-                      </p>
-                    </td>
-                    <td class="price" data-title="Price">
-                      <span>$75.00 </span>
-                    </td>
-                    <td class="text-center" data-title="Stock">
-                      <span class="color3 font-weight-bold">In Stock</span>
-                    </td>
-                    <td class="text-right" data-title="Cart">
-                      <button class="btn btn-sm">
-                        <i class="fi-rs-shopping-bag mr-5"></i>Add to cart
-                      </button>
-                    </td>
-                    <td class="action" data-title="Remove">
-                      <a href="#"><i class="fi-rs-trash"></i></a>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="image">
-                      <img
-                        src="../../public/userassets/imgs/shop/product-3-1.jpg"
-                        alt="#"
-                      />
-                    </td>
-                    <td class="product-des">
-                      <h5 class="product-name">
-                        <a href="shop-product-right.html"
-                          >Amazon Brand - Daily Ritual Women's Jersey
-                        </a>
-                      </h5>
-                      <p class="font-xs">
-                        Erat amet et et amet diam et et.<br />
-                        Justo amet at dolore
-                      </p>
-                    </td>
-                    <td class="price" data-title="Price">
-                      <span>$62.00 </span>
-                    </td>
-                    <td class="text-center" data-title="Stock">
-                      <span class="text-danger font-weight-bold"
-                        >Out of stock</span
+                      <span class="color3 font-weight-bold"
+                        ><%=product.productId.status%></span
                       >
                     </td>
                     <td class="text-right" data-title="Cart">
-                      <button class="btn btn-sm btn-secondary">
-                        <i class="fi-rs-headset mr-5"></i>Contact Us
+                      <%if(product.productId.stock > 0){%>
+                      <button
+                        class="btn btn-sm addToCart"
+                        wishlistId="<%= product.id%>"
+                        productId="<%= product.productId._id%>"
+                      >
+                        <i class="fi-rs-shopping-bag mr-5"></i>Add to cart
                       </button>
+                      <%}else{%>
+                      <p>product out of stock</p>
+                      <%}%>
                     </td>
                     <td class="action" data-title="Remove">
-                      <a href="#"><i class="fi-rs-trash"></i></a>
+                      <a href="/user/delete-product?product=<%=product.id%>"
+                        ><i class="fi-rs-trash btn btn-sm"></i
+                      ></a>
                     </td>
                   </tr>
+                  <%})%>
                 </tbody>
+                <%}else{%>
+                <div>
+                  <p class="text-center text-info d-block">Wishlist is empty</p>
+                  <div
+                    class="d-flex align-items-center justify-content-center mt-20"
+                  >
+                    <a class="btn text-center" href="/user/"
+                      >Continue Shopping</a
+                    >
+                  </div>
+                </div>
+
+                <%}%>
               </table>
             </div>
           </div>
@@ -434,6 +392,50 @@
       </div>
     </section>
   </main>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const addToCartBtn = document.querySelectorAll(".addToCart");
+      addToCartBtn.forEach((button) => {
+        button.addEventListener("click", async function (event) {
+          event.preventDefault();
+          const wishlistId = button.getAttribute("wishlistId");
+          const productId = button.getAttribute("productId");
+          await fetch(
+            `/user/add-to-cart-wishlist?wishlistId=${wishlistId}&productId=${productId}`,
+            {
+              method: "post",
+            }
+          )
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.message) {
+                Swal.fire({
+                  title: "Success",
+                  text: data.message,
+                  icon: "success",
+                  confirmButtonText: "Ok",
+                  timer: 1500,
+                  timerProgressBar: true,
+                });
+              }
+              setTimeout(() => {
+                window.location.href = "/user/load-wishlist";
+              }, 1500);
+            })
+            .catch((error) => {
+              Swal.fire({
+                title: "Sorry!",
+                text: error,
+                icon: "error",
+                confirmButtonText: "Ok",
+                timer: 2000,
+                timerProgressBar: true,
+              });
+            });
+        });
+      });
+    });
+  </script>
 
   <!-- Preloader Start -->
 

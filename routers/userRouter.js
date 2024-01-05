@@ -18,6 +18,8 @@ const { loadUserProfile, loadAddAddress, submitAddress, loadEditAddress, postEdi
 const { loadCheckout, applyCoupon } = require("../controllers/userControllers/checkout")
 
 const { loadOrderSuccess, placeOrderCOD, walletPayment, paymentRazorpay, updatePaymentStatus } = require("../controllers/userControllers/payment")
+
+const { loadWishlist, addToWishlist, deleteWishlist, addToCartWishlist } = require("../controllers/userControllers/wishlist")
 // just rendering the pages
 userRouter.get("/login", loadLogin);
 userRouter.get("/signup", loadSignup);
@@ -48,7 +50,7 @@ userRouter.post("/filter-sort", filterAndSort)
 
 // added a middleware of authenticating token
 userRouter.use(verifyUser)
-// check blocked status
+// check the autherization of the client
 userRouter.use(checkBlockedStatus)
 
 
@@ -58,7 +60,6 @@ userRouter.post("/add-to-cart", addToCart)
 userRouter.get("/delete-cart", removeProductFromCart)
 userRouter.get("/clear-all-cart", clearAllCart)
 userRouter.post("/update-quantity", updateQuantity)
-
 
 //profile
 userRouter.get("/profile", loadUserProfile)
@@ -83,5 +84,12 @@ userRouter.get("/cancel-order/:id", cancelOrder)
 userRouter.get("/return-order/:id", returnOrder)
 userRouter.get("/search", searchProduct)
 userRouter.post("/single-cancel-order", singleCancelOrder)
+
+//wishlist
+userRouter.get("/load-wishlist", loadWishlist)
+userRouter.post("/add-to-wishlist", addToWishlist)
+userRouter.get("/delete-product", deleteWishlist)
+userRouter.post("/add-to-cart-wishlist", addToCartWishlist)
+
 
 module.exports = userRouter

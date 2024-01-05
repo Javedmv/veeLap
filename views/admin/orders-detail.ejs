@@ -368,6 +368,7 @@
                         <th width="40%">Product</th>
                         <th width="20%">Unit Price</th>
                         <th width="20%">Quantity</th>
+                        <th width="20%">Product Status</th>
                         <th width="20%" class="text-end">Total</th>
                       </tr>
                     </thead>
@@ -378,7 +379,7 @@
                           <a class="itemside" href="#">
                             <div class="left">
                               <img
-                                src="<%=product.productId.images[0].path%>"
+                                src="<%=product.productId.images[0]?.path%>"
                                 width="40"
                                 height="40"
                                 class="img-xs"
@@ -392,7 +393,12 @@
                         </td>
                         <td>₹ <%=product.productId.salesPrice%></td>
                         <td><%= product.quantity%></td>
-                        <td class="text-end">₹ <%= product.price%></td>
+                        <td
+                          class="badge rounded-pill alert-<%= product.singleProductStatus === 'Order Placed' ? 'dark' : product.singleProductStatus === 'Shipped' ? 'warning' : product.singleProductStatus === 'Delivered' ? 'success' : product.singleProductStatus === 'Cancelled' ? 'danger' : product.singleProductStatus === 'Returned'? 'secondary' : '' %>"
+                        >
+                          <%=product.singleProductStatus%>
+                        </td>
+                        <td class="text-end">₹<%= product.price%></td>
                       </tr>
                       <%})%>
                       <tr>

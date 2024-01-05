@@ -161,14 +161,18 @@ const cancelOrder = async (req, res) => {
         const userOrder = await orderModel.findOne({ userId: userData._id })
         let cancelledOrder = await orderModel.findOne({ _id: orderId })
         await orderModel.updateOne({ _id: orderId }, { $set: { orderStatus: "Cancelled" } })
+        let discount = 0;
         for (const item of cancelledOrder.products) {
+            item.singleProductStatus = "Cancelled"
+            if (item.productAmount != 0) {
+                discount += item.productAmount
+            }
             await productModel.updateOne({ _id: item.productId }, {
                 $inc: { stock: item.quantity }
             })
         }
-
         if (cancelledOrder.paymentStatus == "Success") {
-            const wallet = await walletModel.updateOne({ userId: userData._id }, { $inc: { balance: cancelledOrder.totalAmount } })
+            const wallet = await walletModel.updateOne({ userId: userData._id }, { $inc: { balance: cancelledOrder.totalAmount - discount } })
         }
         cancelledOrder.save()
         res.redirect(`/user/order-status-details?orderRefId=${cancelledOrder.referenceId}`)
@@ -176,6 +180,7 @@ const cancelOrder = async (req, res) => {
         console.log(error);
     }
 }
+
 const returnOrder = async (req, res) => {
     try {
         const orderId = req.params.id
@@ -198,33 +203,57 @@ const returnOrder = async (req, res) => {
 }
 const singleCancelOrder = async (req, res) => {
     try {
-        const { orderId, productStatusId } = req.query
-        console.log(productStatusId);
-        const userData = await userModel.findOne({ email: req.user })
-        const wallet = await walletModel.findOne({ userId: userData._id })
+        const { orderId, productStatusId } = req.query;
+        const userData = await userModel.findOne({ email: req.user });
+        const wallet = await walletModel.findOne({ userId: userData._id });
         const orderData = await orderModel.findOne({ _id: orderId })
             .populate({
                 path: "products.productId",
                 model: "Product"
-            })
-        orderData.products.forEach(async (product) => {
-            if (product._id == productStatusId) {
-                product.singleProductStatus = "Cancelled"
-                console.log(product.productId._id);
-                await productModel.updateOne({ _id: product.productId._id }, { $inc: { stock: product.quantity } })
-                console.log(orderData.paymentMethod)
+            });
+        let productUpdated = false;
+
+        for (const product of orderData.products) {
+            if (product._id == productStatusId && product.singleProductStatus !== "Cancelled") {
+                await orderModel.updateOne(
+                    { _id: orderId, "products._id": productStatusId },
+                    { $set: { "products.$.singleProductStatus": "Cancelled" } }
+                );
+
+                await productModel.findByIdAndUpdate(
+                    product.productId._id,
+                    { $inc: { stock: product.quantity } }
+                );
+
                 if (orderData.paymentStatus == "Success") {
-                    // wallet.balance += product.productId.
-                    // need to add a field in the order model and save the coupon applied amount to that field make sure other tihings are correct
+                    wallet.balance += product.price - product.productAmount;
                 }
+
+                productUpdated = true;
+                break;
             }
-        })
-        // orderData.save()
+
+        }
+        const order = await orderModel.findOne({ _id: orderId })
+        let allProductsCancelled = order.products.every(product => product.singleProductStatus == "Cancelled");
+        if (allProductsCancelled) {
+            await orderModel.updateOne({ _id: orderId }, { $set: { orderStatus: "Cancelled" } })
+        }
+
+        if (productUpdated) {
+            await orderData.save();
+            await wallet.save();
+            return res.status(200).json({ orderRefId: orderData.referenceId });
+        } else {
+            return res.status(200).json({ cancel: true });
+        }
 
     } catch (error) {
         console.log(error);
+        return res.status(500).json({ error: "Internal Server Error" });
     }
-}
+};
+
 
 module.exports = {
     loadUserProfile,

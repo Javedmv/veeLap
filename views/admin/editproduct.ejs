@@ -270,8 +270,8 @@
                               <% if (product.images.length > 0) { %>
                                 <% product.images.forEach(e => { %>
                                 
-                                  <div class="m-2 text-center">
-                                      <img class="mb-2" src="<%= e.path %>" alt="product Image" >
+                                  <div class="m-2 text-center" >
+                                      <img class="mb-2 text-center" src="<%= e.path %>" alt="product Image" width="300px" height="300px">
                                       <div><a href="/admin/edit-delete-image?SingleImgId=<%= e._id%>&productId=<%= product._id %>" class="btn btn-danger">Delete</a></div>
                                   </div>
                               <% }) %>
@@ -447,10 +447,30 @@
         // Images
 
         if (!images || images.length < 2) {
-          errors["images"] = "At least two image is required.";
+          errors["images"] = "At least two image files are required.";
           document.getElementById("imagesError").textContent = errors["images"];
         } else {
-          clearErrorMessages();
+          // Validate file types
+          const allowedExtensions = ["jpg", "jpeg", "png", "webp"];
+          let allFilesValid = true;
+
+          for (let i = 0; i < images.length; i++) {
+            const file = images[i];
+            const fileExtension = file.name.split(".").pop().toLowerCase();
+
+            if (!allowedExtensions.includes(fileExtension)) {
+              allFilesValid = false;
+              break;
+            }
+          }
+
+          if (!allFilesValid) {
+            errors["images"] = "Only JPG, JPEG, WEBP and PNG images are allowed.";
+            document.getElementById("imagesError").textContent =
+              errors["images"];
+          } else {
+            clearErrorMessages();
+          }
         }
 
         return errors;

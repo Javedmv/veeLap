@@ -46,9 +46,16 @@ const loadHome = async (req, res) => {
     try {
         const loggedIn = req.cookies.loggedIn
         const userEmail = req.cookies.userEmail
-        const products = await productModel.find({})
+        const page = req.query.page || 1;
+        const no_doc_on_each_pages = 3;
+        const totalProducts = await productModel.countDocuments({
+            status: "Active",
+        });
+        const totalPages = Math.ceil(totalProducts / no_doc_on_each_pages)
+        const skip = (page - 1) * no_doc_on_each_pages
+        const products = await productModel.find({ status: "Active" }).skip(skip).limit(no_doc_on_each_pages)
         const category = await categoryModel.find({})
-        res.render("user/home", { userEmail, loggedIn, products, category });
+        res.render("user/home", { userEmail, loggedIn, products, category, page, totalPages });
     } catch (error) {
         console.log(error.message);
     }
