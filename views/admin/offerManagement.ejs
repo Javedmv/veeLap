@@ -190,8 +190,7 @@
             <div class="card-body">
               <div class="table-responsive">
                 <table class="table table-hover" id="couponTable">
-                  <%# if (offerData.length > 0) {%>
-                  <h5 style="text-align: center">No offers available</h5>
+                  <% if (offerData.length > 0) {%>
                   <thead
                     class="col-lg-12d-flex align-items-center justify-content-center"
                   >
@@ -210,18 +209,20 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <%# offerData.reverse().forEach(offer => {%>
+                    <% offerData.reverse().forEach(offer => {%>
                     <tr>
-                      <td class="text-center"><%#= offer.offerType %></td>
-                      <td class="text-center"><%#= offer.offerName %></td>
+                      <td class="text-center"><%= offer.offerType %></td>
                       <td class="text-center">
-                        <%#= offer.discountPercentage %>%
+                        <%= offer.productId.productName %>
                       </td>
                       <td class="text-center">
-                        <%#= offer.startDate.toLocaleDateString() %>
+                        <%= offer.discountPercentage %>%
                       </td>
                       <td class="text-center">
-                        <%#= offer.endDate.toLocaleDateString() %>
+                        <%= offer.startDate.toLocaleDateString() %>
+                      </td>
+                      <td class="text-center">
+                        <%= offer.endDate.toLocaleDateString() %>
                       </td>
                       <td class="text-center">
                         <a
@@ -230,31 +231,37 @@
                             color: white;
                           "
                           class="btn"
-                          href="/admin/edit-offer/<%#= offer._id %>"
+                          href="/admin/load-edit-offer/<%= offer._id %>"
                           >Edit</a
                         >
 
-                        <%# if(offer.status === 'Unblock') {%>
+                        <% if(offer.status == 'Active') {%>
                         <button
                           class="btn btn-md"
-                          onclick="confirmBlockOffer('<%#S= offer._id %>')"
+                          onclick="confirmBlockOffer('<%= offer._id %>')"
                         >
                           Block
                         </button>
-                        <%#} else if (offer.status === 'Block') {%>
+                        <%} else if (offer.status == 'Inactive') {%>
                         <button
                           class="btn btn-md"
                           style="background-color: #b61300; color: #fff"
-                          onclick="confirmUnblockOffer('<%#= offer._id %>')"
+                          onclick="confirmUnblockOffer('<%= offer._id %>')"
                         >
                           Unblock
                         </button>
-                        <%#} %>
+                        <%}else{ %> <%}%>
                       </td>
                     </tr>
-                    <%#}) %>
+                    <%}) %>
                   </tbody>
-                  <%#} %>
+                  <%}else{ %>
+                  <div class="text-center">
+                    <h4>Sorry No Offer Available!!</h4>
+                    <br />
+                    <p>Create One by Clicking On Add Offer.</p>
+                  </div>
+                  <%}%>
                 </table>
               </div>
             </div>
@@ -303,7 +310,7 @@
               cancelButtonText: "Cancel",
             }).then((result) => {
               if (result.isConfirmed) {
-                //   window.location.href = /admin/block-offer/${offerId};
+                window.location.href = `/admin/block-offer/${offerId}`;
               }
             });
           }
@@ -318,7 +325,7 @@
               cancelButtonText: "Cancel",
             }).then((result) => {
               if (result.isConfirmed) {
-                //   window.location.href = /admin/unblock-offer/${offerId};
+                window.location.href = `/admin/unblock-offer/${offerId}`;
               }
             });
           }

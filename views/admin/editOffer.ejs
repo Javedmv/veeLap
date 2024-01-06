@@ -175,113 +175,112 @@
           </ul>
         </div>
       </header>
-        <section class="content-main">
-            <div class="row">
-                <div class="col-9">
-                    <div class="content-header">
-                        <h3 class="content-title">Add Offer</h3>
-                        <!-- <div>
-                            <button class="btn btn-light rounded font-sm mr-5 text-body hover-up">Save to draft</button>
-                            <button class="btn btn-md rounded font-sm hover-up">Publich</button>
-                        </div> -->
-                    </div>
+      <section class="content-main">
+        <div class="row">
+            <div class="col-9">
+                <div class="content-header">
+                    <h3 class="content-title">Edit Offer</h3>
+                    <!-- <div>
+                        <button class="btn btn-light rounded font-sm mr-5 text-body hover-up">Save to draft</button>
+                        <button class="btn btn-md rounded font-sm hover-up">Publich</button>
+                    </div> -->
                 </div>
-                <div class="col-lg-6">
-                    <div class="card mb-4">
-                        <!-- <div class="card-header">
-                            <h4>Basic</h4>
-                        </div> -->
-                        <div class="card-body">
-                            <form  id="offer-form" method="post">
-                                
-                                <div class="col-lg-6 mb-4">
-                                  <label class="form-label">Offer Type</label>
-                                  <select class="form-select" name="offerType" id="offerType">
-                                    <option value="" disabled selected>Select Type</option>
-                                    <option value="product">Product</option>
-                                  </select>
-                                </div>
-                                
-                                <div class="mb-4" id="offerNameProduct" style="display: none;">
-                                    <label for="offerNameProduct" class="form-label">Product Name</label>
-                                    <select class="form-select" name="offerNameProduct" id="offerNameProductSelect">
-                                        <option disabled selected>Select Name</option>
-                                        <% productData.forEach(product => { %>
-                                        <option value="<%= product._id %>"><%= product.productName %></option>
-                                        <% }) %>
-                                    </select>
-                                </div>
-  
-                                <div class="row">
-                                  <div class="col-lg-6">
-                                    <div class="mb-4">
-                                        <label class="form-label">Discount percentage</label>
-                                        <input placeholder="percentage" type="number" class="form-control" name="discountPercentage" id="discountPercentage">
-                                    </div>
-                                  </div>
-  
-                                  <div class="col-lg-6">
-                                    <label class="form-label">Status</label>
-                                    <select class="form-select" name="status" id="status">
-                                        <option disabled selected>Select status</option>
-                                        <option value="Inactive" > Block </option>
-                                        <option value="Active" > Unblock </option>
-                                    </select>
-                                  </div>
-                                </div>
-  
-                                <div class="row">
-                                  <div class="col-lg-6">
-                                      <div class="mb-4">
-                                          <label class="form-label">Startind Date</label>
-                                          <div class="row gx-2">
-                                              <input placeholder="₹" type="date" class="form-control" name="startDate" id="startDate">
-                                          </div>
-                                      </div>
-                                  </div>
-  
-                                  <div class="col-lg-6">
-                                      <div class="mb-4">
-                                          <label class="form-label">Ending Date</label>
-                                          <input placeholder="₹" type="date" class="form-control" name="endDate" id="endDate">
-                                      </div>
-                                  </div>
-                                </div>
-  
-                                <div>
-                                    <button class="btn btn-md" type="submit" id="submit">Submit</button>
-                                </div>
-                            </form>
+            </div>
+            <div class="col-lg-6">
+                <div class="card mb-4">
+                    <!-- <div class="card-header">
+                        <h4>Basic</h4>
+                    </div> -->
+                    <div class="card-body">
+                        <form  id="offer-form" method="post">
 
-                            <script>
-                              document.addEventListener('DOMContentLoaded', function () {
-                                const offerTypeSelect = document.getElementById('offerType');
-                                const offerNameCategory = document.getElementById('offerNameCategory');
-                                const offerNameProduct = document.getElementById('offerNameProduct');
+                            <input type="hidden" name="offerId" id="offerId" value="<%= offerData._id %>">
                             
-                                offerTypeSelect.addEventListener('change', function () {
-                                  const selectedOption = offerTypeSelect.value;
+                            <div class="col-lg-6 mb-4">
+                              <label class="form-label">Offer Type</label>
+                              <select class="form-select" name="offerType" id="offerType">
+                                <option disabled selected><%= offerData.offerType %></option>
+                              </select>
+                            </div>
+
+                            <div class="mb-4" id="offerName">
+                                <label for="offerName" class="form-label">Offer Name</label>
+                                <select class="form-select" name="offerName" id="offerNameId">
+                                  <option value="<%= offerData.productId._id %>" disabled selected><%= offerData.productId.productName %></option>
+                                </select>
+                            </div>
                             
-                                  if (selectedOption === 'category') {
-                                    offerNameCategory.style.display = 'block';
-                                    offerNameProduct.style.display = 'none';
-                                  } else if (selectedOption === 'product') {
-                                    offerNameProduct.style.display = 'block';
-                                    offerNameCategory.style.display = 'none';
-                                  } else {
-                                    offerNameCategory.style.display = 'none';
-                                    offerNameProduct.style.display = 'none';
-                                  }
-                                });
-                              });
-                            </script>
-                        </div>
-                    </div> 
-                    
-                </div>
+
+                            <div class="row">
+                              <div class="col-lg-6">
+                                <div class="mb-4">
+                                    <label class="form-label">Discount percentage</label>
+                                    <input placeholder="percentage" type="number" class="form-control" value="<%= offerData.discountPercentage %>" name="discountPercentage" id="discountPercentage">
+                                </div>
+                              </div>
+
+                              <div class="col-lg-6">
+                                <label class="form-label">Status</label>
+                                <select class="form-select" name="status" id="status">
+                                  <option <%= offerData.status === 'Inactive' ? 'selected' : '' %>>Block</option>
+                                  <option <%= offerData.status === 'Active' ? 'selected' : '' %>>Unblock</option>
+                                </select>
+                              </div>
+                            </div>
+
+                            <div class="row">
+                              <div class="col-lg-6">
+                                  <div class="mb-4">
+                                      <label class="form-label">Startind Date</label>
+                                      <div class="row gx-2">
+                                          <input placeholder="₹" type="date" value="<%= offerData.startDate.toISOString().split('T')[0] %>" class="form-control" name="startDate" id="startDate">
+                                      </div>
+                                  </div>
+                              </div>
+
+                              <div class="col-lg-6">
+                                  <div class="mb-4">
+                                      <label class="form-label">Ending Date</label>
+                                      <input placeholder="₹" type="date" value="<%= offerData.endDate.toISOString().split('T')[0] %>" class="form-control" name="endDate" id="endDate">
+                                  </div>
+                              </div>
+                            </div>
+
+                            <div>
+                                <button class="btn btn-md" type="submit" id="submit">Submit</button>
+                            </div>
+                        </form>
+
+                        <!-- <script>
+                          document.addEventListener('DOMContentLoaded', function () {
+                            const offerTypeSelect = document.getElementById('offerType');
+                            const offerNameCategory = document.getElementById('offerNameCategory');
+                            const offerNameProduct = document.getElementById('offerNameProduct');
+                        
+                            offerTypeSelect.addEventListener('change', function () {
+                              const selectedOption = offerTypeSelect.value;
+                        
+                              if (selectedOption === 'category') {
+                                offerNameCategory.style.display = 'block';
+                                offerNameProduct.style.display = 'none';
+                              } else if (selectedOption === 'product') {
+                                offerNameProduct.style.display = 'block';
+                                offerNameCategory.style.display = 'none';
+                              } else {
+                                offerNameCategory.style.display = 'none';
+                                offerNameProduct.style.display = 'none';
+                              }
+                            });
+                          });
+                        </script> -->
+
+                    </div>
+                </div> 
                 
             </div>
-        </section> <!-- content-main end// -->
+            
+        </div>
+    </section> 
         <footer class="main-footer font-xs">
             <div class="row pb-30 pt-15">
                 <div class="col-sm-6">
@@ -315,22 +314,18 @@
           form.addEventListener('submit', function (event) {
             event.preventDefault();
       
+            // Validate form before submission
             if (validateForm()) {
+              const offerId = document.getElementById('offerId').value;
               const offerType = document.getElementById('offerType').value;
-      
-              let offerName;
-              if (offerType === 'category') {
-                offerName = document.getElementById('offerNameCategorySelect').value;
-              } else if (offerType === 'product') {
-                offerName = document.getElementById('offerNameProductSelect').value;
-              }
-      
+              const offerName = document.getElementById('offerNameId').value;
               const discountPercentage = document.getElementById('discountPercentage').value;
               const status = document.getElementById('status').value;
               const startDate = document.getElementById('startDate').value;
               const endDate = document.getElementById('endDate').value;
-      
+
               const jsonData = {
+                offerId,
                 offerType,
                 productId:offerName,
                 discountPercentage,
@@ -339,7 +334,8 @@
                 endDate
               };
       
-              fetch('/admin/postadd-offer', {
+              // Continue with form submission (fetch request)
+              fetch('/admin/postEdit-offer', {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
@@ -347,7 +343,7 @@
                 body: JSON.stringify(jsonData),
               })
                 .then(response => response.json())
-                .then(data => {
+                .then(async(data) => {
                   if (data.error) {
                     Swal.fire({
                       icon: 'error',
@@ -357,15 +353,15 @@
                       timer: 1500,
                     });
                   } else {
-                    Swal.fire({
+                    await Swal.fire({
                       icon: 'success',
                       title: 'Success',
                       text: data.message,
                       showConfirmButton: false,
                       timer: 1500,
-                    }).then(()=>{
-                        window.location.href = '/admin/view-offer-management';
-                    })
+                    });
+                    
+                    window.location.href = '/admin/view-offer-management';
                   }
                 })
                 .catch(error => {
@@ -379,17 +375,18 @@
                   console.error("Error:", error);
                 });
             }
-          });
+        });
       
           function validateForm() {
-          
+            // Validate each field
             const offerType = document.getElementById('offerType').value;
+            const offerName = document.getElementById('offerNameId').value;
             const discountPercentage = document.getElementById('discountPercentage').value;
             const status = document.getElementById('status').value;
             const startDate = document.getElementById('startDate').value;
             const endDate = document.getElementById('endDate').value;
       
-            if (!offerType || !discountPercentage || !status || !startDate || !endDate) {
+            if (!offerType || !offerName || !discountPercentage || !status || !startDate || !endDate) {
               Swal.fire({
                 icon: 'error',
                 title: 'Validation Error',
@@ -400,6 +397,7 @@
               return false;
             }
       
+            // Validate discount percentage range
             if (discountPercentage < 0 || discountPercentage > 100) {
               Swal.fire({
                 icon: 'error',
@@ -410,7 +408,7 @@
               });
               return false;
             }
-
+      
             return true;
           }
         });

@@ -1,12 +1,13 @@
 const mongoose = require("mongoose")
 
 const offerModel = new mongoose.Schema({
-    offerName: {
+    offerType: {
         type: String,
         required: true,
     },
-    offerType: {
-        type: String,
+    productId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product",
         required: true,
     },
     discountPercentage: {
@@ -24,10 +25,6 @@ const offerModel = new mongoose.Schema({
     status: {
         type: String,
         default: "Inactive"
-    },
-    isActive: {
-        type: Boolean,
-        default: true,
     },
 },
     { timestamps: true }

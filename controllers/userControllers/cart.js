@@ -31,7 +31,7 @@ const loadCart = async (req, res) => {
             let grandTotal = 0;
 
             for (let i = 0; i < products.products.length; i++) {
-                grandTotal = grandTotal + products.products[i].productId.salesPrice * products.products[i].quantity
+                grandTotal = grandTotal + ((products.products[i].productId.salesPrice * products.products[i].quantity) - (products.products[i].productId.offerAmount * products.products[i].quantity))
             }
             return res.render("user/cart", { loggedIn, products, grandTotal });
         }

@@ -6,6 +6,11 @@
     overflow: hidden;
     -webkit-line-clamp: 2; /* Number of lines to show */
   }
+  .old-price {
+    text-decoration: line-through;
+    color: #cccccc;
+  }
+
 </style>
   <body>
     <div class="mobile-header-active mobile-header-wrapper-style">
@@ -370,9 +375,16 @@
                         </p>
                         
                       </td>
+                      <%if(product.productId.offerAmount > 0){%>
                       <td class="prices" data-title="Price col-2">
-                        <span>₹<%= product.productId.salesPrice%> </span>
+                        <span class="old-price mr-10">₹<%= product.productId.salesPrice%> </span>
+                        <span>₹<%= product.productId.salesPrice - product.productId.offerAmount%> </span>
                       </td>
+                      <% } else { %>
+                      <td class="prices" data-title="Price col-2">
+                          <span>₹<%= product.productId.salesPrice%> </span>
+                      </td>
+                      <%}%>
                       <td class="text-center col-2" data-title="Stock">
                         <% if(product.productId.stock <= product.quantity){ %>
                           <div class="detail-qty border radius m-auto mt-20" data-product-id="<%= product._id %>">
@@ -392,7 +404,12 @@
                         <% } %>
                       </td>
                       <td class="text-right col-1" data-title="Cart">
-                        <span class="cart-total">₹<%= product.productId.salesPrice * product.quantity %></span>
+                        <%if(product.productId.offerAmount > 0){%>
+                          <span class="cart-total old-price mr-10">₹<%= product.productId.salesPrice * product.quantity %></span>
+                          <span class="cart-total ">₹<%= (product.productId.salesPrice - product.productId.offerAmount) * product.quantity %></span>
+                        <% } else { %>
+                          <span class="cart-total">₹<%= product.productId.salesPrice * product.quantity %></span>
+                        <%}%>
                       </td>
                       <td class="action col-1" data-title="Remove">
                         <a href="/user/delete-cart?userId=<%=product._id%>" class="btn btn-sm deleleCartBtn">

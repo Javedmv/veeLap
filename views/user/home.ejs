@@ -235,7 +235,7 @@
                                 <!-- BODY HOME FIRST IMAGE -->
                               <img
                                 class="default-img"
-                                src="<%= e.images[0].path %>"
+                                src="<%= e.images[0]?.path %>"
                                 alt="image"
                               />
                               <img
@@ -244,10 +244,13 @@
                                 alt="image"
                               />
                             </a>
-                            <% } else { %>
-                              <span>No Image Available</span>
                             <% } %>
                           </div>
+                          <%if(e.discountStatus === "Active"){%>
+                          <div class="product-badges product-badges-position product-badges-mrg">
+                            <span class="sale">Sale</span>
+                          </div>
+                          <%}%>
                           <div class="product-action-1">
                             <button
                               type="button"
@@ -278,10 +281,16 @@
                               <span>90%</span>
                             </span>
                           </div> -->
-                          <div class="product-price">
-                            <span>₹ <%= e.salesPrice%></span>
-                            <span class="old-price">₹ <%= e.regularPrice%></span>
-                          </div>
+                          <%if(e.discountStatus === "Active" ){%>
+                            <div class="product-price">
+                              <span>₹ <%= e.salesPrice - e.offerAmount %></span>
+                              <span class="old-price">₹ <%= e.salesPrice%></span>
+                            </div>
+                          <%}else{%>
+                            <div class="product-price">
+                              <span>₹ <%= e.salesPrice%></span>
+                            </div>
+                            <%}%>
                           <div class="product-action-1 show">
                             <button
                               aria-label="Add To Cart"

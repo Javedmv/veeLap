@@ -64,6 +64,24 @@ const productModel = mongoose.Schema({
             },
         },
     ],
+    discountStatus: {
+        type: String,
+        default: "Inactive"
+    },
+    discountPercent: {
+        type: Number,
+    },
+    offerStart: {
+        type: Date
+    },
+    offerEnd: {
+        type: Date
+    },
+    offerAmount: {
+        type: Number,
+        default: 0
+    }
+
 });
 
 module.exports = mongoose.model("Product", productModel);

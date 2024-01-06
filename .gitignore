@@ -1,4 +1,4 @@
 node_modules/
 .env
 wrong.ejs/
-public/uploads
+public/uploads/
