@@ -11,9 +11,9 @@ const { loadCart, addToCart, removeProductFromCart, clearAllCart, updateQuantity
 
 const { productDetails } = require("../controllers/userControllers/product")
 
-const { filterAndSort, searchProduct } = require("../controllers/userControllers/filterAndSort")
+const { filterAndSort, searchProduct, aboutPage, loadSalesPage } = require("../controllers/userControllers/filterAndSort")
 
-const { loadUserProfile, loadAddAddress, submitAddress, loadEditAddress, postEditAddress, deleteAddress, loadOrderDetails, cancelOrder, returnOrder, singleCancelOrder } = require("../controllers/userControllers/profile")
+const { loadUserProfile, loadAddAddress, submitAddress, loadEditAddress, postEditAddress, deleteAddress, loadOrderDetails, cancelOrder, returnOrder, singleCancelOrder, submitReferral } = require("../controllers/userControllers/profile")
 
 const { loadCheckout, applyCoupon } = require("../controllers/userControllers/checkout")
 
@@ -47,6 +47,9 @@ userRouter.get("/product-details/:id", productDetails)
 
 //filter and sort products
 userRouter.post("/filter-sort", filterAndSort)
+userRouter.get("/about", aboutPage)
+userRouter.get("/sales-page", loadSalesPage)
+userRouter.post("/search", searchProduct)
 
 // added a middleware of authenticating token
 userRouter.use(verifyUser)
@@ -70,6 +73,8 @@ userRouter.post("/submit-edit-address/:id", postEditAddress)
 userRouter.get("/delete-single-address/:id", deleteAddress)
 userRouter.get("/order-status-details", loadOrderDetails)
 userRouter.post("/edit-user-details", editUserDetails)
+userRouter.post("/referral", submitReferral)
+
 //checkout
 userRouter.get("/checkout", loadCheckout)
 userRouter.get("/order/success", loadOrderSuccess)
@@ -82,7 +87,6 @@ userRouter.post("/update-payment-status", updatePaymentStatus)
 //order
 userRouter.get("/cancel-order/:id", cancelOrder)
 userRouter.get("/return-order/:id", returnOrder)
-userRouter.get("/search", searchProduct)
 userRouter.post("/single-cancel-order", singleCancelOrder)
 
 //wishlist

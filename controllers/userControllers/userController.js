@@ -7,7 +7,7 @@ const productModel = require("../../models/productModel");
 const categoryModel = require("../../models/categoryModel");
 const Swal = require('sweetalert2');
 const walletModel = require("../../models/walletModel");
-
+const Randomstring = require("randomstring")
 
 const otpGenerator = {
     generate: function (length) {
@@ -47,7 +47,7 @@ const loadHome = async (req, res) => {
         const loggedIn = req.cookies.loggedIn
         const userEmail = req.cookies.userEmail
         const page = req.query.page || 1;
-        const no_doc_on_each_pages = 3;
+        const no_doc_on_each_pages = 9;
         const totalProducts = await productModel.countDocuments({
             status: "Active",
         });
@@ -150,11 +150,14 @@ const submitSignup = async (req, res) => {
         if (userData) {
             res.render("user/signup", { error: "Email already exists" });
         } else {
+            let code = Randomstring.generate(8)
+            console.log(code);
             await userModel.create({
                 userName: userName,
                 email: email,
                 phoneNumber: phoneNumber,
                 password: password,
+                ReferralCode: code,
             });
             const newUser = await userModel.findOne({ email: email })
             await walletModel.create({
@@ -296,7 +299,7 @@ const resetPassword = async (req, res) => {
         console.log(error);
         res.status(500).json({ error: "Internal Server Error" })
     }
-}
+};
 
 const editUserDetails = async (req, res) => {
     try {
@@ -313,7 +316,7 @@ const editUserDetails = async (req, res) => {
     } catch (error) {
         console.log(error);
     }
-}
+};
 
 module.exports = {
     loadLogin,

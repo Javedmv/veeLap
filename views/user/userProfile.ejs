@@ -565,7 +565,24 @@
                           <div class="d-flex align-items-center justify-content-end mr-60 mt-5">
                             <a href="/user/load-forgot-pass" class="text-primary">Forgot Password?</a>
                           </div>
+                      <div class=" col-lg-10 mx-auto d-flex">
+                        <div class="mr-20">
+                          Referral Code : <%=user.ReferralCode%>
+                        </div>
+                        <a class="btn btn-sm font-sm rounded btn-dark copy-button"
+                        onclick="copyToClipboard('<%=user.ReferralCode%>')">Copy</a>
                       </div>
+                      <%#referal code%>
+                      <%if(user.ReferralStatus){%>
+                      <div class="mt-20 col-lg-10 mx-auto referral-container">
+                        <label for="referralCode">Enter Referral Code:</label>
+                        <input type="text" id="referralCode" placeholder="Enter code..." class="form-control referralCodeInput" />
+                        <button id="submitReferral" type="button" class="btn btn-sm">Submit</button>
+                      </div>
+                      <%}%>
+                    </div>
+                    
+
                       <div id="editDetails" style="display: none;">
                         <div class="card col-lg-10 mx-auto">
                             <div class="card-header text-center">
@@ -599,7 +616,13 @@
                           </div>
                         </div> 
                         <div class="tab-pane fade" id="wallet-details" role="tabpanel" aria-labelledby="wallet-details">
-                          <div id="walletDetails">
+                          <table>
+                            <tr>
+                              <th>Si no</th>
+                              <th></th>
+                            </tr>
+                          </table>
+                          <div id="walletDetails ">
                             <div class="card col-lg-5 mx-auto">
                               <div class="card-header text-center">
                                   <h5 class="d-block align-items-center">Wallet</h5>
@@ -620,6 +643,54 @@
             </div>
           </section>
         </main>
+        <script>
+          document.addEventListener("DOMContentLoaded",function(){
+            const ReferralBtn = document.getElementById("submitReferral")
+            ReferralBtn.addEventListener("click", async function () {
+              const referralCodeInputs = document.getElementById("referralCode").value
+              await fetch(`/user/referral?refCod=${referralCodeInputs}`,{
+                method:'post',
+              }).then((response)=>{
+                return response.json()
+              }).then((data) => {
+                if(!data.status){
+                  showSweetAlert(data.message,'error')
+                }else{
+                  showSweetAlert(data.message,'success')
+                  .then(()=>{
+                    window.location.href= "/user/referral"
+                  })
+                }
+              })
+              
+            });
+            function showSweetAlert(message,icon) {
+              Swal.fire({
+                title: 'Hello!',
+                text: message,
+                icon: icon,
+                confirmButtonText: 'OK'
+              });
+            }
+            function copyToClipboard(code) {
+              navigator.clipboard
+                .writeText(code)
+                .then(() => {
+                  console.log("Coupon Code copied to Clipboard");
+                  Swal.fire({
+                    position: "center",
+                    icon: "success",
+                    title: "Coupon Code copied to Clipboard",
+                    showConfirmButton: false,
+                    timer: 1500,
+                 });
+               })
+                .catch((err) => {
+                  console.error("Unable to copy to clipboard", err);
+                });
+            }
+          })
+        </script>
     <script>
       document.addEventListener("DOMContentLoaded",function(){
         document.getElementById("editAccountBtn").addEventListener("click",function(){

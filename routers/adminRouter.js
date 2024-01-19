@@ -26,7 +26,7 @@ const {
 } = require("../controllers/adminControllers/adminController")
 const { loadCategory, addCategory, editCategory, loadEditCategory, statusCategory, deleteCategory } = require("../controllers/adminControllers/categoryManagement")
 const { loadUser, userStatus } = require("../controllers/adminControllers/userManagement");
-const { loadAddProducts, addProduct, loadProduct, loadEditProducts, deleteSingleImage, editAddImage, editSubmitProduct, deleteProduct } = require("../controllers/adminControllers/productManagement");
+const { loadAddProducts, addProduct, loadProduct, loadEditProducts, deleteSingleImage, editSubmitProduct, deleteProduct } = require("../controllers/adminControllers/productManagement");
 const { loadOrder, loadOrderDetails, changeOrderStatus } = require("../controllers/adminControllers/orderManagement")
 const { loadCouponManagement, loadAddCoupon, loadEditCoupon, addNewCoupon, unblockCoupon, blockCoupon, postEditCoupon } = require("../controllers/adminControllers/couponManagement")
 const { loadOfferManagement, loadAddOffer, addOfferSubmit, unblockOffer, blockOffer, loadEditOffer, postEditOffer } = require("../controllers/adminControllers/offerMangement")
@@ -60,7 +60,6 @@ admin_Router.get("/view-add-product", loadAddProducts);
 admin_Router.post("/add-product", upload.array("productImages", 3), addProduct);
 admin_Router.get("/edit-product/:id", loadEditProducts);
 admin_Router.get("/edit-delete-image", deleteSingleImage);
-admin_Router.get("/edit-add-image/:id", editAddImage);
 admin_Router.post("/edit-submit-product/:id", upload.array("productImages", 3), editSubmitProduct);
 admin_Router.delete("/delete-product/:id", deleteProduct);
 

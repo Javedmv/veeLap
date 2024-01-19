@@ -1,5 +1,4 @@
 ﻿<%-include("./partials/header.ejs")%>
-
     <main class="main">
       <section class="home-slider position-relative mb-30">
         <div class="container">
@@ -230,7 +229,7 @@
 <!-- ejs starts -->
                         <div class="product-img-action-wrap">
                           <div class="product-img product-img-zoom">
-                            <% if (e && e.images && e.images.length > 0 && e.images[0].path) { %>
+                            <% if (e && e.images && e.images.length > 0 && e.images[0]?.path) { %>
                             <a href="/user/product-details/<%= e._id%>">
                                 <!-- BODY HOME FIRST IMAGE -->
                               <img
@@ -248,7 +247,7 @@
                           </div>
                           <%if(e.discountStatus === "Active"){%>
                           <div class="product-badges product-badges-position product-badges-mrg">
-                            <span class="sale">Sale</span>
+                            <span class="sale ">Sale</span>
                           </div>
                           <%}%>
                           <div class="product-action-1">
@@ -269,10 +268,10 @@
                         </div>
                         <div class="product-content-wrap">
                           <div class="product-category">
-                            <a href="shop-grid-right.html"><%= e.brand%></a>
+                            <a href="/user/product-details/<%= e._id%>"><%= e.brand%></a>
                           </div>
                           <h2>
-                            <a href="shop-product-right.html"
+                            <a href="/user/product-details/<%= e._id%>"
                               ><%= e.productName%></a
                             >
                           </h2>
@@ -380,7 +379,7 @@
                 setTimeout(()=>{
                   window.location.href=`/user/load-cart?quantity=${data.quantity}&productId=${data.productId}`
                 })
-              } else {
+              } else  {
                 Swal.fire({
                   title: data.error,
                   text: "Sorry",

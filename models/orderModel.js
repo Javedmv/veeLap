@@ -64,6 +64,9 @@ const orderModel = mongoose.Schema({
         ref: "Address",
         required: true
     },
+    returnAmount: {
+        type: Number,
+    }
 },
     { timestamps: true }
 )

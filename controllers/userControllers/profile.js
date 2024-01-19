@@ -1,3 +1,4 @@
+const { json } = require("body-parser");
 const addressModel = require("../../models/addressModel");
 const orderModel = require("../../models/orderModel");
 const productModel = require("../../models/productModel");
@@ -26,8 +27,10 @@ const loadAddAddress = async (req, res) => {
     try {
         const loggedIn = req.cookies.loggedIn
         const { isCheckout } = req.query
+        console.log(typeof isCheckout);
         if (!isCheckout === "true") {
             isCheckout = null
+            console.log("inside the is checkout");
         }
         res.render("user/addAddress", { loggedIn, isCheckout })
     } catch (error) {
@@ -39,6 +42,7 @@ const submitAddress = async (req, res) => {
     try {
         const { phone, pincode, state, landMark, city, name, addressType } = req.body
         const { isCheckout } = req.query
+        console.log(isCheckout);
         const user = await userModel.findOne({ email: req.user }, { _id: 1 })
         const userAddress = await addressModel.findOne({ userId: user })
         if (!userAddress) {
@@ -66,9 +70,11 @@ const submitAddress = async (req, res) => {
                 phone
             })
             await userAddress.save()
-            if (isCheckout === "true") {
+            if (isCheckout == "true") {
+                console.log("this is from the cart");
                 res.redirect("/user/checkout")
             } else {
+                console.log("this is from the profile");
                 res.redirect("/user/profile")
             }
         }
@@ -163,16 +169,30 @@ const cancelOrder = async (req, res) => {
         await orderModel.updateOne({ _id: orderId }, { $set: { orderStatus: "Cancelled" } })
         let discount = 0;
         for (const item of cancelledOrder.products) {
-            item.singleProductStatus = "Cancelled"
-            if (item.productAmount != 0) {
-                discount += item.productAmount
+            if (item.singleProductStatus != "Cancelled") {
+                item.singleProductStatus = "Cancelled"
+                if (item.productAmount != 0) {
+                    discount += item.productAmount
+                }
+                // if (item.offerAmount != 0) {
+                //     discount += item.offerAmount
+                // }
+                await productModel.updateOne({ _id: item.productId }, {
+                    $inc: { stock: item.quantity }
+                })
+
             }
-            await productModel.updateOne({ _id: item.productId }, {
-                $inc: { stock: item.quantity }
-            })
+
         }
+
         if (cancelledOrder.paymentStatus == "Success") {
-            const wallet = await walletModel.updateOne({ userId: userData._id }, { $inc: { balance: cancelledOrder.totalAmount - discount } })
+            // for (let product of cancelledOrder.products) {
+            // let walletReturn = 0;
+            // if (product.singleProductStatus != "Cancelled") {
+            //     walletReturn += product.price - discount
+            // }
+            const wallet = await walletModel.updateOne({ userId: userData._id }, { $inc: { balance: cancelledOrder.returnAmount } })
+            // }
         }
         cancelledOrder.save()
         res.redirect(`/user/order-status-details?orderRefId=${cancelledOrder.referenceId}`)
@@ -226,9 +246,11 @@ const singleCancelOrder = async (req, res) => {
                 );
 
                 if (orderData.paymentStatus == "Success") {
-                    wallet.balance += product.price - product.productAmount;
+                    await walletModel.findByIdAndUpdate(wallet._id, { $inc: { balance: (product.price - product.productAmount) } });
+                    await orderModel.findByIdAndUpdate(orderId, {
+                        $inc: { returnAmount: -(product.price - product.productAmount) }
+                    });
                 }
-
                 productUpdated = true;
                 break;
             }
@@ -242,7 +264,6 @@ const singleCancelOrder = async (req, res) => {
 
         if (productUpdated) {
             await orderData.save();
-            await wallet.save();
             return res.status(200).json({ orderRefId: orderData.referenceId });
         } else {
             return res.status(200).json({ cancel: true });
@@ -254,6 +275,33 @@ const singleCancelOrder = async (req, res) => {
     }
 };
 
+const submitReferral = async (req, res) => {
+    try {
+        const referralCode = req.query.refCod
+        const user = req.user
+        const userDate = await userModel.findOne({ email: req.user })
+        const refrerralUser = await userModel.findOne({ ReferralCode: referralCode })
+        console.log(userDate, "this is userData");
+        console.log(refrerralUser, "thisis referal user");
+        if (refrerralUser) {
+            if (userDate.ReferralCode == referralCode) {
+                console.log("sane ref");
+                return res.status(200).json({ status: false, message: "Sorry, Wrong Referal Code" })
+            } else {
+                console.log('success');
+                await walletModel.updateOne({ userId: refrerralUser._id }, { $inc: { balance: 200 } })
+                await walletModel.updateOne({ userId: userDate._id }, { $inc: { balance: 100 } })
+                await userModel.updateOne({ email: user }, { ReferralStatus: false })
+                return res.status(200).json({ status: true, message: "you have won 100 rs" })
+            }
+        } else {
+            console.log("failed");
+            return res.status(200).json({ status: false, message: "Sorry, Invalid Referal Code" })
+        }
+    } catch (error) {
+        console.log(error);
+    }
+}
 
 module.exports = {
     loadUserProfile,
@@ -265,5 +313,6 @@ module.exports = {
     loadOrderDetails,
     cancelOrder,
     returnOrder,
-    singleCancelOrder
+    singleCancelOrder,
+    submitReferral
 }

@@ -351,8 +351,8 @@
                         </td>
                         <td class="text-center">
                           <% if (item.singleProductStatus == "Cancelled") { %>
-                          <span class="text-danger">Cancelled</span> <% } else {
-                          %>
+                          <span class="text-danger">Cancelled</span> <% } else
+                          if(item.singleProductStatus != "Order Failed") { %>
                           <button
                             class="btn-sm btn-danger singleCancelBtn"
                             product-id="<%= item._id %>"
@@ -366,58 +366,7 @@
                       <% }); %>
                     </tbody>
                   </table>
-                  <script>
-                    document.addEventListener("DOMContentLoaded", function () {
-                      const cancelBtns =
-                        document.querySelectorAll(".singleCancelBtn");
-                      cancelBtns.forEach(function (cancelBtn) {
-                        cancelBtn.addEventListener(
-                          "click",
-                          async function (event) {
-                            event.preventDefault();
-                            const productId = this.getAttribute("product-id");
-                            const orderId = this.getAttribute("order_id");
-                            await fetch(
-                              `/user/single-cancel-order?orderId=${orderId}&productStatusId=${productId}`,
-                              {
-                                method: "post",
-                                headers: {
-                                  "Content-Type": "application/json",
-                                },
-                              }
-                            )
-                              .then((response) => response.json())
-                              .then((data) => {
-                                if (data.orderRefId) {
-                                  Swal.fire({
-                                    title: "Prduct cancel successfully",
-                                    icon: "success",
-                                    confirmButtonText: "OK",
-                                    timer: 1500,
-                                    showConfirmButton: false,
-                                  });
-                                  console.log(data.orderRefId);
-                                  setTimeout(() => {
-                                    window.location.href = `/user/order-status-details?orderRefId=${data.orderRefId}`;
-                                  }, 1400);
-                                } else {
-                                  Swal.fire({
-                                    title: "Product already Cancelled",
-                                    icon: "error",
-                                    confirmButtonText: "OK",
-                                    timer: 1500,
-                                    showConfirmButton: false,
-                                  });
-                                }
-                              })
-                              .catch((error) => {
-                                console.error(error);
-                              });
-                          }
-                        );
-                      });
-                    });
-                  </script>
+
                   <div>
                     <h5 class="d-flex justify-content-end p-10">
                       Total Amount: ₹ <%= orderDetails.totalAmount %>
@@ -441,7 +390,7 @@
                           >Return Order</a
                         >
                       </div>
-                      <%}else{%>
+                      <%}else if(orderDetails.orderStatus != "Order Failed"){%>
                       <div class="mx-3">
                         <a
                           href="/user/cancel-order/<%= orderDetails._id%>"
@@ -469,4 +418,51 @@
     </div>
   </section>
 </main>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const cancelBtns = document.querySelectorAll(".singleCancelBtn");
+    cancelBtns.forEach(function (cancelBtn) {
+      cancelBtn.addEventListener("click", async function (event) {
+        event.preventDefault();
+        const productId = this.getAttribute("product-id");
+        const orderId = this.getAttribute("order_id");
+        await fetch(
+          `/user/single-cancel-order?orderId=${orderId}&productStatusId=${productId}`,
+          {
+            method: "post",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        )
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.orderRefId) {
+              Swal.fire({
+                title: "Prduct cancel successfully",
+                icon: "success",
+                confirmButtonText: "OK",
+                timer: 1500,
+                showConfirmButton: false,
+              });
+              setTimeout(() => {
+                window.location.href = `/user/order-status-details?orderRefId=${data.orderRefId}`;
+              }, 1400);
+            } else {
+              Swal.fire({
+                title: "Product already Cancelled",
+                icon: "error",
+                confirmButtonText: "OK",
+                timer: 1500,
+                showConfirmButton: false,
+              });
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      });
+    });
+  });
+</script>
 <%-include("./partials/footer.ejs")%>

@@ -30,6 +30,7 @@
           <div class="card mb-4">
             <div class="card-header justify-content-center">
               <h6>Edit Product</h6>
+              
             </div>
             <div class="card-body">
               <form
@@ -47,8 +48,9 @@
                         <option value="SAMSUNG" <%= (product.brand === "SAMSUNG") ? "selected" : "" %>>SAMSUNG</option>
                         <option value="HP" <%= (product.brand === "HP") ? "selected" : "" %>>HP</option>
                         <option value="DELL" <%= (product.brand === "DELL") ? "selected" : "" %>>DELL</option>
+                        <option value="HUAWEI"<%= (product.brand === "HUAWEI") ? "selected" : "" %>>HUAWEI</option>
+                        <option value="REALME"<%= (product.brand === "REALME") ? "selected" : "" %>>REALME</option>
                     </select>
-                    
                       <div
                         id="brandError"
                         class="error-message text-danger"
@@ -246,7 +248,19 @@
                   <div class="card mb-4">
                     <div class="card-header d-flex justify-content-between">
                       <h4>Images</h4>   
+                      <%if(error){%>
+                        <p id="errorMessage" class="text-danger"><%=error%></p>
+                        <%}%>
                   </div>
+                  <script>
+                    function hideErrorMessage() {
+                      const errorMessage = document.getElementById('errorMessage');
+                      if (errorMessage) {
+                        errorMessage.style.display = 'none';
+                      }
+                    }
+                    setTimeout(hideErrorMessage, 10000);
+                  </script>
                   <input
                             class="form-control"
                             type="file"
@@ -446,7 +460,7 @@
 
         // Images
 
-        if (!images || images.length < 2) {
+        if (!images || images.length < 0) {
           errors["images"] = "At least two image files are required.";
           document.getElementById("imagesError").textContent = errors["images"];
         } else {

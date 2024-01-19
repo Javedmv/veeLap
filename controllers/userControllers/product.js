@@ -13,9 +13,11 @@ const productDetails = async (req, res) => {
                 model: 'Category'
             })
             .exec()
-
-        // console.log(product);
-        res.render("user/productdetails", { product, loggedIn })
+        let nonrelatedProducts = await productModel.find({ category: product.category._id })
+        const relatedProducts = nonrelatedProducts
+            .filter(item => item._id != productId)
+            .slice(0, 4)
+        res.render("user/productdetails", { product, loggedIn, relatedProducts })
     } catch (error) {
         console.log(error);
     }

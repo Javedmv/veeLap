@@ -10,6 +10,7 @@ const loadOrder = async (req, res) => {
                 model: "User"
             })
             .exec()
+        console.log(orders);
         res.render("admin/orderManagement", { orders })
     } catch (error) {
         console.log(error);

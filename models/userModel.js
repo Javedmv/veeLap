@@ -21,6 +21,16 @@ const userModel = mongoose.Schema({
         type: String,
         required: true,
         default: "Active"
+    },
+    ReferralCode: {
+        type: String
+    },
+    redeemedReferral: {
+        type: Array
+    },
+    ReferralStatus: {
+        type: Boolean,
+        default: true
     }
 })
 

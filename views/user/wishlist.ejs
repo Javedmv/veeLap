@@ -307,7 +307,7 @@
       <div class="container">
         <div class="breadcrumb">
           <a href="index.html" rel="nofollow">Home</a>
-          <span></span> Shop <span></span> Wishlist
+          <span></span> Wishlist
         </div>
       </div>
     </div>
@@ -317,7 +317,8 @@
           <div class="col-12">
             <div class="table-responsive">
               <table class="table shopping-summery text-center">
-                <%if(wishlist.products.length > 0) {%>
+                <% if (wishlist && wishlist.products && wishlist.products.length
+                > 0) { %>
                 <thead>
                   <tr class="main-heading">
                     <th>Image</th>

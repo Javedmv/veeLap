@@ -20,12 +20,18 @@
     <!-- Template CSS -->
     <link rel="stylesheet" href="/userassets/css/main.css" />
     <!-- <script src="/node_modules/sweetalert2/dist/sweetalert2.all.min.js"></script> -->
-  
-
+    <style>
+      @keyframes glowing {
+        0% {
+          background-position: 200% 0;
+        }
+        100% {
+          background-position: -200% 0;
+        }
+      }
+    </style>
 
   </head>
-
- 
     <header class="header-area header-style-4 header-height-2">
       <div class="header-top header-top-ptb-1 d-none d-lg-block">
         <div class="container">
@@ -90,23 +96,11 @@
             </div>
             <div class="header-right">
               <div class="search-style-2">
-                <form  id="searchForm">
-                  <input type="text" name="searchFor" id="searchInput" placeholder="Search for items..." />
+                <form action="/user/search" method="post">
+                  <input type="text" placeholder="Search for items..." name="search">
+                  <button type="submit" class="btn btn-fill-out btn-block " style="font-size: medium;font-weight: 700;">Search</button>
                 </form>
               </div>
-              <script>
-                document.addEventListener("DOMContentLoaded", function () {
-                    let searchInput = document.getElementById('searchInput');
-                    if (searchInput) {
-                        searchInput.addEventListener('keypress',async function (e) {
-                            if (e.key === 'Enter') {
-                                const search = searchInput.value;
-                                await fetch(`/user/search?search=${search}`)
-                            }
-                        });
-                    }
-                });
-            </script>
               <div class="header-action-right">
                 <div class="header-action-2">
                   <div class="header-action-icon-2">
@@ -150,7 +144,7 @@
                 <div
                   class="categori-dropdown-wrap categori-dropdown-active-large"
                 >
-                  <ul>
+                  <!-- <ul>
                     <li>
                       <a href="shop-grid-right.html"
                         ><i class="evara-font-desktop"></i>Apple</a
@@ -171,7 +165,7 @@
                         ><i class="evara-font-home"></i>HP</a
                       >
                     </li>
-                  </ul>
+                  </ul> -->
                 </div>
               </div>
               <div
@@ -185,10 +179,20 @@
                       ></a>
                     </li>
                     <li>
-                      <a href="#">Offers</a>
+                      <a href="/user/sales-page" style="background: linear-gradient(90deg, #ffcc00, #ff3300);
+                        background-clip: text;
+                        color: transparent;
+                        transition: background-position 0.5s;
+                        background-size: 200% 100%;
+                        animation: glowing 2s infinite;
+                        display: inline-block;
+                        white-space: nowrap;
+                      ">
+                        Sale
+                      </a>
                     </li>
                     <li>
-                      <a href="page-about.html">About</a>
+                      <a href="/user/about">About</a>
                     </li>
                   </ul>
                 </nav>
@@ -341,4 +345,3 @@
       </div>
     </div>
   </header>
-  

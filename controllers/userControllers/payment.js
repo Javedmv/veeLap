@@ -61,7 +61,7 @@ const placeOrderCOD = async (req, res) => {
             const orderedItem = {
                 productId: item.productId._id,
                 quantity: item.quantity,
-                price: item.productId.salesPrice * item.quantity,
+                price: (item.productId.salesPrice - item.productId.offerAmount) * item.quantity,
                 singleProductStatus: "Order Placed",
                 productAmount: Math.trunc(couponAmount * item.quantity) || 0
             }
@@ -98,7 +98,7 @@ const placeOrderCOD = async (req, res) => {
             orderStatus: "Order Placed",
             paymentStatus: "Pending",
             paymentMethod: "Cash on delivery",
-            address: delAddress
+            address: delAddress,
         })
         await newOrder.save()
         await cartModel.updateOne({ userId: userData._id }, { $set: { products: [] } });
@@ -126,6 +126,7 @@ const walletPayment = async (req, res) => {
             let orderTotal = 0;//total amount
             let orderProducts = [];
             let totalProductQuantity = 0;
+            // total product quantity is taken to split the coupon
             if (Array.isArray(userCart.products)) {
                 userCart.products.forEach(item => {
                     if (item.quantity) {
@@ -150,7 +151,7 @@ const walletPayment = async (req, res) => {
                 const orderedItem = {
                     productId: item.productId._id,
                     quantity: item.quantity,
-                    price: item.productId.salesPrice * item.quantity,
+                    price: (item.productId.salesPrice - item.productId.offerAmount) * item.quantity,
                     singleProductStatus: "Order Placed",
                     productAmount: Math.trunc(couponAmount * item.quantity) || 0
                 }
@@ -187,7 +188,8 @@ const walletPayment = async (req, res) => {
                 orderStatus: "Order Placed",
                 paymentStatus: "Success",
                 paymentMethod: "Wallet",
-                address: delAddress
+                address: delAddress,
+                returnAmount: orderTotal
             })
             await newOrder.save()
             await walletModel.updateOne({ userId: userData._id }, { $inc: { balance: -orderTotal } })
@@ -240,7 +242,7 @@ const paymentRazorpay = async (req, res) => {
             const orderedItem = {
                 productId: item.productId._id,
                 quantity: item.quantity,
-                price: item.productId.salesPrice * item.quantity,
+                price: (item.productId.salesPrice - item.productId.offerAmount) * item.quantity,
                 singleProductStatus: "Order Placed",
                 productAmount: Math.trunc(couponAmount * item.quantity) || 0
             }
@@ -285,7 +287,8 @@ const paymentRazorpay = async (req, res) => {
             orderStatus: "Order Placed",
             paymentStatus: "Pending",
             paymentMethod: "Online payment",
-            address: delAddress
+            address: delAddress,
+            returnAmount: orderTotal
         })
 
         await order.save()
@@ -303,6 +306,11 @@ const updatePaymentStatus = async (req, res) => {
             paymentStatus
         })
         if (paymentStatus == "Success") {
+            const orderData = orderModel.findById(orderId)
+            await orderModel.updateOne(
+                { _id: orderId },
+                { $set: { "products.$[].singleProductStatus": "Success" } }
+            );
             await cartModel.updateOne({ userId: userData._id }, { $set: { products: [] } });
             return res.status(200).json({ paymentStatus: "Success" });
         } else {

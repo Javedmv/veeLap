@@ -344,6 +344,7 @@
               return Response.json();
             })
             .then((data) => {
+              Timer.style.display = "none";
               console.log("data from server :", data);
               if (data.message) {
                 Swal.fire({

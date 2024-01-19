@@ -17,7 +17,7 @@ const loadCheckout = async (req, res) => {
                 path: "products.productId",
                 model: "Product"
             }).exec()
-
+        console.log(coupons)
         const stockCheck = userCart.products.every(productItem => {
             return productItem.productId.stock >= productItem.quantity;
         });
@@ -39,6 +39,7 @@ const loadCheckout = async (req, res) => {
 const applyCoupon = async (req, res) => {
     try {
         const { Total, code } = req.query
+        console.log(Total);
         const userData = await userModel.findOne({ email: req.user })
         const wallet = await walletModel.findOne({ userId: userData._id });
         let grandTotal = 0;
@@ -53,7 +54,7 @@ const applyCoupon = async (req, res) => {
                 if (userCart.products[i].quantity > userCart.products[i].productId.stock || userCart.products[i].productId.stock == 0) {
                     return res.redirect('/user/load-cart')
                 }
-                grandTotal += userCart.products[i].quantity * userCart.products[i].productId.salesPrice;
+                grandTotal += userCart.products[i].quantity * (userCart.products[i].productId.salesPrice - userCart.products[i].productId.offerAmount);
             }
         } else {
             return res.redirect('/user/load-cart')
