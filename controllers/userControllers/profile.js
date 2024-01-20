@@ -36,7 +36,7 @@ const loadAddAddress = async (req, res) => {
     } catch (error) {
         console.log(error);
     }
-}
+};
 
 const submitAddress = async (req, res) => {
     try {
@@ -81,7 +81,7 @@ const submitAddress = async (req, res) => {
     } catch (error) {
         console.log(error);
     }
-}
+};
 
 const loadEditAddress = async (req, res) => {
     try {
@@ -94,7 +94,7 @@ const loadEditAddress = async (req, res) => {
     } catch (error) {
         console.log(error);
     }
-}
+};
 
 const postEditAddress = async (req, res) => {
     try {
@@ -130,7 +130,7 @@ const postEditAddress = async (req, res) => {
     } catch (error) {
         console.log(error);
     }
-}
+};
 
 const deleteAddress = async (req, res) => {
     try {
@@ -141,7 +141,7 @@ const deleteAddress = async (req, res) => {
     } catch (error) {
         console.log(error);
     }
-}
+};
 
 
 const loadOrderDetails = async (req, res) => {
@@ -158,48 +158,55 @@ const loadOrderDetails = async (req, res) => {
     } catch (error) {
         console.log(error);
     }
-}
+};
 
 const cancelOrder = async (req, res) => {
     try {
         const orderId = req.params.id
         const userData = await userModel.findOne({ email: req.user })
         const userOrder = await orderModel.findOne({ userId: userData._id })
+        const wallet = await walletModel.findOne({ userId: userData._id })
         let cancelledOrder = await orderModel.findOne({ _id: orderId })
-        await orderModel.updateOne({ _id: orderId }, { $set: { orderStatus: "Cancelled" } })
-        let discount = 0;
+        console.log(cancelledOrder.returnAmount, "returnAmount");
+        console.log(cancelledOrder.totalAmount, "thsi is total amount");
+        let walletReturn = 0;
+        let walletDetail;
+        if (cancelledOrder.paymentStatus == "Success") {
+            for (let product of cancelledOrder.products) {
+                if (product.singleProductStatus != "Cancelled") {
+                    walletReturn += product.price - product.productAmount
+                }
+            }
+            walletDetail = {
+                walletStatus: "Credited",
+                orderTotal: walletReturn,
+                referenceId: cancelledOrder.referenceId,
+                time: new Date(Date.now()).toLocaleString(),
+            }
+        }
         for (const item of cancelledOrder.products) {
             if (item.singleProductStatus != "Cancelled") {
                 item.singleProductStatus = "Cancelled"
-                if (item.productAmount != 0) {
-                    discount += item.productAmount
-                }
-                // if (item.offerAmount != 0) {
-                //     discount += item.offerAmount
-                // }
+                console.log(item.productAmount, "thisis productamount");
                 await productModel.updateOne({ _id: item.productId }, {
                     $inc: { stock: item.quantity }
                 })
-
             }
-
+        }
+        if (walletDetail) {
+            walletDetail.walletBalance = wallet.balance + walletReturn
+            await walletModel.updateOne({ userId: userData._id }, { $inc: { balance: walletReturn }, $push: { historyDetails: walletDetail } })
+        } else {
+            await walletModel.updateOne({ userId: userData._id }, { $inc: { balance: walletReturn } })
         }
 
-        if (cancelledOrder.paymentStatus == "Success") {
-            // for (let product of cancelledOrder.products) {
-            // let walletReturn = 0;
-            // if (product.singleProductStatus != "Cancelled") {
-            //     walletReturn += product.price - discount
-            // }
-            const wallet = await walletModel.updateOne({ userId: userData._id }, { $inc: { balance: cancelledOrder.returnAmount } })
-            // }
-        }
+        await orderModel.updateOne({ _id: orderId }, { $set: { orderStatus: "Cancelled" } })
         cancelledOrder.save()
         res.redirect(`/user/order-status-details?orderRefId=${cancelledOrder.referenceId}`)
     } catch (error) {
         console.log(error);
     }
-}
+};
 
 const returnOrder = async (req, res) => {
     try {
@@ -220,7 +227,8 @@ const returnOrder = async (req, res) => {
     } catch (error) {
         console.log(error);
     }
-}
+};
+
 const singleCancelOrder = async (req, res) => {
     try {
         const { orderId, productStatusId } = req.query;
@@ -232,7 +240,7 @@ const singleCancelOrder = async (req, res) => {
                 model: "Product"
             });
         let productUpdated = false;
-
+        let walletDetail;
         for (const product of orderData.products) {
             if (product._id == productStatusId && product.singleProductStatus !== "Cancelled") {
                 await orderModel.updateOne(
@@ -246,7 +254,14 @@ const singleCancelOrder = async (req, res) => {
                 );
 
                 if (orderData.paymentStatus == "Success") {
-                    await walletModel.findByIdAndUpdate(wallet._id, { $inc: { balance: (product.price - product.productAmount) } });
+                    walletDetail = {
+                        walletStatus: "Credited",
+                        orderTotal: product.price - product.productAmount,
+                        referenceId: orderData.referenceId,
+                        time: new Date(Date.now()).toLocaleString(),
+                        walletBalance: wallet.balance + product.price - product.productAmount
+                    }
+                    await walletModel.findByIdAndUpdate(wallet._id, { $inc: { balance: walletDetail.orderTotal }, $push: { historyDetails: walletDetail } });
                     await orderModel.findByIdAndUpdate(orderId, {
                         $inc: { returnAmount: -(product.price - product.productAmount) }
                     });
@@ -254,15 +269,18 @@ const singleCancelOrder = async (req, res) => {
                 productUpdated = true;
                 break;
             }
-
         }
+
+        await orderData.save()
         const order = await orderModel.findOne({ _id: orderId })
         let allProductsCancelled = order.products.every(product => product.singleProductStatus == "Cancelled");
         if (allProductsCancelled) {
             await orderModel.updateOne({ _id: orderId }, { $set: { orderStatus: "Cancelled" } })
+            console.log("inside all products cancelled");
         }
 
         if (productUpdated) {
+            console.log("order data saved succesfully");
             await orderData.save();
             return res.status(200).json({ orderRefId: orderData.referenceId });
         } else {
@@ -274,6 +292,7 @@ const singleCancelOrder = async (req, res) => {
         return res.status(500).json({ error: "Internal Server Error" });
     }
 };
+
 
 const submitReferral = async (req, res) => {
     try {

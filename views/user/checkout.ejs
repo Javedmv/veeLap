@@ -832,7 +832,7 @@
                   order_id: razorOrderID,
                   handler: (response) => {
                     console.log("this is responser");
-                    console.log(response);
+                    // console.log(response);
                     Swal.fire({
                       position: "top-end",
                       icon: "success",
@@ -852,7 +852,7 @@
                 rzp1.open();
                 rzp1.on("payment.failed", (response) => {
                   console.log("Payment Failed");
-                  console.log(response);
+                  // console.log(response);
                   Swal.fire({
                     position: "top-end",
                     icon: "error",

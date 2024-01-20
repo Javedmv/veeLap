@@ -8,7 +8,12 @@ const walletModel = mongoose.Schema({
     balance: {
         type: Number,
         default: 0,
-    }
+    },
+    historyDetails: [
+        {
+            type: Object,
+        }
+    ],
 })
 
-module.exports = mongoose.model("Wallet", walletModel)
+module.exports = mongoose.model("Wallet", walletModel)  

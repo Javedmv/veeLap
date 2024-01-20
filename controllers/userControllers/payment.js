@@ -103,6 +103,7 @@ const placeOrderCOD = async (req, res) => {
         await newOrder.save()
         await cartModel.updateOne({ userId: userData._id }, { $set: { products: [] } });
         return res.status(200).json({ codOutOfStock: false })
+
     } catch (error) {
         console.log(error);
     }
@@ -192,13 +193,19 @@ const walletPayment = async (req, res) => {
                 returnAmount: orderTotal
             })
             await newOrder.save()
-            await walletModel.updateOne({ userId: userData._id }, { $inc: { balance: -orderTotal } })
+            const walletDetail = {
+                walletStatus: "Debited",
+                orderTotal,
+                referenceId: newOrder.referenceId,
+                time: new Date(Date.now()).toLocaleString(),
+                walletBalance: wallet.balance - orderTotal
+            };
+            await walletModel.updateOne({ userId: userData._id }, { $inc: { balance: -orderTotal }, $push: { historyDetails: walletDetail } })
             await cartModel.updateOne({ userId: userData._id }, { $set: { products: [] } });
             return res.status(200).json({ codOutOfStock: false, walletBalance: false })
         } else {
             return res.status(200).json({ walletBalance: true })
         }
-
     } catch (error) {
         console.log(error);
     }
@@ -290,7 +297,6 @@ const paymentRazorpay = async (req, res) => {
             address: delAddress,
             returnAmount: orderTotal
         })
-
         await order.save()
         res.status(200).json({ completed: true, razorOrderId: newOrder, orderId: order._id })
     } catch (error) {

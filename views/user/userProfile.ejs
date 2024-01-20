@@ -463,8 +463,8 @@
                                           <% previousOrderIndex = productIndex; %>
                                         <% } %>
                                         <td style="width: 2rem; height: 2rem;"><img src="<%= product.productId.images[0]?.path %>" alt="image"></td>
-                                        <td><%= product.productId.productName %></td>
-                                        <td><%= order.orderDate.toLocaleDateString() %></td>
+                                        <td class="text-center"><%= product.productId.productName %></td>
+                                        <td class="text-center"><%= order.orderDate.toLocaleDateString() %></td>
                                         <% if (productInnerIndex === 0) { %>
                                         <td class="text-center"  rowspan="<%= order.products.length %>">
                                           <span class="badge rounded-pill alert-<%= order.orderStatus === 'Order Placed' ? 'info' : order.orderStatus === 'Shipped' ? 'warning' : order.orderStatus === 'Delivered' ? 'success' : order.orderStatus === 'Cancelled' ? 'danger' : order.orderStatus === 'Returned'? 'secondary' : order.orderStatus === 'Order Failed'? 'dark' : '' %>">
@@ -472,7 +472,7 @@
                                           </span>
                                         </td>
                                         <% } %>
-                                        <td> ₹<%= product.price %> for <%= product.quantity %> item</td>
+                                        <td class="text-center"> ₹<%= product.price %> for <%= product.quantity %> item</td>
                                         <% if (productInnerIndex === 0) { %>
                                           <td class="text-center" rowspan="<%= order.products.length %>">
                                             <a href="/user/order-status-details?orderRefId=<%= order.referenceId %>" class="btn-small d-block">View</a>
@@ -569,10 +569,8 @@
                         <div class="mr-20">
                           Referral Code : <%=user.ReferralCode%>
                         </div>
-                        <a class="btn btn-sm font-sm rounded btn-dark copy-button"
-                        onclick="copyToClipboard('<%=user.ReferralCode%>')">Copy</a>
                       </div>
-                      <%#referal code%>
+                      
                       <%if(user.ReferralStatus){%>
                       <div class="mt-20 col-lg-10 mx-auto referral-container">
                         <label for="referralCode">Enter Referral Code:</label>
@@ -616,25 +614,49 @@
                           </div>
                         </div> 
                         <div class="tab-pane fade" id="wallet-details" role="tabpanel" aria-labelledby="wallet-details">
-                          <table>
-                            <tr>
-                              <th>Si no</th>
-                              <th></th>
-                            </tr>
-                          </table>
                           <div id="walletDetails ">
-                            <div class="card col-lg-5 mx-auto">
-                              <div class="card-header text-center">
+                            <div class="card  mx-auto">
+                                <div class="card-header text-center">
                                   <h5 class="d-block align-items-center">Wallet</h5>
                                 </div>
                                 <div class="card-body">
-                                  <div class="" style="font-size: large;">Balance: ₹<span><%=wallet.balance%>  </span></div>
-                                  <div>
-                                 <p>your wallet balance will be redeemed on your next order</p>
-                            </div>
+                                  <div class="" style="font-size: large;"></span>
+                                    Balance: ₹<span><%=wallet.balance%></span>
+                                 <p>your wallet balance can be redeemed on your next order</p>
+                                  </div>
                                 </div>
-                              </div>
+                            </div>
                           </div>
+                          <% if (wallet.historyDetails) { %>
+                            <table>
+                              <tr>
+                                <th class="text-center">Si no</th>
+                                <th class="text-center">Referance Id</th>
+                                <th class="text-center">Status</th>
+                                <th class="text-center">Amount</th>
+                                <th class="text-center">Current Balance</th>
+                                <th class="text-center">Date & Time</th>
+                              </tr>
+                            <%
+                            let sino = 1;
+                            wallet.historyDetails.reverse().forEach((element) =>{
+                            %>
+                           
+                            <tr>
+                              <td class="text-center"><%= sino++%></td>
+                              <td class="text-center"><a href="/user/order-status-details?orderRefId=<%= element.referenceId %>"><%=element.referenceId%></a></td>
+                              <td class="text-center"><%=element.walletStatus%></td>
+                              <%if(element.walletStatus === "Debited"){%>
+                              <td class="text-center text-danger">-<%=element.orderTotal%></td>
+                              <%}else{%>
+                              <td class="text-center text-success">+<%=element.orderTotal%></td>
+                                <%}%>
+                              <td class="text-center text-success">₹<%=element.walletBalance%></td>
+                              <td class="text-center"><%=element.time%></td>
+                            </tr>
+                            <%})%>
+                          </table>
+                          <%}%>
                       </div>
                     </div>
                   </div>
