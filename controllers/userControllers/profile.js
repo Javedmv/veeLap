@@ -297,21 +297,35 @@ const singleCancelOrder = async (req, res) => {
 const submitReferral = async (req, res) => {
     try {
         const referralCode = req.query.refCod
-        const user = req.user
-        const userDate = await userModel.findOne({ email: req.user })
+        const user = req.query.email
+        const userDate = await userModel.findOne({ email: user })
         const refrerralUser = await userModel.findOne({ ReferralCode: referralCode })
-        console.log(userDate, "this is userData");
-        console.log(refrerralUser, "thisis referal user");
+        const wallet = await walletModel.findOne({userId:userDate._id})
+        const walletRef = await walletModel.findOne({userId:refrerralUser._id})
         if (refrerralUser) {
             if (userDate.ReferralCode == referralCode) {
-                console.log("sane ref");
                 return res.status(200).json({ status: false, message: "Sorry, Wrong Referal Code" })
             } else {
-                console.log('success');
-                await walletModel.updateOne({ userId: refrerralUser._id }, { $inc: { balance: 200 } })
-                await walletModel.updateOne({ userId: userDate._id }, { $inc: { balance: 100 } })
+                const walletDetail = {
+                    walletStatus: "Credited",
+                    orderTotal: 100,
+                    referenceId: "Referal",
+                    time: new Date(Date.now()).toLocaleString(),
+                    walletBalance: wallet.balance + 100
+                };
+                const refwalletDetail = {
+                    walletStatus: "Credited",
+                    orderTotal: 200,
+                    referenceId: "Referal",
+                    time: new Date(Date.now()).toLocaleString(),
+                    walletBalance: walletRef.balance + 200
+                };
+                await walletModel.updateOne({ userId: refrerralUser._id }, { $inc: { balance: 200 },$push:{historyDetails:refwalletDetail} })
+                await walletModel.updateOne({ userId: userDate._id }, { $inc: { balance: 100 },$push:{historyDetails:walletDetail} })
                 await userModel.updateOne({ email: user }, { ReferralStatus: false })
-                return res.status(200).json({ status: true, message: "you have won 100 rs" })
+                const Url = "/user/login"
+                res.status(200).json({ status: true, message: "you have won 100 rs" ,Url})
+                return res.redirect("/user/")
             }
         } else {
             console.log("failed");

@@ -28,5 +28,4 @@ const userStatus = async (req, res) => {
 module.exports = {
     loadUser,
     userStatus
-
 }

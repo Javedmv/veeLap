@@ -163,10 +163,11 @@ const submitSignup = async (req, res) => {
             await walletModel.create({
                 userId: newUser._id
             })
-            res.render("user/login", {
-                message: "User sign up successfully",
-                error: null,
-            });
+            res.render("user/referalCode",{email:email})
+            // res.render("user/login", {
+            //     message: "User sign up successfully",
+            //     error: null,
+            // });
         }
     } catch (error) {
         console.error(error);
@@ -318,6 +319,14 @@ const editUserDetails = async (req, res) => {
     }
 };
 
+const submitReferal = async (req,res) => {
+    try {
+        res.render("user/login",{message: "User sign up successfully", error: null})
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 module.exports = {
     loadLogin,
     loadSignup,
@@ -331,7 +340,8 @@ module.exports = {
     sendOtpForgot,
     verifyForgotOtp,
     resetPassword,
-    editUserDetails
+    editUserDetails,
+    submitReferal
 };
 
 

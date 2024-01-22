@@ -4,12 +4,12 @@ const userRouter = express();
 const { verifyUser, checkBlockedStatus } = require("../middleware/userAuth")
 
 const { loadLogin, loadSignup, loadHome, sendOtp, verifyOtp, submitSignup, userLogin,
-    userLogout, loadForgotPassword, sendOtpForgot, verifyForgotOtp, resetPassword, editUserDetails
+    userLogout, loadForgotPassword, sendOtpForgot, verifyForgotOtp, resetPassword, editUserDetails,submitReferal
 } = require("../controllers/userControllers/userController")
 
 const { loadCart, addToCart, removeProductFromCart, clearAllCart, updateQuantity } = require("../controllers/userControllers/cart")
 
-const { productDetails } = require("../controllers/userControllers/product")
+const { productDetails,loadRef } = require("../controllers/userControllers/product")
 
 const { filterAndSort, searchProduct, aboutPage, loadSalesPage } = require("../controllers/userControllers/filterAndSort")
 
@@ -25,6 +25,9 @@ userRouter.get("/login", loadLogin);
 userRouter.get("/signup", loadSignup);
 userRouter.get("/", loadHome);
 
+//referal
+userRouter.get("/referalCode",submitReferal)
+userRouter.get("/ref",loadRef)
 // forgot password
 userRouter.get("/load-forgot-pass", loadForgotPassword);
 userRouter.post("/send-otp-forgot", sendOtpForgot)
@@ -94,6 +97,4 @@ userRouter.get("/load-wishlist", loadWishlist)
 userRouter.post("/add-to-wishlist", addToWishlist)
 userRouter.get("/delete-product", deleteWishlist)
 userRouter.post("/add-to-cart-wishlist", addToCartWishlist)
-
-
 module.exports = userRouter
