@@ -44,4 +44,4 @@ app.use('/user', userRoute);
 
 app.listen(process.env.PORT, (err) => {
     console.error("app is running " + "http://127.0.0.1:" + process.env.PORT)
-})
+});

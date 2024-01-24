@@ -43,9 +43,9 @@ const loadCart = async (req, res) => {
 
 const addToCart = async (req, res) => {
     try {
-        if (req.user) {
+        if (req.cookies.loggedIn) {
             const productId = req.body.productId;
-            user = req.user;
+            user = req.cookies.userEmail;
             const userData = await userModel.findOne({ email: user });
             const userId = userData._id;
             let product = await productModel.findOne({ _id: productId });
@@ -80,7 +80,7 @@ const addToCart = async (req, res) => {
             }
         } else {
             console.log("without req.user");
-            return res.status(200).json({ notUser: true });
+            return res.status(200).json({ notUser: true ,error:"Login to Continue!!"});
         }
     } catch (error) {
         console.error(error);

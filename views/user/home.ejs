@@ -18,11 +18,11 @@
                           On All Products
                         </h2>
                         <p class="animated">
-                          Save more with coupons & up to 70% off
+                          Save more with coupons & up to 30% off
                         </p>
                         <a
                           class="animated btn btn-brush btn-brush-3"
-                          href="shop-product-right.html"
+                          href="#"
                           tabindex="0"
                         >
                           Shop Now
@@ -33,7 +33,7 @@
                       <div class="single-slider-img single-slider-img-1">
                         <img
                           class="animated"
-                          src="/userassets/imgs/slider/slider-6.png"
+                          src="/userassets/imgs/slider/bannner.png"
                           alt=""
                         />
                       </div>
@@ -46,17 +46,17 @@
                   <div class="row align-items-center slider-animated-1">
                     <div class="col-lg-5 col-md-6">
                       <div class="hero-slider-content-2">
-                        <h4 class="animated">Hot promotions</h4>
-                        <h3 class="animated fw-900">Fashion Trending</h3>
-                        <h2 class="animated fw-900 text-brand">
-                          Great Collection
+                        <h4 class="animated">Hot Sale</h4>
+                        <h3 class="animated fw-900" style="color: blue;">Gaming Laptop</h3>
+                        <h2 class="animated fw-900" style="color: red;">
+                          ROG STRIX
                         </h2>
                         <p class="animated">
                           Save more with coupons & up to 20% off
                         </p>
                         <a
                           class="animated btn btn-brush btn-brush-1"
-                          href="shop-product-right.html"
+                          href="#"
                           tabindex="0"
                         >
                           Get It Now
@@ -67,7 +67,7 @@
                       <div class="single-slider-img single-slider-img-1">
                         <img
                           class="animated"
-                          src="/userassets/imgs/slider/slider-7.png"
+                          src="/userassets/imgs/slider/slider1.jpg"
                           alt=""
                         />
                       </div>
@@ -379,7 +379,7 @@
                 setTimeout(()=>{
                   window.location.href=`/user/load-cart?quantity=${data.quantity}&productId=${data.productId}`
                 })
-              } else  {
+              } else if(data.notUser) {
                 Swal.fire({
                   title: data.error,
                   text: "Sorry",
@@ -387,7 +387,10 @@
                   confirmButtonText: "Ok",
                   timer: 2000,
                   timerProgressBar: true,
-                });
+                })
+                .then(()=>{
+                  window.location.href = "/user/login"
+                })
               }
             } catch (error) {
               Swal.fire({

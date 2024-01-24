@@ -72,10 +72,10 @@ const submitAddress = async (req, res) => {
             await userAddress.save()
             if (isCheckout == "true") {
                 console.log("this is from the cart");
-                res.redirect("/user/checkout")
+                return res.redirect("/user/checkout")
             } else {
                 console.log("this is from the profile");
-                res.redirect("/user/profile")
+                return res.redirect("/user/profile")
             }
         }
     } catch (error) {

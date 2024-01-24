@@ -54,6 +54,7 @@ userRouter.get("/about", aboutPage)
 userRouter.get("/sales-page", loadSalesPage)
 userRouter.post("/search", searchProduct)
 
+userRouter.post("/add-to-cart", addToCart)
 // added a middleware of authenticating token
 userRouter.use(verifyUser)
 // check the autherization of the client
@@ -62,7 +63,6 @@ userRouter.use(checkBlockedStatus)
 
 // cart
 userRouter.get("/load-cart", loadCart)
-userRouter.post("/add-to-cart", addToCart)
 userRouter.get("/delete-cart", removeProductFromCart)
 userRouter.get("/clear-all-cart", clearAllCart)
 userRouter.post("/update-quantity", updateQuantity)
