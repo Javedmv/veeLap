@@ -26,6 +26,7 @@ userRouter.get("/signup", loadSignup);
 userRouter.get("/", loadHome);
 
 //referal
+userRouter.post("/referral", submitReferral)
 userRouter.get("/referalCode",submitReferal)
 userRouter.get("/ref",loadRef)
 // forgot password
@@ -76,7 +77,6 @@ userRouter.post("/submit-edit-address/:id", postEditAddress)
 userRouter.get("/delete-single-address/:id", deleteAddress)
 userRouter.get("/order-status-details", loadOrderDetails)
 userRouter.post("/edit-user-details", editUserDetails)
-userRouter.post("/referral", submitReferral)
 
 //checkout
 userRouter.get("/checkout", loadCheckout)
