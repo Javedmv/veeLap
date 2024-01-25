@@ -27,10 +27,10 @@ const loadAddAddress = async (req, res) => {
     try {
         const loggedIn = req.cookies.loggedIn
         const { isCheckout } = req.query
-        console.log(typeof isCheckout);
+        // console.log(typeof isCheckout);
         if (!isCheckout === "true") {
             isCheckout = null
-            console.log("inside the is checkout");
+            // console.log("inside the is checkout");
         }
         res.render("user/addAddress", { loggedIn, isCheckout })
     } catch (error) {
@@ -42,7 +42,7 @@ const submitAddress = async (req, res) => {
     try {
         const { phone, pincode, state, landMark, city, name, addressType } = req.body
         const { isCheckout } = req.query
-        console.log(isCheckout);
+        // console.log(isCheckout);
         const user = await userModel.findOne({ email: req.user }, { _id: 1 })
         const userAddress = await addressModel.findOne({ userId: user })
         if (!userAddress) {
@@ -71,10 +71,10 @@ const submitAddress = async (req, res) => {
             })
             await userAddress.save()
             if (isCheckout == "true") {
-                console.log("this is from the cart");
+                // console.log("this is from the cart");
                 return res.redirect("/user/checkout")
             } else {
-                console.log("this is from the profile");
+                // console.log("this is from the profile");
                 return res.redirect("/user/profile")
             }
         }
@@ -167,8 +167,8 @@ const cancelOrder = async (req, res) => {
         const userOrder = await orderModel.findOne({ userId: userData._id })
         const wallet = await walletModel.findOne({ userId: userData._id })
         let cancelledOrder = await orderModel.findOne({ _id: orderId })
-        console.log(cancelledOrder.returnAmount, "returnAmount");
-        console.log(cancelledOrder.totalAmount, "thsi is total amount");
+        // console.log(cancelledOrder.returnAmount, "returnAmount");
+        // console.log(cancelledOrder.totalAmount, "thsi is total amount");
         let walletReturn = 0;
         let walletDetail;
         if (cancelledOrder.paymentStatus == "Success") {
@@ -187,7 +187,7 @@ const cancelOrder = async (req, res) => {
         for (const item of cancelledOrder.products) {
             if (item.singleProductStatus != "Cancelled") {
                 item.singleProductStatus = "Cancelled"
-                console.log(item.productAmount, "thisis productamount");
+                // console.log(item.productAmount, "thisis productamount");
                 await productModel.updateOne({ _id: item.productId }, {
                     $inc: { stock: item.quantity }
                 })
@@ -276,11 +276,11 @@ const singleCancelOrder = async (req, res) => {
         let allProductsCancelled = order.products.every(product => product.singleProductStatus == "Cancelled");
         if (allProductsCancelled) {
             await orderModel.updateOne({ _id: orderId }, { $set: { orderStatus: "Cancelled" } })
-            console.log("inside all products cancelled");
+            // console.log("inside all products cancelled");
         }
 
         if (productUpdated) {
-            console.log("order data saved succesfully");
+            // console.log("order data saved succesfully");
             await orderData.save();
             return res.status(200).json({ orderRefId: orderData.referenceId });
         } else {
@@ -328,7 +328,7 @@ const submitReferral = async (req, res) => {
                 return res.redirect("/user/")
             }
         } else {
-            console.log("failed");
+            // console.log("failed");
             return res.status(200).json({ status: false, message: "Sorry, Invalid Referal Code" })
         }
     } catch (error) {

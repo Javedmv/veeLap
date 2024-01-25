@@ -82,7 +82,7 @@ const sendOtp = async (req, res) => {
             res.status(401).json({ error: "User Already Exists" });
         } else {
             generatedOTP = otpGenerator.generate(6);
-            console.log("Generated OTP:", generatedOTP);
+            // console.log("Generated OTP:", generatedOTP);
 
             const transport = nodemailer.createTransport({
                 service: "gmail",
@@ -110,7 +110,7 @@ const sendOtp = async (req, res) => {
             const sendMails = async (transport, mailOption) => {
                 try {
                     await transport.sendMail(mailOption);
-                    console.log("email send successfully");
+                    // console.log("email send successfully");
                     // console.log('Server response:', info.response); error says info is not defined
                 } catch (error) {
                     console.log(error);
@@ -127,10 +127,10 @@ const sendOtp = async (req, res) => {
 const verifyOtp = async (req, res) => {
     try {
         const userOtp = req.query.userOtp;
-        console.log(typeof userOtp);
-        console.log(typeof generatedOTP);
-        console.log("userOTP: " + userOtp);
-        console.log("line 106 " + generatedOTP);
+        // console.log(typeof userOtp);
+        // console.log(typeof generatedOTP);
+        // console.log("userOTP: " + userOtp);
+        // console.log("line 106 " + generatedOTP);
         if (userOtp && generatedOTP && userOtp === generatedOTP.toString()) {
             res.status(200).json({ message: "OTP Verification Successful" });
         } else {
@@ -225,7 +225,7 @@ const sendOtpForgot = async (req, res) => {
         const ifExist = await userModel.findOne({ email: userEmail })
         if (ifExist) {
             generatedOTP = otpGenerator.generate(6);
-            console.log("Generated OTP OF FORGOT:", generatedOTP);
+            // console.log("Generated OTP OF FORGOT:", generatedOTP);
             const transport = nodemailer.createTransport({
                 service: "gmail",
                 host: "smtp.gmail.com",

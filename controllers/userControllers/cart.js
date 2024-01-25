@@ -17,7 +17,7 @@ const loadCart = async (req, res) => {
         if (loggedIn) {
             if (req.query.quantity && req.query.productId) {
                 const newQuantity = req.query.quantity
-                console.log(newQuantity);
+                // console.log(newQuantity);
                 const queryPrductId = req.query.productId
                 for (let i = 0; i < products.products.length; i++) {
                     const product = products.products[i];
@@ -79,7 +79,7 @@ const addToCart = async (req, res) => {
                 res.status(200).json({ message: "Item Added to Cart" });
             }
         } else {
-            console.log("without req.user");
+            // console.log("without req.user");
             return res.status(200).json({ notUser: true ,error:"Login to Continue!!"});
         }
     } catch (error) {
@@ -126,7 +126,7 @@ const updateQuantity = async (req, res) => {
         const userData = await userModel.findOne({ email });
         const userCart = await cartModel.findOne({ userId: userData._id });
         for (const item of userCart.products) {
-            console.log("inside");
+            // console.log("inside");
             if (item._id == productId) {
                 await cartModel.updateOne({ userId: userData._id, "products._id": productId },
                     { $set: { "products.$.quantity": quantity } });
@@ -153,122 +153,3 @@ module.exports = {
     clearAllCart,
     updateQuantity
 }
-
-
-
-
-
-
-//     .populate({
-//         path: '', // to which path you want this data in the cart model
-//         model: 'Product'
-//     })
-//     .exec()
-
-// const user = await userModel.findOne({ email: userEmail })
-//     .populate({
-//         path: 'userId',
-//         model: 'User'
-//     })
-//     .exec()
-// console.log(req.cookies.userEmail);
-// console.log(productId);
-// console.log(user);
-// console.log(product)
-
-
-
-
-// console.log(productId);
-// console.log(user);
-
-
-// if (!userData) {
-//     res.status(401).json({ error: "please login to continue" })
-// }
-
-//     if (product.stock <= 0) {
-//     console.log("this is the stock part");
-//     return res.status(200).json({ error: "product is out of stock" });
-// }
-
-// const addToCart = async (req, res) => {
-//     try {
-//         if (req.user) {
-//             const productId = req.body.productId;
-//             user = req.user;
-//             const userData = await userModel.findOne({ email: user });
-//             const userId = userData._id;
-//             const product = await productModel.findOne({ _id: productId });
-
-//             if (product.stock <= 0) {
-//                 return res.status(200).json({ error: "product is out of stock" });
-//             } else {
-
-//                 let userCart = await cartModel.findOne({ userId });
-//                 // if user has a cart
-//                 if (userCart) {
-//                     const existingProductIndex = userCart.products.findIndex((p) => {
-//                         return p.productId == productId;
-//                         // check the type
-//                     });
-
-//                     if (existingProductIndex !== -1) {
-//                         let productItem = userCart.products[existingProductIndex];
-//                         productItem.quantity += 1;
-//                     } else {
-//                         userCart.products.push({ productId: product._id, quantity: 1 });
-//                     }
-//                     // save the changes to the database
-//                     await userCart.save();
-//                 } else {
-//                     await cartModel.create({
-//                         userId: userId,
-//                         products: [{ productId: product._id, quantity: 1 }]
-//                     });
-//                 }
-//                 const qq = await cartModel.find({})
-//                 console.log(qq);
-//                 res.status(200).json({ message: "Item Added to Cart" });
-//             }
-//         } else {
-//             console.log("without req.user");
-//             return res.status(200).json({ error: "User not logged in" });
-//         }
-//     } catch (error) {
-//         console.error(error);
-//         // Handle error response or logging here
-//         res.status(500).json({ error: "Internal Server Error" });
-//     }
-// };
-
-
-
-// vahid
-// deleteProductFromCart: async (req, res, next) => {
-//     try {
-//       const userId = req.session.userId;
-//       const productId = req.query.productId;
-
-//       let cart = await cartModel.findOne({ user: userId });
-//       if (!cart) {
-//         const error = new Error("Cart is yet to create for this user");
-//         error.status(404);
-//         throw error;
-//       }
-//       let cartItems = cart.cartItems;
-//       cartItems = cartItems.filter(
-//         (_) => String(_.product) !== String(productId)
-//       );
-//       await cartModel.findOneAndUpdate(
-//         { user: userId },
-//         { $set: { cartItems: cartItems } },
-//         { new: true }
-//       );
-
-//       res.redirect("/viewCart");
-//     } catch (err) {
-//       console.error(err.message);
-//       next(err);
-//     }
-//   },

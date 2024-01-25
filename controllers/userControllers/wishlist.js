@@ -33,12 +33,12 @@ const addToWishlist = async (req, res) => {
             });
 
             if (productIndex === -1) {
-                console.log("new product");
+                // console.log("new product");
                 userWishlist.products.push({ productId });
                 await userWishlist.save();
             }
         } else {
-            console.log("new wishlist");
+            // console.log("new wishlist");
             const newWishlist = new wishlistModel({ userId: userData._id })
             await newWishlist.save()
             newWishlist.products.push({ productId })
@@ -79,7 +79,7 @@ const addToCartWishlist = async (req, res) => {
             { new: true }
         )
         const userCart = await cartModel.findOne({ userId: userData._id })
-        console.log(userCart);
+        // console.log(userCart);
         let productExsist = true;
         if (userCart) {
             for (let item of userCart.products) {

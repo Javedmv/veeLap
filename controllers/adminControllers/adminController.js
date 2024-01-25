@@ -1,7 +1,8 @@
 const adminModel = require("../../models/adminModel");
 const jwt = require("jsonwebtoken")
 const jwtKey = require("../../config/jwtAdmin")
-
+const orderModel = require("../../models/orderModel")
+const productModel = require("../../models/productModel")
 
 const loadAdminLogin = async (req, res) => {
     try {
@@ -34,7 +35,20 @@ const verifyAdmin = async (req, res) => {
 
 const loadDashboard = async (req, res) => {
     try {
-        res.render("admin/dashboard");
+        const orders = await orderModel.find({})
+        .populate({
+            path:'userId',
+            model:'User'
+        })
+        Object.freeze(orders)
+        const productLength = await productModel.countDocuments()
+        let revenue = 0; 
+        orders.forEach(element => {
+            if(element.orderStatus != "Cancelled" && element.paymentStatus == "Success"){
+            element.returnAmount != 0 ? revenue += element.returnAmount : revenue += element.totalAmount
+            }
+        });
+        res.render("admin/dashboard",{orders,revenue,productLength});
     } catch (error) {
         console.log(error);
     }

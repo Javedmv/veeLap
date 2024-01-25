@@ -119,9 +119,9 @@ const editSubmitProduct = async (req, res) => {
         if (req.files) {
             let imgArr = [];
             const alreadyImage = await productModel.findOne({ _id: productId })
-            console.log(alreadyImage, "this is the already");
+            // console.log(alreadyImage, "this is the already");
             imgArr.push(...alreadyImage.images)
-            console.log(imgArr);
+            // console.log(imgArr);
             const productImg = req.files
             for (let i = 0; i < productImg.length; i++) {
                 const croppedImage = await sharp(productImg[i].path)
@@ -145,7 +145,7 @@ const editSubmitProduct = async (req, res) => {
                 });
             }
             const existingCategory = await categoryModel.findOne({ categoryName: category })
-            console.log(imgArr.length);
+            // console.log(imgArr.length);
             if (imgArr.length < 2) {
                 res.render("admin/editproduct", { error: "Atleast 2 images should be added", product: alreadyImage })
             } else {
@@ -168,9 +168,9 @@ const editSubmitProduct = async (req, res) => {
                     }
                 })
             }
-            console.log("edit product added successfully");
+            // console.log("edit product added successfully");
             const lee = await productModel.findOne({ _id: productId }, { images: 1 })
-            console.log(lee);
+            // console.log(lee);
         }
         res.redirect("/admin/view-all-products")
     } catch (error) {

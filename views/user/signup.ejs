@@ -285,8 +285,8 @@
           confirmPasswordVm.style.display === "none"
         ) {
           // write the fetch and send otp
-          console.log(email);
-          console.log(phone);
+          // console.log(email);
+          // console.log(phone);
           try {
             sendOtpBtn.style.display = "none";
             const response = await fetch(
@@ -294,7 +294,7 @@
             );
             const data = await response.json();
 
-            console.log("Success:", data);
+            // console.log("Success:", data);
             if (data.message) {
               startCountdown();
               Swal.fire({
@@ -312,7 +312,7 @@
                 clearInterval();
                 setInterval(() => {
                   sendOtpBtn.style.display = "none";
-                  console.log("inside is started");
+                  // console.log("inside is started");
                   clearInterval();
                 }, 60000);
               }, 60000);
@@ -345,7 +345,7 @@
             })
             .then((data) => {
               Timer.style.display = "none";
-              console.log("data from server :", data);
+              // console.log("data from server :", data);
               if (data.message) {
                 Swal.fire({
                   title: "veeLap",
@@ -358,7 +358,7 @@
                 submit.disabled = false;
                 setTimeout(() => {
                   var intervalId = setInterval(() => {
-                    console.log("exicuted");
+                    // console.log("exicuted");
                     sendOtpBtn.style.display = "none";
                     verifyOtpBtn.style.display = "none";
                   }, 2000);
@@ -380,7 +380,7 @@
       }
       submitBtn.addEventListener("click", () => {
         clearInterval(intervalId);
-        console.log("Done");
+        // console.log("Done");
       });
       setTimeout(() => {
         document.getElementById("set").style.display = "none";
@@ -397,7 +397,7 @@
 
         if (remainingTime < 0) {
           clearInterval(countdown);
-          console.log("Countdown completed!");
+          // console.log("Countdown completed!");
         }
       }, 1000);
     }

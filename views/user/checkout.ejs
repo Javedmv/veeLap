@@ -795,7 +795,7 @@
       });
 
       const razorPayBtn = document.querySelector(".razorpay");
-      console.log("here1");
+      // console.log("here1");
       razorPayBtn.addEventListener("click", async function (event) {
         const selectedAddressRadioButtons = document.querySelector(
           "input[name=address]:checked"
@@ -817,21 +817,21 @@
             },
           })
             .then((response) => {
-              console.log("logging response");
+              // console.log("logging response");
               return response.json();
             })
             .then((data) => {
-              console.log("return form response in postive");
+              // console.log("return form response in postive");
               if (data.completed) {
                 const razorOrderID = data.razorOrderId;
                 const orderId = data.orderId;
-                console.log("reached here", razorOrderID);
+                // console.log("reached here", razorOrderID);
                 var options = {
                   amount: razorOrderID.amount,
                   key: "rzp_test_GGrk1vYqKj8uDF",
                   order_id: razorOrderID,
                   handler: (response) => {
-                    console.log("this is responser");
+                    // console.log("this is responser");
                     // console.log(response);
                     Swal.fire({
                       position: "top-end",
@@ -847,11 +847,11 @@
                     }, 1500);
                   },
                 };
-                console.log(" new razorpay");
+                // console.log(" new razorpay");
                 var rzp1 = new Razorpay(options);
                 rzp1.open();
                 rzp1.on("payment.failed", (response) => {
-                  console.log("Payment Failed");
+                  // console.log("Payment Failed");
                   // console.log(response);
                   Swal.fire({
                     position: "top-end",

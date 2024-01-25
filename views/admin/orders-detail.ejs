@@ -497,7 +497,7 @@
 
         saveBtn.addEventListener("click", async function () {
           const statusSelect = document.querySelector(".statusSelect").value;
-          console.log(statusSelect);
+          // console.log(statusSelect);
 
           if (statusSelect) {
             Swal.fire({
@@ -511,7 +511,7 @@
             })
               .then(async function (result) {
                 if (result.isConfirmed) {
-                  console.log(statusSelect);
+                  // console.log(statusSelect);
                   const response = await fetch(
                     `/admin/change-order-status?orderStatus=${statusSelect}&orderId=${orderId}`
                   );

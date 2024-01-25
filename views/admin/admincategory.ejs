@@ -384,7 +384,7 @@
               .getElementById("categoryName")
               .value.trim();
             const status = document.getElementById("statusSelect").value;
-            console.log(categoryname, status);
+            // console.log(categoryname, status);
             event.preventDefault();
 
             // Validation: Avoid numbers in catgName
@@ -448,7 +448,7 @@
           button.addEventListener("click", async (event) => {
             event.preventDefault();
             const categoryId = button.getAttribute("data-category-id");
-            console.log(categoryId);
+            // console.log(categoryId);
 
             // Use SweetAlert to confirm the deletion
             if (categoryId) {

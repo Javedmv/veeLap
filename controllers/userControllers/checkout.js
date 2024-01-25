@@ -39,7 +39,7 @@ const loadCheckout = async (req, res) => {
 const applyCoupon = async (req, res) => {
     try {
         const { Total, code } = req.query
-        console.log(Total);
+        // console.log(Total);
         const userData = await userModel.findOne({ email: req.user })
         const wallet = await walletModel.findOne({ userId: userData._id });
         let grandTotal = 0;
