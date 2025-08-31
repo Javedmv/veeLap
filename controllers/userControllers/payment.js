@@ -315,7 +315,7 @@ const updatePaymentStatus = async (req, res) => {
             const orderData = orderModel.findById(orderId)
             await orderModel.updateOne(
                 { _id: orderId },
-                { $set: { "products.$[].singleProductStatus": "Success" } }
+                { $set: { "products.$[].singleProductStatus": "Order Placed" } }
             );
             await cartModel.updateOne({ userId: userData._id }, { $set: { products: [] } });
             return res.status(200).json({ paymentStatus: "Success" });

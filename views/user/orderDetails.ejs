@@ -313,7 +313,7 @@
                       <tr>
                         <td class="text-center">
                           <img
-                            src="<%= item.productId.images[0]?.path  %>"
+                            src="<%= item.productId?.images[0]?.path  %>"
                             class="img-sm"
                             alt="image"
                             height="68"
@@ -324,7 +324,7 @@
                           <%= orderDetails.referenceId %>
                         </td>
                         <td class="text-center">
-                          <%= item.productId.productName %>
+                          <%= item.productId?.productName %>
                         </td>
                         <td class="text-center">
                           <%= orderDetails.createdAt.toLocaleDateString() %>

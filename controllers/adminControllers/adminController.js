@@ -37,9 +37,10 @@ const loadDashboard = async (req, res) => {
     try {
         const orders = await orderModel.find({})
         .populate({
-            path:'userId',
-            model:'User'
+            path: 'userId',
+            model: 'User'
         })
+        .sort({ _id: -1 });
         Object.freeze(orders)
         const productLength = await productModel.countDocuments()
         let revenue = 0; 

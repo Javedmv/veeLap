@@ -462,8 +462,8 @@
                                           <td rowspan="<%= order.products.length %>" class="text-center"><%= productIndex + 1 %></td>
                                           <% previousOrderIndex = productIndex; %>
                                         <% } %>
-                                        <td style="width: 2rem; height: 2rem;"><img src="<%= product.productId.images[0]?.path %>" alt="image"></td>
-                                        <td class="text-center"><%= product.productId.productName %></td>
+                                        <td style="width: 2rem; height: 2rem;"><img src="<%= product?.productId?.images[0]?.path %>" alt="image"></td>
+                                        <td class="text-center"><%= product?.productId?.productName %></td>
                                         <td class="text-center"><%= order.orderDate.toLocaleDateString() %></td>
                                         <% if (productInnerIndex === 0) { %>
                                         <td class="text-center"  rowspan="<%= order.products.length %>">
