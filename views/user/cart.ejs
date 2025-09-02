@@ -371,7 +371,7 @@
                           
                         </p>
                         <p class="clamp-lines font-xs mr-50 ml-50">
-                          <a href="/user/product-details/<%= product.productId._id%>"><%= product.productId.description%></a>
+                          <a href="/product-details/<%= product.productId._id%>"><%= product.productId.description%></a>
                         </p>
                         
                       </td>
@@ -412,7 +412,7 @@
                         <%}%>
                       </td>
                       <td class="action col-1" data-title="Remove">
-                        <a href="/user/delete-cart?userId=<%=product._id%>" class="btn btn-sm deleleCartBtn">
+                        <a href="/delete-cart?userId=<%=product._id%>" class="btn btn-sm deleleCartBtn">
                           <i class="fi-rs-trash"></i>
                         </a>
                         
@@ -422,7 +422,7 @@
                     
                     <tr>
                       <td colspan="6" class="text-end">
-                        <a href="/user/clear-all-cart" class="btn btn-sm">
+                        <a href="/clear-all-cart" class="btn btn-sm">
                           <i class="fi-rs-cross-small"></i> Clear Cart</a
                           >
                         </td>
@@ -445,7 +445,7 @@
                 <!-- <a class="btn mr-10 mb-sm-15"
                   ><i class="fi-rs-shuffle mr-10"></i>Update Cart</a
                 > -->
-                <a class="btn" href="/user/"
+                <a class="btn" href="/"
                   ><i class="fi-rs-shopping-bag mr-10"></i>Continue Shopping</a
                 >
               </div>
@@ -495,7 +495,7 @@
                       </table>
                     </div>
                     <%if(grandTotal){%>
-                    <div class="d-flex align-items-center justify-content-center"><a href="/user/checkout?grandTotal=<%=grandTotal%>" class="btn">
+                    <div class="d-flex align-items-center justify-content-center"><a href="/checkout?grandTotal=<%=grandTotal%>" class="btn">
                       <i class="fi-rs-box-alt mr-10"></i> Proceed To CheckOut</a
                     ></div>
                     <%}%>
@@ -524,7 +524,7 @@
               event.preventDefault()
               let newQuantity = parseInt(qtyValue.textContent,10) + 1;
               qtyValue.textContent = newQuantity
-              await fetch("/user/update-quantity",{
+              await fetch("/update-quantity",{
                 method:"POST",
                 headers:{
                   'Content-Type': 'application/json'
@@ -538,7 +538,7 @@
                 if (data.success) {
                   qtyValue.textContent = data.quantity;
                 }
-                window.location.href = "/user/load-cart"
+                window.location.href = "/load-cart"
               }).catch(error => {
                   console.log("Error updating quantity:", error);
               })
@@ -553,7 +553,7 @@
                   newQuantity = 1
                 }
                 qtyValue.textContent = newQuantity
-                await fetch("/user/update-quantity",{
+                await fetch("/update-quantity",{
                 method:"POST",
                 headers:{
                   'Content-Type': 'application/json'
@@ -567,7 +567,7 @@
                 if (data.success) {
                   qtyValue.textContent = data.quantity;
                 }
-                window.location.href = "/user/load-cart"
+                window.location.href = "/load-cart"
               }).catch(error => {
                   console.log("Error updating quantity:", error);
               });

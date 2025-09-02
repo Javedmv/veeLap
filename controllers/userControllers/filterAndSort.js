@@ -6,49 +6,58 @@ const filterAndSort = async (req, res) => {
     try {
         let products;
         const ObjectId = mongoose.Types.ObjectId;
-        let { sort, categories } = req.body
-        const loggedIn = req.cookies.loggedIn
-        const userEmail = req.cookies.userEmail
-        const page = req.query.page || 1;
+        let { sort, categories } = req.body;
+        const loggedIn = req.cookies.loggedIn;
+        const userEmail = req.cookies.userEmail;
+        const page = parseInt(req.query.page) || 1;
         const no_doc_on_each_pages = 9;
-        const totalProducts = await productModel.countDocuments({
-            status: "Active",
-        });
-        const totalPages = Math.ceil(totalProducts / no_doc_on_each_pages)
-        const skip = (page - 1) * no_doc_on_each_pages
-        sort = (sort == "highToLow") ? -1 : 1;
-        if (sort && categories) {
-            products = await categoryResult(sort, categories)
+        const skip = (page - 1) * no_doc_on_each_pages;
+
+        // Make sure categories is always an array
+        if (categories && !Array.isArray(categories)) {
+            categories = [categories];
+        }
+
+        // Count products (for pagination)
+        const totalProducts = await productModel.countDocuments({ status: "Active" });
+        const totalPages = Math.ceil(totalProducts / no_doc_on_each_pages);
+
+        // Sorting order
+        let sortOrder = 1; // default low to high
+        if (sort === "highToLow") sortOrder = -1;
+
+        if (categories && categories.length > 0) {
+            products = await productModel.aggregate([
+                { $match: { category: { $in: categories.map(id => new ObjectId(id)) } } },
+                { $sort: { salesPrice: sortOrder } },
+                { $skip: skip },
+                { $limit: no_doc_on_each_pages }
+            ]);
         } else {
             products = await productModel.find({ status: "Active" })
-                .sort({ salesPrice: sort })
+                .sort({ salesPrice: sortOrder })
                 .skip(skip)
                 .limit(no_doc_on_each_pages)
                 .exec();
         }
-        async function categoryResult(sort, filter) {
-            const objectId = new ObjectId(filter)
-            const sortedFilter = await productModel.aggregate([{ $match: { category: objectId } },
-            {
-                $lookup: {
-                    from: 'categories', // Adjust this based on your actual collection name
-                    localField: 'category',
-                    foreignField: '_id',
-                    as: 'categoryData'
-                }
-            },
-            {
-                $unwind: '$categoryData' // Unwind the array created by $lookup (optional, depending on your use case)
-            }, { $sort: { salesPrice: sort ? sort : 1 } }]).skip(skip)
-                .limit(no_doc_on_each_pages)
-            return sortedFilter
-        }
-        const category = await categoryModel.find({})
-        res.render("user/home", { userEmail, loggedIn, products, category, totalPages, page });
+
+        const category = await categoryModel.find({});
+
+        res.render("user/home", {
+            userEmail,
+            loggedIn,
+            products,
+            category,
+            totalPages,
+            page,
+            selectedSort: sort,
+            selectedCategories: categories || []
+        });
     } catch (error) {
         console.log(error);
     }
-}
+};
+
 
 const searchProduct = async (req, res) => {
     try {
@@ -65,7 +74,7 @@ const searchProduct = async (req, res) => {
         const totalPages = Math.ceil(totalProducts / no_doc_on_each_pages)
         const skip = (page - 1) * no_doc_on_each_pages
         const products = await productModel.find({ productName: regex, status: "Active" }).skip(skip).limit(no_doc_on_each_pages)
-        res.render("user/home", { userEmail, loggedIn, products, category, page, totalPages });
+        res.render("user/home", { userEmail, loggedIn, products, category, page, totalPages, selectedSort: null, selectedCategories: [] });
     } catch (error) {
         console.log(error);
     }

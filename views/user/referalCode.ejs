@@ -36,7 +36,7 @@
         <label for="referralCode">Enter Referral Code:</label>
         <input type="text" id="referralCode" placeholder="Enter code..." class="form-control referralCodeInput" />
         <button id="submitReferral" type="button" class="btn btn-primary mt-3">Submit</button>
-        <a href="/user/referalCode" class="btn btn-link mt-2">Skip</a>
+        <a href="/referalCode" class="btn btn-link mt-2">Skip</a>
     </div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.16.6/dist/sweetalert2.all.min.js"></script>
@@ -48,7 +48,7 @@
       const ReferralBtn = document.getElementById("submitReferral")
       ReferralBtn.addEventListener("click", async function () {
         const referralCodeInputs = document.getElementById("referralCode").value
-        await fetch(`/user/referral?refCod=${referralCodeInputs}&email=${emailId}`,{
+        await fetch(`/referral?refCod=${referralCodeInputs}&email=${emailId}`,{
           method:'post',
         }).then((response)=>{
           return response.json()

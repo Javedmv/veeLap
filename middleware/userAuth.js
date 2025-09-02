@@ -6,7 +6,7 @@ const verifyUser = (req, res, next) => {
     const token = req.cookies.token;
     const verifyToken = jwt.verify(token, jwtKey.secretKey, (err, decoded) => {                  // jwt key is from .env file
         if (err) {
-            res.redirect("/user/login")
+            res.redirect("/login")
         }
         req.user = decoded;
         next()

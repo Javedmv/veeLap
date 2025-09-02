@@ -366,7 +366,7 @@
                       <%}%>
                     </td>
                     <td class="action" data-title="Remove">
-                      <a href="/user/delete-product?product=<%=product.id%>"
+                      <a href="/delete-product?product=<%=product.id%>"
                         ><i class="fi-rs-trash btn btn-sm"></i
                       ></a>
                     </td>
@@ -379,7 +379,7 @@
                   <div
                     class="d-flex align-items-center justify-content-center mt-20"
                   >
-                    <a class="btn text-center" href="/user/"
+                    <a class="btn text-center" href="/"
                       >Continue Shopping</a
                     >
                   </div>
@@ -402,7 +402,7 @@
           const wishlistId = button.getAttribute("wishlistId");
           const productId = button.getAttribute("productId");
           await fetch(
-            `/user/add-to-cart-wishlist?wishlistId=${wishlistId}&productId=${productId}`,
+            `/add-to-cart-wishlist?wishlistId=${wishlistId}&productId=${productId}`,
             {
               method: "post",
             }
@@ -420,7 +420,7 @@
                 });
               }
               setTimeout(() => {
-                window.location.href = "/user/load-wishlist";
+                window.location.href = "/load-wishlist";
               }, 1500);
             })
             .catch((error) => {

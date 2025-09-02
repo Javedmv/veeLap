@@ -51,7 +51,7 @@
                       <form
                         method="post"
                         id="userInfoForm"
-                        action="/user/submit"
+                        action="/submit"
                       >
                         <!-- <span id="errSignupName" class="text-danger"></span> -->
                         <!-- need to find if user already exsists or not -->
@@ -205,7 +205,7 @@
                       </div>
                       <div class="text-muted text-center">
                         Already have an account?
-                        <a href="/user/login">Log in now</a>
+                        <a href="/login">Log in now</a>
                       </div>
                     </div>
                   </div>
@@ -290,7 +290,7 @@
           try {
             sendOtpBtn.style.display = "none";
             const response = await fetch(
-              `/user/sendotp?email=${email}&phone=${phone}`
+              `/sendotp?email=${email}&phone=${phone}`
             );
             const data = await response.json();
 
@@ -337,7 +337,7 @@
         verifyOtpBtn.addEventListener("click", async (event) => {
           const userOtp = document.getElementById("otp").value;
           event.preventDefault();
-          fetch(`/user/verify-otp?userOtp=${userOtp}`, {
+          fetch(`/verify-otp?userOtp=${userOtp}`, {
             method: "POST",
           })
             .then((Response) => {

@@ -27,7 +27,7 @@ const loadCheckout = async (req, res) => {
         });
         if (!stockCheck || !statusCheck) {
             // Redirect to cart if productStock is insufficient
-            return res.redirect('/user/load-cart');
+            return res.redirect('/load-cart');
         }
         if (userCart.products.length > 0) {
             return res.render("user/checkout", { loggedIn, userAddress, userCart, grandTotal, coupons })
@@ -52,12 +52,12 @@ const applyCoupon = async (req, res) => {
         if (userCart && userCart.products.length > 0) {
             for (let i = 0; i < userCart.products.length; i++) {
                 if (userCart.products[i].quantity > userCart.products[i].productId.stock || userCart.products[i].productId.stock == 0) {
-                    return res.redirect('/user/load-cart')
+                    return res.redirect('/load-cart')
                 }
                 grandTotal += userCart.products[i].quantity * (userCart.products[i].productId.salesPrice - userCart.products[i].productId.offerAmount);
             }
         } else {
-            return res.redirect('/user/load-cart')
+            return res.redirect('/load-cart')
         }
         const coupon = await couponModel.findOne({ couponCode: code })
         if (!coupon) {

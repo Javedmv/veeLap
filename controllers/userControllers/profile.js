@@ -72,10 +72,10 @@ const submitAddress = async (req, res) => {
             await userAddress.save()
             if (isCheckout == "true") {
                 // console.log("this is from the cart");
-                return res.redirect("/user/checkout")
+                return res.redirect("/checkout")
             } else {
                 // console.log("this is from the profile");
-                return res.redirect("/user/profile")
+                return res.redirect("/profile")
             }
         }
     } catch (error) {
@@ -120,12 +120,12 @@ const postEditAddress = async (req, res) => {
                     }
                 })
                     .then(() => {
-                        res.redirect("/user/profile")
+                        res.redirect("/profile")
                     });
             }
-            res.redirect("/user/profile")
+            res.redirect("/profile")
         } else {
-            res.redirect("/user/profile")
+            res.redirect("/profile")
         }
     } catch (error) {
         console.log(error);
@@ -137,7 +137,7 @@ const deleteAddress = async (req, res) => {
         const addressId = req.params.id
         const userData = await userModel.findOne({ email: req.user })
         const deletedAddress = await addressModel.updateOne({ userId: userData._id }, { $pull: { address: { _id: addressId } } })
-        res.redirect("/user/profile")
+        res.redirect("/profile")
     } catch (error) {
         console.log(error);
     }
@@ -202,7 +202,7 @@ const cancelOrder = async (req, res) => {
 
         await orderModel.updateOne({ _id: orderId }, { $set: { orderStatus: "Cancelled" } })
         cancelledOrder.save()
-        res.redirect(`/user/order-status-details?orderRefId=${cancelledOrder.referenceId}`)
+        res.redirect(`/order-status-details?orderRefId=${cancelledOrder.referenceId}`)
     } catch (error) {
         console.log(error);
     }
@@ -223,7 +223,7 @@ const returnOrder = async (req, res) => {
         if (returnedOrder.paymentStatus == "Success") {
             const wallet = await walletModel.updateOne({ userId: userData._id }, { $inc: { balance: returnedOrder.totalAmount } })
         }
-        res.redirect(`/user/order-status-details?orderRefId=${returnedOrder.referenceId}`)
+        res.redirect(`/order-status-details?orderRefId=${returnedOrder.referenceId}`)
     } catch (error) {
         console.log(error);
     }
@@ -323,9 +323,9 @@ const submitReferral = async (req, res) => {
                 await walletModel.updateOne({ userId: refrerralUser._id }, { $inc: { balance: 200 },$push:{historyDetails:refwalletDetail} })
                 await walletModel.updateOne({ userId: userDate._id }, { $inc: { balance: 100 },$push:{historyDetails:walletDetail} })
                 await userModel.updateOne({ email: user }, { ReferralStatus: false })
-                const Url = "/user/login"
+                const Url = "/login"
                 res.status(200).json({ status: true, message: "you have won 100 rs" ,Url})
-                return res.redirect("/user/")
+                return res.redirect("/")
             }
         } else {
             // console.log("failed");

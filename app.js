@@ -40,7 +40,7 @@ mongoose.connect(dbConfig.url).then(() => {
 });
 
 app.use("/admin", adminRoute)
-app.use('/user', userRoute);
+app.use('/', userRoute);
 
 app.listen(process.env.PORT, (err) => {
     console.log("app is running " + "http://127.0.0.1:" + process.env.PORT)

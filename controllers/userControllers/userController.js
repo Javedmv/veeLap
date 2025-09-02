@@ -55,7 +55,7 @@ const loadHome = async (req, res) => {
         const skip = (page - 1) * no_doc_on_each_pages
         const products = await productModel.find({ status: "Active" }).skip(skip).limit(no_doc_on_each_pages)
         const category = await categoryModel.find({})
-        res.render("user/home", { userEmail, loggedIn, products, category, page, totalPages });
+        res.render("user/home", { userEmail, loggedIn, products, category, page, totalPages, selectedSort: null, selectedCategories: [] });
     } catch (error) {
         console.log(error.message);
     }
@@ -192,7 +192,7 @@ const userLogin = async (req, res) => {
                     res.cookie("loggedIn", true, { maxAge: 24 * 60 * 60 * 1000 });
                     res.cookie("userEmail", userData.email);
                     // res.status(200).json({ success: true });
-                    res.redirect("/user/")
+                    res.redirect("/")
                 } catch (error) {
                     console.error(error)
                     res.status(500).render("user/login", { error: "Internal Server Error" });
@@ -213,7 +213,7 @@ const userLogout = async (req, res) => {
         res.clearCookie("loggedIn");
         res.clearCookie("userEmail");
         // res.clearCookie("userName");
-        res.redirect("/user/")
+        res.redirect("/")
     } catch (error) {
         console.log(error)
     }
@@ -310,9 +310,9 @@ const editUserDetails = async (req, res) => {
 
         } else {
             await userModel.updateOne({ email: req.user }, { $set: { phoneNumber: newPhoneNumber, userName: newUserName } })
-            return res.redirect("/user/profile")
+            return res.redirect("/profile")
         }
-        res.redirect("/user/logout")
+        res.redirect("/logout")
 
     } catch (error) {
         console.log(error);

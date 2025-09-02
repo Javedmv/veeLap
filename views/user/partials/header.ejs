@@ -72,14 +72,14 @@
                 <% if (!loggedIn){ %>
                   <ul>
                       <i class="fi-rs-user"></i>
-                    <li><a href="/user/login">Log In</a></li>
-                    <li> <a href="/user/signup">Sign Up</a></li> 
+                    <li><a href="/login">Log In</a></li>
+                    <li> <a href="/signup">Sign Up</a></li> 
                   </ul>
                <%}else{%>  
-                <a href="/user/profile"><i class="fi-rs-user"></i></a>
+                <a href="/profile"><i class="fi-rs-user"></i></a>
                 <!-- <a href="#">ejs</a> -->
                 <span class="ml-10 mr-10">|</span>
-               <a href="/user/logout">Log Out</a> 
+               <a href="/logout">Log Out</a> 
                 <% } %>               
               </div>
             </div>
@@ -90,40 +90,41 @@
         <div class="container">
           <div class="header-wrap">
             <div class="logo logo-width-1">
-              <a href="/user/"
+              <a href="/"
                 ><img src="/userassets/imgs/theme/veeLap.png" alt="logo"
               /></a>
             </div>
             <div class="header-right">
               <div class="search-style-2">
-                <form action="/user/search" method="post">
+                <form action="/search" method="post">
                   <input type="text" placeholder="Search for items..." name="search">
                   <button type="submit" class="btn btn-fill-out btn-block " style="font-size: medium;font-weight: 700;">Search</button>
                 </form>
               </div>
-              <div class="header-action-right">
-                <div class="header-action-2">
-                  <div class="header-action-icon-2">
-                    <a href="/user/load-wishlist">
-                      <img
-                        class="svgInject"
-                        alt="Evara"
-                        src="/userassets/imgs/theme/icons/icon-heart.svg"
-                      />
-                      <span class="pro-count blue">4</span>
-                    </a>
-                  </div>
-                  <div class="header-action-icon-2">
-                    <a class="mini-cart-icon" href="/user/load-cart">
-                      <img
-                        alt="Evara"
-                        src="/userassets/imgs/theme/icons/icon-cart.svg"
-                      />
-                      <span class="pro-count blue">2</span>
-                    </a>
-                  </div>
+              <div class="d-flex align-items-center gap-3">
+                <!-- Wishlist -->
+                <div class="position-relative">
+                  <a href="/load-wishlist" class="d-inline-flex align-items-center">
+                    <img class="svgInject" alt="Wishlist" src="/userassets/imgs/theme/icons/icon-heart.svg" width="28" height="28" />
+                    <span id="wishlist-count" 
+                          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
+                      0
+                    </span>
+                  </a>
+                </div>
+              
+                <!-- Cart -->
+                <div class="position-relative">
+                  <a href="/load-cart" class="d-inline-flex align-items-center">
+                    <img alt="Cart" src="/userassets/imgs/theme/icons/icon-cart.svg" width="28" height="28" />
+                    <span id="cart-count" 
+                          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
+                      0
+                    </span>
+                  </a>
                 </div>
               </div>
+                         
             </div>
           </div>
         </div>
@@ -174,12 +175,12 @@
                 <nav>
                   <ul>
                     <li>
-                      <a class="active" href="/user/"
+                      <a class="active" href="/"
                         >Home <i class=""></i
                       ></a>
                     </li>
                     <li>
-                      <a href="/user/sales-page" style="background: linear-gradient(90deg, #ffcc00, #ff3300);
+                      <a href="/sales-page" style="background: linear-gradient(90deg, #ffcc00, #ff3300);
                         background-clip: text;
                         color: transparent;
                         transition: background-position 0.5s;
@@ -192,7 +193,7 @@
                       </a>
                     </li>
                     <li>
-                      <a href="/user/about">About</a>
+                      <a href="/about">About</a>
                     </li>
                   </ul>
                 </nav>
@@ -317,7 +318,7 @@
               <a href="page-contact.html"> Our location </a>
             </div>
             <div class="single-mobile-header-info">
-              <a href="/user/login">Log In / Sign Up </a>
+              <a href="/login">Log In / Sign Up </a>
             </div>
             <div class="single-mobile-header-info">
               <a href="#">(+01) - 2345 - 6789 </a>

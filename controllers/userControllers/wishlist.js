@@ -61,7 +61,7 @@ const deleteWishlist = async (req, res) => {
             { $pull: { products: { _id: wishlistId } } },
             { new: true }
         );
-        res.redirect("/user/load-wishlist")
+        res.redirect("/load-wishlist")
     } catch (error) {
         console.log(error);
     }

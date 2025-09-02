@@ -394,7 +394,7 @@
                         >
                       </li>
                       <li class="nav-item">
-                        <a class="nav-link" href="/user/logout"
+                        <a class="nav-link" href="/logout"
                           ><i class="fi-rs-sign-out mr-10"></i>Logout</a
                         >
                       </li>
@@ -475,7 +475,7 @@
                                         <td class="text-center"> ₹<%= product.price %> for <%= product.quantity %> item</td>
                                         <% if (productInnerIndex === 0) { %>
                                           <td class="text-center" rowspan="<%= order.products.length %>">
-                                            <a href="/user/order-status-details?orderRefId=<%= order.referenceId %>" class="btn-small d-block">View</a>
+                                            <a href="/order-status-details?orderRefId=<%= order.referenceId %>" class="btn-small d-block">View</a>
                                           </td>
                                         <% } %>
                                       </tr>
@@ -522,8 +522,8 @@
                               </address>
                               <p><strong>Phone:</strong> <%=add.phone%></p>
                               <div class="d-flex align-items-center justify-content-between">
-                                <a href="/user/edit-address/<%=add._id%>" class="btn btn-primary btn-small" style="background-color: rgb(67, 66, 66);border:rgb(69, 69, 69) ;">Edit</a>
-                                <a href="/user/delete-single-address/<%=add._id%>" class=" btn btn-small" style="background-color: rgb(230, 0, 0);border:rgb(90, 25, 25) ;">Delete</a>
+                                <a href="/edit-address/<%=add._id%>" class="btn btn-primary btn-small" style="background-color: rgb(67, 66, 66);border:rgb(69, 69, 69) ;">Edit</a>
+                                <a href="/delete-single-address/<%=add._id%>" class=" btn btn-small" style="background-color: rgb(230, 0, 0);border:rgb(90, 25, 25) ;">Delete</a>
                               </div>
                           </div>
                           
@@ -541,7 +541,7 @@
                           <%}%>
                         
                         <div class="d-flex align-items-center justify-content-end mt-20">
-                          <a href="/user/add-address" class="btn sm-btn">
+                          <a href="/add-address" class="btn sm-btn">
                             Add Address
                           </a>
                         </div>
@@ -563,7 +563,7 @@
                             </div>
                           </div>
                           <div class="d-flex align-items-center justify-content-end mr-60 mt-5">
-                            <a href="/user/load-forgot-pass" class="text-primary">Forgot Password?</a>
+                            <a href="/load-forgot-pass" class="text-primary">Forgot Password?</a>
                           </div>
                       <div class=" col-lg-10 mx-auto d-flex">
                         <div class="mr-20">
@@ -579,7 +579,7 @@
                                 <h5 class="d-block align-items-center">Edit Account Details</h5>
                             </div>
                             <div class="card-body">
-                                <form method="post" action="/user/edit-user-details">
+                                <form method="post" action="/edit-user-details">
                                     <div class="mb-3">
                                         <label for="newUserName" class="form-label"><strong>User Name:</strong></label>
                                         <input type="text" class="form-control " id="newUserName" name="newUserName" placeholder="Enter new user name" value="<%= user.userName%>">
@@ -596,7 +596,7 @@
                                     </div>
                     
                                     <div class="text-center d-flex justify-content-between">
-                                      <a class="btn btn-sm" href="/user/profile" style="background-color: rgb(69, 69, 69)
+                                      <a class="btn btn-sm" href="/profile" style="background-color: rgb(69, 69, 69)
                                       ;">Cancel</a>
                                       <button type="submit" class="btn btn-primary btn-sm edit-user-save">Save Changes</button>
                                     </div>
@@ -636,7 +636,7 @@
                            
                             <tr>
                               <td class="text-center"><%= sino++%></td>
-                              <td class="text-center"><a href="/user/order-status-details?orderRefId=<%= element.referenceId %>"><%=element.referenceId%></a></td>
+                              <td class="text-center"><a href="/order-status-details?orderRefId=<%= element.referenceId %>"><%=element.referenceId%></a></td>
                               <td class="text-center"><%=element.walletStatus%></td>
                               <%if(element.walletStatus === "Debited"){%>
                               <td class="text-center text-danger">-<%=element.orderTotal%></td>

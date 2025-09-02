@@ -15,7 +15,7 @@
   <div class="card">
     <div class="card-body">
       <%for(const element of address.address){%>
-      <form method="post" action="/user/submit-edit-address/<%=element._id%>">
+      <form method="post" action="/submit-edit-address/<%=element._id%>">
         <div class="form-group">
           <label for="AddressType" class="bold-label">Address Type :</label>
           <input

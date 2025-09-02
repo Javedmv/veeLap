@@ -313,7 +313,7 @@
                 <a
                   style="background-color: grey; border: grey; color: black"
                   class="btn btn-small"
-                  href="/user/add-address?isCheckout=true"
+                  href="/add-address?isCheckout=true"
                   >Add address</a
                 >
               </h6>
@@ -356,7 +356,7 @@
                 <div class="card-body">
                   <address>
                     Click Here to
-                    <a href="/user/add-address">Add New Address</a>
+                    <a href="/add-address">Add New Address</a>
                   </address>
                 </div>
               </div>
@@ -394,7 +394,7 @@
                       </td>
                       <td>
                         <a
-                          href="/user/product-details/<%=element.productId._id%>"
+                          href="/product-details/<%=element.productId._id%>"
                           ><%= element.productId.description %></a
                         >
                       </td>
@@ -629,7 +629,7 @@
             selectedAddressValue = selectedAddressRadioButtons.value;
 
             await fetch(
-              `/user/placeorder/cod?addressId=${selectedAddressValue}&grandTotal=${grandTotal}&discount=${discount}&couponcode=${couponCODE}`,
+              `/placeorder/cod?addressId=${selectedAddressValue}&grandTotal=${grandTotal}&discount=${discount}&couponcode=${couponCODE}`,
               {
                 method: "post",
                 body: JSON.stringify({ addressId: selectedAddressValue }),
@@ -650,7 +650,7 @@
                     timer: 1500,
                   });
                   setTimeout(() => {
-                    window.location.href = "/user/load-cart";
+                    window.location.href = "/load-cart";
                   }, 1500);
                 } else {
                   Swal.fire({
@@ -661,7 +661,7 @@
                     timer: 1500,
                   });
                   setTimeout(() => {
-                    window.location.href = "/user/order/success";
+                    window.location.href = "/order/success";
                   }, 1500);
                 }
               })
@@ -689,7 +689,7 @@
         const couponCode = validateCouponCode(checkCoupon);
         if (couponCode) {
           await fetch(
-            `/user/applycoupon?code=${couponCode}&Total=${grandTotal}`
+            `/applycoupon?code=${couponCode}&Total=${grandTotal}`
           )
             .then((response) => response.json())
             .then((data) => {
@@ -736,7 +736,7 @@
           selectedAddressValue = selectedAddressRadioButtons.value;
 
           await fetch(
-            `/user/pay-wallet?couponCode=${couponCODE}&grandTotal=${grandTotal}&discount=${discount}`,
+            `/pay-wallet?couponCode=${couponCODE}&grandTotal=${grandTotal}&discount=${discount}`,
             {
               method: "post",
               body: JSON.stringify({ addressId: selectedAddressValue }),
@@ -757,7 +757,7 @@
                   timer: 1500,
                 });
                 setTimeout(() => {
-                  window.location.href = "/user/load-cart";
+                  window.location.href = "/load-cart";
                 }, 1500);
               } else if (data.walletBalance) {
                 Swal.fire({
@@ -776,7 +776,7 @@
                   timer: 1500,
                 });
                 setTimeout(() => {
-                  window.location.href = "/user/order/success";
+                  window.location.href = "/order/success";
                 }, 1500);
               }
             })
@@ -804,7 +804,7 @@
 
         if (selectedAddressRadioButtons) {
           selectedAddressValue = selectedAddressRadioButtons.value;
-          await fetch("/user/pay-razorpay", {
+          await fetch("/pay-razorpay", {
             method: "post",
             body: JSON.stringify({
               addressId: selectedAddressValue,
@@ -873,7 +873,7 @@
                   timer: 1500,
                 });
                 setTimeout(() => {
-                  window.location.href = "/user/load-cart";
+                  window.location.href = "/load-cart";
                 }, 1500);
               } else {
                 Swal.fire({
@@ -906,7 +906,7 @@
         response,
         orderId
       ) {
-        const url = `/user/update-payment-status?paymentStatus=${paymentStatus}&razorOrderId=${razorOrderId}&orderId=${orderId}`;
+        const url = `/update-payment-status?paymentStatus=${paymentStatus}&razorOrderId=${razorOrderId}&orderId=${orderId}`;
 
         fetch(url, {
           method: "POST",
@@ -922,14 +922,14 @@
           })
           .then((data) => {
             if (data.paymentStatus == "Success") {
-              window.location.href = `/user/order/success`;
+              window.location.href = `/order/success`;
             } else {
-              window.location.href = "/user/load-cart";
+              window.location.href = "/load-cart";
             }
           })
           .catch((error) => {
             console.error("Failed to update payment status", error);
-            window.location.href = "/user/login";
+            window.location.href = "/login";
           });
       }
       //function to handle payment success

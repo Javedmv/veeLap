@@ -19,8 +19,10 @@ const { loadCheckout, applyCoupon } = require("../controllers/userControllers/ch
 
 const { loadOrderSuccess, placeOrderCOD, walletPayment, paymentRazorpay, updatePaymentStatus } = require("../controllers/userControllers/payment")
 
-const { loadWishlist, addToWishlist, deleteWishlist, addToCartWishlist } = require("../controllers/userControllers/wishlist")
+const { loadWishlist, addToWishlist, deleteWishlist, addToCartWishlist } = require("../controllers/userControllers/wishlist");
+const { getCounts } = require("../controllers/userControllers/countController");
 // just rendering the pages
+userRouter.get("/get-counts", getCounts);
 userRouter.get("/login", loadLogin);
 userRouter.get("/signup", loadSignup);
 userRouter.get("/", loadHome);
@@ -61,7 +63,7 @@ userRouter.use(verifyUser)
 // check the autherization of the client
 userRouter.use(checkBlockedStatus)
 
-
+// count for the wishlist and cart
 // cart
 userRouter.get("/load-cart", loadCart)
 userRouter.get("/delete-cart", removeProductFromCart)

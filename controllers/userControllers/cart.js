@@ -102,7 +102,7 @@ const removeProductFromCart = async (req, res) => {
                 }
             }
         })
-        res.redirect("/user/load-cart")
+        res.redirect("/load-cart")
     } catch (error) {
         console.log(error);
     }
@@ -113,7 +113,7 @@ const clearAllCart = async (req, res) => {
         const userEmail = req.cookies.userEmail
         const userData = await userModel.findOne({ email: userEmail })
         const deletedProduct = await cartModel.updateOne({ userId: userData._id }, { $pull: { products: {} } })
-        res.redirect("/user/load-cart")
+        res.redirect("/load-cart")
     } catch (error) {
         console.log(error);
     }

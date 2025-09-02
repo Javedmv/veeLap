@@ -2,3 +2,7 @@ node_modules/
 .env
 wrong.ejs/
 public/uploads/
+deployment.yaml
+Dockerfile
+service.yaml
+.dockerignore

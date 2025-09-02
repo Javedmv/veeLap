@@ -170,26 +170,29 @@
 
                 </ul>
               </div> -->
-              <form action="/user/filter-sort" method="post" class="row">
+              <form action="/filter-sort" method="post" class="row">
                 <div class="col-md-12">
                   <div class="widget-category mb-30">
                     <h5 class="section-title style-1 mb-30 wow fadeIn animated">
                         Sort by
                     </h5>
                     <ul class="categories">
-                        <li class="form-check">
-                            <input type="radio" class="form-check-input " id="viewAll" value="viewAll" name="sort" >
-                            <label class="form-check-label" for="popularity">View All</label>
-                        </li>
-                        <li class="form-check">
-                            <input type="radio" class="form-check-input" id="lowToHigh" value="lowToHigh" name="sort">
-                            <label class="form-check-label" for="lowToHigh">Price: Low to High</label>
-                        </li>
-                        <li class="form-check">
-                            <input type="radio" class="form-check-input" id="highToLow" value="highToLow" name="sort">
-                            <label class="form-check-label" for="highToLow">Price: High to Low</label>
-                        </li>
-                    </ul>
+                      <li class="form-check">
+                        <input type="radio" class="form-check-input" id="viewAll" value="viewAll" name="sort"
+                          <%= (selectedSort === 'viewAll' || !selectedSort) ? 'checked' : '' %>>
+                        <label class="form-check-label" for="viewAll">Featured</label>
+                      </li>                      
+                      <li class="form-check">
+                          <input type="radio" class="form-check-input" id="lowToHigh" value="lowToHigh" name="sort"
+                              <%= (selectedSort === 'lowToHigh') ? 'checked' : '' %>>
+                          <label class="form-check-label" for="lowToHigh">Price: Low to High</label>
+                      </li>
+                      <li class="form-check">
+                          <input type="radio" class="form-check-input" id="highToLow" value="highToLow" name="sort"
+                              <%= (selectedSort === 'highToLow') ? 'checked' : '' %>>
+                          <label class="form-check-label" for="highToLow">Price: High to Low</label>
+                      </li>
+                  </ul>
                 </div>                
                 </div>
                 <div class="col-md-12">
@@ -198,13 +201,17 @@
                             Categories
                         </h5>
                         <ul class="categories">
-                            <% category.forEach((catgory) => { %>
-                                <li class="form-check">
-                                    <input type="checkbox" class="form-check-input " id="<%= catgory.categoryName%>" name="categories" value="<%= catgory._id%>">
-                                    <label class="form-check-label" for="<%= catgory.categoryName%>"><%= catgory.categoryName%></label>
-                                </li>
-                            <% }) %>
-                        </ul>
+                          <% category.forEach((catgory) => { %>
+                              <li class="form-check">
+                                  <input type="checkbox" class="form-check-input"
+                                      id="<%= catgory.categoryName %>"
+                                      name="categories"
+                                      value="<%= catgory._id %>"
+                                      <%= (selectedCategories.includes(catgory._id.toString())) ? 'checked' : '' %>>
+                                  <label class="form-check-label" for="<%= catgory.categoryName %>"><%= catgory.categoryName %></label>
+                              </li>
+                          <% }) %>
+                      </ul>
                     </div>
                 </div>
                 <div class="col-md-12 d-flex align-items-center justify-content-center mt--30">
@@ -230,7 +237,7 @@
                         <div class="product-img-action-wrap">
                           <div class="product-img product-img-zoom">
                             <% if (e && e.images && e.images.length > 0 && e.images[0]?.path) { %>
-                            <a href="/user/product-details/<%= e._id%>">
+                            <a href="/product-details/<%= e._id%>">
                                 <!-- BODY HOME FIRST IMAGE -->
                               <img
                                 class="default-img"
@@ -268,10 +275,10 @@
                         </div>
                         <div class="product-content-wrap">
                           <div class="product-category">
-                            <a href="/user/product-details/<%= e._id%>"><%= e.brand%></a>
+                            <a href="/product-details/<%= e._id%>"><%= e.brand%></a>
                           </div>
                           <h2>
-                            <a href="/user/product-details/<%= e._id%>"
+                            <a href="/product-details/<%= e._id%>"
                               ><%= e.productName%></a
                             >
                           </h2>
@@ -326,9 +333,7 @@
               <ul class="pagination">
                 <% for (let i = 1; i <= totalPages; i++) { %>
                   <% if (i === page) { %>
-                
-
-                    <li class="page-item <% (i === page) ? 'active' : '' %>" aria-current="page">
+                    <li class="page-item active" aria-current="page">
                       <span class="page-link">
                         <%= i %>
                         <span class="visually-hidden">(current)</span>
@@ -336,7 +341,8 @@
                     </li>
                   <% } else { %>
                     <li class="page-item">
-                      <a class="page-link" href="/user/?page=<%= i %>">
+                      <a class="page-link" 
+                         href="/filter-sort?page=<%= i %>&sort=<%= selectedSort %>&categories=<%= selectedCategories.join(',') %>">
                         <%= i %> 
                       </a>
                     </li>
@@ -348,6 +354,7 @@
           
           
           
+          
         </div>
       </section>
 
@@ -356,6 +363,14 @@
 
     <script>
       document.addEventListener("DOMContentLoaded", async (event) => {
+        try {
+          const res = await axios.get("/get-counts");
+          const { cartCount, wishlistCount } = res.data;
+          document.getElementById("cart-count").innerText = cartCount;
+          document.getElementById("wishlist-count").innerText = wishlistCount;
+        } catch (err) {
+          console.error("Error loading counts", err);
+        }
         const addToCartBtn = document.querySelectorAll(".CART");
         addToCartBtn.forEach((element) => {
           element.addEventListener("click", async (event) => {
@@ -363,7 +378,7 @@
             const productId = element.getAttribute("prdctId");
       
             try {
-              const response = await axios.post("/user/add-to-cart", {
+              const response = await axios.post("/add-to-cart", {
                 productId: productId,
               })
               const data = response.data;
@@ -377,7 +392,7 @@
                 });
               }else if(data.productExsist){
                 setTimeout(()=>{
-                  window.location.href=`/user/load-cart?quantity=${data.quantity}&productId=${data.productId}`
+                  window.location.href=`/load-cart?quantity=${data.quantity}&productId=${data.productId}`
                 })
               } else if(data.notUser) {
                 Swal.fire({
@@ -389,8 +404,12 @@
                   timerProgressBar: true,
                 })
                 .then(()=>{
-                  window.location.href = "/user/login"
+                  window.location.href = "/login"
                 })
+              }
+              if(data.message){
+                  const cartCountElem = document.getElementById("cart-count");
+                  cartCountElem.innerText = parseInt(cartCountElem.innerText) + 1;
               }
             } catch (error) {
               Swal.fire({
@@ -410,7 +429,7 @@
               event.preventDefault();
               const productId = element.getAttribute("prdctId");
               try {
-                const response = await axios.post(`/user/add-to-wishlist?productId=${productId}`)
+                const response = await axios.post(`/add-to-wishlist?productId=${productId}`)
                 const data = response.data
                 if(data){
                   Swal.fire({
@@ -422,6 +441,11 @@
                   timerProgressBar: true,
                 });
                 }
+                if(data.message){
+                const wishlistCountElem = document.getElementById("wishlist-count");
+                wishlistCountElem.innerText = parseInt(wishlistCountElem.innerText) + 1;
+                }
+
               } catch (error) {
                 Swal.fire({
                 title: "Sorry!",
