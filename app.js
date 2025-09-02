@@ -43,5 +43,9 @@ app.use("/admin", adminRoute)
 app.use('/', userRoute);
 
 app.listen(process.env.PORT, (err) => {
-    console.log("app is running " + "http://127.0.0.1:" + process.env.PORT)
+    if (err) {
+        console.error("Error starting server:", err);
+    } else {
+        console.log(`app is running on http://0.0.0.0:${process.env.PORT}`);
+    }
 });
