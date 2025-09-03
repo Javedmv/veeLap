@@ -21,10 +21,13 @@ const { loadOrderSuccess, placeOrderCOD, walletPayment, paymentRazorpay, updateP
 
 const { loadWishlist, addToWishlist, deleteWishlist, addToCartWishlist } = require("../controllers/userControllers/wishlist");
 const { getCounts } = require("../controllers/userControllers/countController");
+const guestOnly = require("../middleware/guestOnly");
 // just rendering the pages
 userRouter.get("/get-counts", getCounts);
-userRouter.get("/login", loadLogin);
-userRouter.get("/signup", loadSignup);
+
+userRouter.get("/login",guestOnly, loadLogin);
+userRouter.get("/signup",guestOnly, loadSignup);
+
 userRouter.get("/", loadHome);
 
 //referal

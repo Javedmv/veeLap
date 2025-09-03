@@ -19,6 +19,12 @@ app.use(express.static('node_modules'));
 app.use(cookieParser());
 
 app.use(express.json());
+app.use((req, res, next) => {
+    res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, private");
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "0");
+    next();
+});
 
 const adminRoute = require("./routers/adminRouter")
 const userRoute = require("./routers/userRouter")
