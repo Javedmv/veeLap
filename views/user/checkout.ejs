@@ -196,8 +196,7 @@
                 </ul>
               </li>
               <li class="menu-item-has-children">
-                <span class="menu-expand"></span
-                ><a href="blog-category-fullwidth.html">Blog</a>
+                <span class="menu-expand"></span><a href="blog-category-fullwidth.html">Blog</a>
                 <ul class="dropdown">
                   <li>
                     <a href="blog-category-grid.html">Blog Category Grid</a>
@@ -506,12 +505,7 @@
                       <div class="col mt-15">
                         <div class="card coupon-card border">
                           <div class="text-center mt-10 ml-10 mr-10 mb-10">
-                            <div class="d-flex flex-row text-center">
-                              <img
-                                src="https://icon-library.com/images/coupon-icon-png/coupon-icon-png-21.jpg"
-                                width="70"
-                              />
-
+                            <div class="d-flex flex-row text-center justify-content-center">
                               <div
                                 class="d-flex justify-content-center align-items-center flex-column ml-1"
                               >
@@ -530,7 +524,7 @@
                           <div class="mt-10 ml-10 mr-10 mb-10">
                             <h5 class="mb-0">
                               Coupon code:
-                              <span class="bold" style="color: orange"
+                              <span class="bold" style="color: rgb(255, 0, 0)"
                                 ><%=coupon.couponCode%></span
                               >
                             </h5>
@@ -964,7 +958,7 @@
             });
           })
           .catch((err) => {
-            console.error("Unable to copy to clipboard", error);
+            console.error("Unable to copy to clipboard", err);
           });
       }
     }
