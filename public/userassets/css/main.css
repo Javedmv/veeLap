@@ -10512,3 +10512,44 @@ span.fi-rs-apps {
   z-index: 9999;
 }
 /*# sourceMappingURL=main.css.map */
+
+
+/* for the image bottom at the product detail page */
+.banner-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 50px;
+  gap: 20px; /* spacing between text and image */
+}
+
+.banner-text {
+  flex: 1;
+}
+
+.banner-text .subtitle {
+  margin-bottom: 15px;
+  margin-top: 40px;
+}
+
+.banner-text .title {
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.banner-img {
+  border-radius: 10px;
+  max-width: 400px; /* adjust as needed */
+  height: auto;
+}
+@media (max-width: 768px) {
+  .banner-container {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .banner-img {
+    max-width: 100%;
+    margin-top: 20px;
+  }
+}
