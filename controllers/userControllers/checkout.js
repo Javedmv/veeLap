@@ -10,14 +10,17 @@ const loadCheckout = async (req, res) => {
         const loggedIn = req.cookies.loggedIn
         const userData = await userModel.findOne({ email: req.user });
         const userAddress = await addressModel.findOne({ userId: userData._id });
-        const coupons = await couponModel.find({ minimumPurchase: { $lt: grandTotal }, status: "Unblock" });
+        const coupons = await couponModel.find({
+            minimumPurchase: { $lt: grandTotal },
+            status: "Unblock",
+            expiryDate: { $gt: new Date() }
+        })
         const wallet = await walletModel.findOne({ userId: userData._id });
         const userCart = await cartModel.findOne({ userId: userData._id })
             .populate({
                 path: "products.productId",
                 model: "Product"
             }).exec()
-        console.log(coupons)
         const stockCheck = userCart.products.every(productItem => {
             return productItem.productId.stock >= productItem.quantity;
         });
