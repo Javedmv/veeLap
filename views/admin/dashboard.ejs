@@ -550,8 +550,9 @@
           </div>
         </div> -->
         <div class="card mb-4">
-          <header class="card-header">
+          <header class="card-header d-flex justify-content-between">
             <h4 class="card-title">Latest orders</h4>
+            <a type="button" href="/admin/view-all-orders" class="card-title pr-50">View all</a>
            <!-- <div class="row align-items-center">
                <div class="col-md-3 col-12 me-auto mb-md-0 mb-3">
                 <div class="custom_select">
@@ -605,7 +606,7 @@
                   </thead>
                   <tbody>
                     <%orders.forEach((element)=>{%>
-                      <td><a href="#" class="fw-bold"><%=element.referenceId%></a></td>
+                      <td><a href="/admin/order/details-page/<%=element._id%>" class="fw-bold"><%=element.referenceId%></a></td>
                       <td><%=element.userId.userName%></td>
                       <td><%=element.orderDate.toLocaleString()%></td>
                       <td><%=element.totalAmount%></td>

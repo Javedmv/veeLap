@@ -40,9 +40,9 @@ const loadDashboard = async (req, res) => {
             path: 'userId',
             model: 'User'
         })
-        .sort({ _id: -1 });
+        .sort({ createdAt: -1 }).limit(4)
         Object.freeze(orders)
-        const productLength = await productModel.countDocuments()
+        const productLength = await productModel.countDocuments();
         let revenue = 0; 
         orders.forEach(element => {
             if(element.orderStatus != "Cancelled" && element.paymentStatus == "Success"){
