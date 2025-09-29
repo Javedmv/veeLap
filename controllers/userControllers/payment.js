@@ -256,9 +256,14 @@ const paymentRazorpay = async (req, res) => {
             await productModel.updateOne({ _id: orderedItem.productId }, { $inc: { stock: -orderedItem.quantity } })
             orderTotal += orderedItem.price
             orderProducts.push(orderedItem)
-        } if (discount) {
+        } 
+        let usedCouponId = null;
+        if (discount) {
             orderTotal -= discount
-            await couponModel.updateOne({ couponCode: couponCode }, { $push: { redeemedUser: userData._id } })
+            const coupon = await couponModel.findOne({ couponCode: couponCode });
+            if (coupon) {
+                usedCouponId = coupon._id;
+            }
         } else {
             orderTotal = grandTotal
         }
@@ -295,7 +300,8 @@ const paymentRazorpay = async (req, res) => {
             paymentStatus: "Pending",
             paymentMethod: "Online payment",
             address: delAddress,
-            returnAmount: orderTotal
+            returnAmount: orderTotal,
+            ...(usedCouponId && { couponCode: usedCouponId })
         })
         await order.save()
         res.status(200).json({ completed: true, razorOrderId: newOrder, orderId: order._id })
@@ -311,16 +317,23 @@ const updatePaymentStatus = async (req, res) => {
         await orderModel.findByIdAndUpdate(orderId, {
             paymentStatus
         })
+        const order = await orderModel.findById(orderId);
+
         if (paymentStatus == "Success") {
-            const orderData = orderModel.findById(orderId)
             await orderModel.updateOne(
                 { _id: orderId },
                 { $set: { "products.$[].singleProductStatus": "Order Placed" } }
             );
+
+            if (order && order.couponCode) {
+                await couponModel.findByIdAndUpdate(
+                    order.couponCode,
+                    { $addToSet: { redeemedUser: order.userId } }
+                );
+            }
             await cartModel.updateOne({ userId: userData._id }, { $set: { products: [] } });
             return res.status(200).json({ paymentStatus: "Success" });
         } else {
-            const order = await orderModel.findById({ _id: orderId });
             if (order) {
                 await orderModel.findByIdAndUpdate(orderId, {
                     $set: {
@@ -334,6 +347,12 @@ const updatePaymentStatus = async (req, res) => {
                     await productModel.updateOne(
                         { _id: product.productId },
                         { $inc: { stock: product.quantity } }
+                    );
+                }
+                if (order.couponCode) {
+                    await couponModel.findByIdAndUpdate(
+                        order.couponCode,
+                        { $pull: { redeemedUser: order.userId } }
                     );
                 }
             }

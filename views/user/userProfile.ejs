@@ -323,7 +323,7 @@
           </div>
         </div>
       </div>
-      <section class="pt-150 pb-150">
+      <section class="pt-50 pb-50">
         <div class="container">
           <div class="row">
             <div class="col-lg-10 m-auto">
@@ -475,11 +475,14 @@
                                         <td class="text-center"> ₹<%= product.price %> for <%= product.quantity %> item</td>
                                         <% if (productInnerIndex === 0) { %>
                                           <td class="text-center" rowspan="<%= order.products.length %>">
-                                            <a href="/order-status-details?orderRefId=<%= order.referenceId %>" class="btn-small d-block">View</a>
+                                            <a href="/order-status-details?orderRefId=<%= order.referenceId %>" class="btn btn-small d-block">View</a>
                                           </td>
                                         <% } %>
                                       </tr>
                                     <% }); %>
+                                    <tr>
+                                      <td colspan="7"><hr></td>
+                                    </tr>
                                   <% }); %>
                                 <% } %>
                               </tbody>

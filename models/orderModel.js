@@ -66,6 +66,10 @@ const orderModel = mongoose.Schema({
     },
     returnAmount: {
         type: Number,
+    },
+    couponCode: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Coupon"
     }
 },
     { timestamps: true }
