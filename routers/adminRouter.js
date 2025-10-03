@@ -21,8 +21,8 @@ const {
     loadAdminLogin,
     verifyAdmin,
     loadDashboard,
-    adminLogout
-
+    adminLogout,
+    downloadSalesReport
 } = require("../controllers/adminControllers/adminController")
 const { loadCategory, addCategory, editCategory, loadEditCategory, statusCategory, deleteCategory } = require("../controllers/adminControllers/categoryManagement")
 const { loadUser, userStatus } = require("../controllers/adminControllers/userManagement");
@@ -38,6 +38,9 @@ admin_Router.use(verifyAdminToken)
 
 admin_Router.get("/", loadDashboard);
 admin_Router.get("/logout", adminLogout)
+
+// sales report
+admin_Router.get('/sales-report/download', downloadSalesReport);
 
 // category
 admin_Router.get("/view-allcategory", loadCategory);

@@ -3,6 +3,11 @@ const jwt = require("jsonwebtoken")
 const jwtKey = require("../../config/jwtAdmin")
 const orderModel = require("../../models/orderModel")
 const productModel = require("../../models/productModel")
+const PDFDocument = require('pdfkit');
+const {
+  generateSalesReportPDF,
+  getWeekOfMonth
+} = require('../../utils/sales_report_pdf');
 
 const loadAdminLogin = async (req, res) => {
     try {
@@ -65,9 +70,97 @@ const adminLogout = async (req, res) => {
     }
 }
 
+const downloadSalesReport = async (req, res) => {
+  try {
+  const orders = await orderModel
+    .find({})
+    .populate({ path: 'userId', model: 'User' })
+    .populate({
+      path: 'products.productId',
+      model: 'Product',
+      populate: { path: 'category', model: 'Category' } // This ensures category is populated
+    })
+    .sort({ orderDate: 1 })
+    .lean();
+
+    if (!orders || orders.length === 0) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'No orders found to generate report' 
+      });
+    }
+
+    const monthlyData = {};
+
+    orders.forEach(order => {
+      if (!order.orderDate) return; // Skip orders without dates
+      const date = new Date(order.orderDate);
+      if (isNaN(date.getTime())) return;
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth()).padStart(2, '0')}`;
+      const weekOfMonth = getWeekOfMonth(date);
+      if (!monthlyData[monthKey]) {
+        monthlyData[monthKey] = {
+          month: date.toLocaleString('en-IN', { month: 'long', year: 'numeric' }),
+          monthNum: date.getMonth(),
+          year: date.getFullYear(),
+          weeks: {}
+        };
+      }
+      if (!monthlyData[monthKey].weeks[weekOfMonth]) {
+        monthlyData[monthKey].weeks[weekOfMonth] = [];
+      }
+      monthlyData[monthKey].weeks[weekOfMonth].push(order);
+    });
+    if (Object.keys(monthlyData).length === 0) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'No valid orders found to generate report' 
+      });
+    }
+    const doc = new PDFDocument({ 
+      margins: { top: 40, bottom: 40, left: 40, right: 40 },
+      size: 'A4',
+      bufferPages: true,
+      autoFirstPage: true
+    });
+    const filename = `sales-report-${new Date().toISOString().split('T')[0]}.pdf`;
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    doc.on('error', (err) => {
+      console.error('PDF generation error:', err);
+      if (!res.headersSent) {
+        res.status(500).json({ 
+          success: false, 
+          message: 'Error generating PDF report' 
+        });
+      }
+    });
+    res.on('error', (err) => {
+      console.error('Response stream error:', err);
+      doc.end();
+    });
+    doc.pipe(res);
+    generateSalesReportPDF(doc, monthlyData);
+    doc.end();
+  } catch (err) {
+    console.error('Sales report generation error:', err);
+    if (!res.headersSent) {
+      res.status(500).json({ 
+        success: false, 
+        message: 'Failed to generate sales report',
+        error: process.env.NODE_ENV === 'development' ? err.message : undefined
+      });
+    }
+  }
+};
+
 module.exports = {
-    loadAdminLogin,
-    verifyAdmin,
-    loadDashboard,
-    adminLogout
-} 
+  loadAdminLogin,
+  verifyAdmin,
+  loadDashboard,
+  adminLogout,
+  downloadSalesReport
+};

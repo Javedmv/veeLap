@@ -39,7 +39,7 @@ const dbConfig = require("./config/database");
 
 
 mongoose.connect(dbConfig.url).then(() => {
-    console.log("DB connected to " + dbConfig.url)
+    console.log("DB connected to MongoDB")
 }).catch((err) => {
     console.error(err);
     process.exit();
