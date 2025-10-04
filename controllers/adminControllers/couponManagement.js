@@ -78,7 +78,6 @@ const postEditCoupon = async (req, res) => {
                 status
             }
         })
-        console.log(coupon);
         res.redirect("/admin/coupon-management")
     } catch (error) {
         console.log(error);

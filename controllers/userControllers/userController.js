@@ -7,7 +7,8 @@ const productModel = require("../../models/productModel");
 const categoryModel = require("../../models/categoryModel");
 const Swal = require('sweetalert2');
 const walletModel = require("../../models/walletModel");
-const Randomstring = require("randomstring")
+const Randomstring = require("randomstring");
+const getUserCartAndWishlist = require("../../utils/getUserCartAndWishlist");
 
 const otpGenerator = {
     generate: function (length) {
@@ -44,8 +45,9 @@ const loadSignup = async (req, res) => {
 //get route of dashboard
 const loadHome = async (req, res) => {
     try {
-        const loggedIn = req.cookies.loggedIn
-        const userEmail = req.cookies.userEmail
+        const loggedIn = req.cookies?.loggedIn
+        const userEmail = req.cookies?.userEmail
+        const user = await userModel.findOne({email: userEmail});
         const page = req.query.page || 1;
         const no_doc_on_each_pages = 9;
         const totalProducts = await productModel.countDocuments({
@@ -55,7 +57,11 @@ const loadHome = async (req, res) => {
         const skip = (page - 1) * no_doc_on_each_pages
         const products = await productModel.find({ status: "Active" }).skip(skip).limit(no_doc_on_each_pages)
         const category = await categoryModel.find({})
-        res.render("user/home", { userEmail, loggedIn, products, category, page, totalPages, selectedSort: null, selectedCategories: [] });
+        let userCartAndWishlist = { cartCount: 0, wishlistCount: 0 };
+        if (loggedIn && user) {
+        userCartAndWishlist = await getUserCartAndWishlist(user?._id);
+        }
+        res.render("user/home", { userEmail, loggedIn, products, category, page, totalPages, selectedSort: null, selectedCategories: [], userCartAndWishlist });
     } catch (error) {
         console.log(error.message);
     }
@@ -187,7 +193,7 @@ const userLogin = async (req, res) => {
         } else {
             if (userData.password == password) {
                 try {
-                    const token = jwt.sign(email, jwtKey.secretKey)
+                    const token = jwt.sign({ _id: userData._id, email: userData.email }, jwtKey.secretKey)
                     res.cookie("token", token, { maxAge: 24 * 60 * 60 * 1000 });
                     res.cookie("loggedIn", true, { maxAge: 24 * 60 * 60 * 1000 });
                     res.cookie("userEmail", userData.email);
@@ -305,11 +311,11 @@ const resetPassword = async (req, res) => {
 const editUserDetails = async (req, res) => {
     try {
         const { newPhoneNumber, newEmail, newUserName } = req.body
-        const userData = await userModel.findOne({ email: req.user });
+        const userData = await userModel.findOne({ email: req.user.email });
         if (newEmail != userData.email) {
 
         } else {
-            await userModel.updateOne({ email: req.user }, { $set: { phoneNumber: newPhoneNumber, userName: newUserName } })
+            await userModel.updateOne({ email: req.user.email }, { $set: { phoneNumber: newPhoneNumber, userName: newUserName } })
             return res.redirect("/profile")
         }
         res.redirect("/logout")

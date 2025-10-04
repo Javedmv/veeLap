@@ -17,9 +17,9 @@ const verifyUser = (req, res, next) => {
 const checkBlockedStatus = async (req, res, next) => {
     try {
         if (req.user) {
-            const user = req.user
+            const user = req.user.email
             const currUser = await userModel.findOne({ email: user })
-            if (currUser.status == "Inactive") {
+            if (currUser.status === "Inactive") {
                 res.clearCookie("token");
                 res.clearCookie("loggedIn");
                 res.clearCookie("userEmail");

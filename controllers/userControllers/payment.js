@@ -7,6 +7,7 @@ const { v4: uuidv4 } = require("uuid");
 const walletModel = require("../../models/walletModel");
 const couponModel = require("../../models/couponModel");
 const Razorpay = require('razorpay');
+const getUserCartAndWishlist = require("../../utils/getUserCartAndWishlist");
 const dotenv = require("dotenv").config()
 
 const { RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET } = process.env
@@ -21,7 +22,11 @@ const instance = new Razorpay({
 const loadOrderSuccess = async (req, res) => {
     try {
         const loggedIn = req.cookies.loggedIn
-        res.render("user/orderSuccess", { loggedIn })
+        let userCartAndWishlist = { cartCount: 0, wishlistCount: 0 };
+        if(loggedIn){
+            userCartAndWishlist = await getUserCartAndWishlist(req.user?._id);
+        }
+        res.render("user/orderSuccess", { loggedIn ,userCartAndWishlist })
     } catch (error) {
         console.log(error);
     }
@@ -30,9 +35,9 @@ const placeOrderCOD = async (req, res) => {
     try {
         let { grandTotal, addressId, discount, couponcode } = req.query
         const loggedIn = req.cookies.loggedIn
-        const userData = await userModel.findOne({ email: req.user })
-        const userAddress = await addressModel.findOne({ userId: userData._id })
-        const userCart = await cartModel.findOne({ userId: userData._id })
+        const {_id} = req.user;
+        const userAddress = await addressModel.findOne({ userId: _id })
+        const userCart = await cartModel.findOne({ userId: _id })
             .populate({
                 path: "products.productId",
                 model: "Product"
@@ -72,7 +77,7 @@ const placeOrderCOD = async (req, res) => {
 
         if (discount != "undefined") {
             orderTotal -= discount
-            await couponModel.updateOne({ couponCode: couponcode }, { $push: { redeemedUser: userData._id } })
+            await couponModel.updateOne({ couponCode: couponcode }, { $push: { redeemedUser: _id } })
         }
 
         let delAddress;
@@ -101,7 +106,7 @@ const placeOrderCOD = async (req, res) => {
             address: delAddress,
         })
         await newOrder.save()
-        await cartModel.updateOne({ userId: userData._id }, { $set: { products: [] } });
+        await cartModel.updateOne({ userId: _id }, { $set: { products: [] } });
         return res.status(200).json({ codOutOfStock: false })
 
     } catch (error) {
@@ -111,13 +116,13 @@ const placeOrderCOD = async (req, res) => {
 
 const walletPayment = async (req, res) => {
     try {
-        const userData = await userModel.findOne({ email: req.user })
-        const wallet = await walletModel.findOne({ userId: userData._id })
+        const {_id} = req.user;
+        const wallet = await walletModel.findOne({ userId: _id })
         const { couponCode, grandTotal, discount } = req.query
         const addressId = req.body.addressId
         const loggedIn = req.cookies.loggedIn
-        const userAddress = await addressModel.findOne({ userId: userData._id })
-        const userCart = await cartModel.findOne({ userId: userData._id })
+        const userAddress = await addressModel.findOne({ userId: _id })
+        const userCart = await cartModel.findOne({ userId: _id })
             .populate({
                 path: "products.productId",
                 model: "Product"
@@ -163,7 +168,7 @@ const walletPayment = async (req, res) => {
 
             if (discount != "undefined") {
                 orderTotal -= discount
-                await couponModel.updateOne({ couponCode: couponCode }, { $push: { redeemedUser: userData._id } })
+                await couponModel.updateOne({ couponCode: couponCode }, { $push: { redeemedUser: _id } })
             }
 
             let delAddress;
@@ -200,8 +205,8 @@ const walletPayment = async (req, res) => {
                 time: new Date(Date.now()).toLocaleString(),
                 walletBalance: wallet.balance - orderTotal
             };
-            await walletModel.updateOne({ userId: userData._id }, { $inc: { balance: -orderTotal }, $push: { historyDetails: walletDetail } })
-            await cartModel.updateOne({ userId: userData._id }, { $set: { products: [] } });
+            await walletModel.updateOne({ userId: _id }, { $inc: { balance: -orderTotal }, $push: { historyDetails: walletDetail } })
+            await cartModel.updateOne({ userId: _id }, { $set: { products: [] } });
             return res.status(200).json({ codOutOfStock: false, walletBalance: false })
         } else {
             return res.status(200).json({ walletBalance: true })
@@ -214,10 +219,10 @@ const walletPayment = async (req, res) => {
 const paymentRazorpay = async (req, res) => {
     try {
         const { addressId, grandTotal, discount, couponCode } = req.body
-        const userData = await userModel.findOne({ email: req.user })
+        const {_id} = req.user;
         const loggedIn = req.cookies.loggedIn
-        const userAddress = await addressModel.findOne({ userId: userData._id })
-        const userCart = await cartModel.findOne({ userId: userData._id })
+        const userAddress = await addressModel.findOne({ userId: _id })
+        const userCart = await cartModel.findOne({ userId: _id })
             .populate({
                 path: "products.productId",
                 model: "Product"
@@ -313,7 +318,7 @@ const paymentRazorpay = async (req, res) => {
 const updatePaymentStatus = async (req, res) => {
     try {
         const { paymentStatus, razorOrderId, orderId } = req.query
-        const userData = await userModel.findOne({ email: req.user })
+        const { _id } = req.user;
         await orderModel.findByIdAndUpdate(orderId, {
             paymentStatus
         })
@@ -331,7 +336,7 @@ const updatePaymentStatus = async (req, res) => {
                     { $addToSet: { redeemedUser: order.userId } }
                 );
             }
-            await cartModel.updateOne({ userId: userData._id }, { $set: { products: [] } });
+            await cartModel.updateOne({ userId: _id }, { $set: { products: [] } });
             return res.status(200).json({ paymentStatus: "Success" });
         } else {
             if (order) {

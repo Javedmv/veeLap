@@ -3,18 +3,24 @@ const productModel = require("../../models/productModel");
 const userModel = require("../../models/userModel");
 const walletModel = require("../../models/walletModel");
 const wishlistModel = require("../../models/wishlistModel");
+const getUserCartAndWishlist = require("../../utils/getUserCartAndWishlist");
 
 
 const loadWishlist = async (req, res) => {
     try {
         const loggedIn = req.cookies.loggedIn
-        const userData = await userModel.findOne({ email: req.user })
-        const wishlist = await wishlistModel.findOne({ userId: userData._id })
+        const {_id} = req.user
+        const wishlist = await wishlistModel.findOne({ userId: _id })
             .populate({
                 path: 'products.productId', model: 'Product'
             })
             .exec()
-        res.render("user/wishlist", { loggedIn, wishlist })
+        let userCartAndWishlist = { cartCount: 0, wishlistCount: 0 };
+        if (loggedIn) {
+            const user = await userModel.findOne({_id});
+            userCartAndWishlist = await getUserCartAndWishlist(_id);
+        } 
+        res.render("user/wishlist", { loggedIn, wishlist , userCartAndWishlist})
     } catch (error) {
         console.log(error);
     }
@@ -23,10 +29,10 @@ const loadWishlist = async (req, res) => {
 const addToWishlist = async (req, res) => {
     try {
         const productId = req.query.productId;
-        const userData = await userModel.findOne({ email: req.user })
+        const {_id} = req.user;
         const product = await productModel.findOne({ _id: productId })
 
-        const userWishlist = await wishlistModel.findOne({ userId: userData._id })
+        const userWishlist = await wishlistModel.findOne({ userId: _id })
         if (userWishlist) {
             let productIndex = userWishlist.products.findIndex((product) => {
                 return product.productId == productId;
@@ -39,7 +45,7 @@ const addToWishlist = async (req, res) => {
             }
         } else {
             // console.log("new wishlist");
-            const newWishlist = new wishlistModel({ userId: userData._id })
+            const newWishlist = new wishlistModel({ userId: _id })
             await newWishlist.save()
             newWishlist.products.push({ productId })
             await newWishlist.save()
@@ -55,9 +61,9 @@ const addToWishlist = async (req, res) => {
 const deleteWishlist = async (req, res) => {
     try {
         const wishlistId = req.query.product
-        const userData = await userModel.findOne({ email: req.user })
+        const {_id} = req.user;
         const wishlist = await wishlistModel.findOneAndUpdate(
-            { userId: userData._id },
+            { userId: _id },
             { $pull: { products: { _id: wishlistId } } },
             { new: true }
         );
@@ -71,14 +77,14 @@ const addToCartWishlist = async (req, res) => {
     try {
         const wishlistId = req.query.wishlistId
         const productId = req.query.productId
-        const userData = await userModel.findOne({ email: req.user })
+        const {_id} = req.user;
         const product = await productModel.findOne({ _id: productId })
         const wishlist = await wishlistModel.findOneAndUpdate(
-            { userId: userData._id },
+            { userId: _id },
             { $pull: { products: { _id: wishlistId } } },
             { new: true }
         )
-        const userCart = await cartModel.findOne({ userId: userData._id })
+        const userCart = await cartModel.findOne({ userId: _id })
         // console.log(userCart);
         let productExsist = true;
         if (userCart) {

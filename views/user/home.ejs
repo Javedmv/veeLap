@@ -363,14 +363,6 @@
 
     <script>
       document.addEventListener("DOMContentLoaded", async (event) => {
-        try {
-          const res = await axios.get("/get-counts");
-          const { cartCount, wishlistCount } = res.data;
-          document.getElementById("cart-count").innerText = cartCount;
-          document.getElementById("wishlist-count").innerText = wishlistCount;
-        } catch (err) {
-          console.error("Error loading counts", err);
-        }
         const addToCartBtn = document.querySelectorAll(".CART");
         addToCartBtn.forEach((element) => {
           element.addEventListener("click", async (event) => {

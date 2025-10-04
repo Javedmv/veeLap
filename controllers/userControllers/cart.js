@@ -2,13 +2,13 @@ const { default: mongoose } = require("mongoose");
 const cartModel = require("../../models/cartModel");
 const userModel = require("../../models/userModel");
 const productModel = require("../../models/productModel");
+const getUserCartAndWishlist = require("../../utils/getUserCartAndWishlist");
 
 const loadCart = async (req, res) => {
     try {
         const loggedIn = req.cookies.loggedIn
         const userEmail = req.cookies.userEmail
-        const userData = await userModel.findOne({ email: userEmail })
-        let products = await cartModel.findOne({ userId: userData._id })
+        let products = await cartModel.findOne({ userId: req.user?._id })
             .populate({
                 path: 'products.productId', model: 'Product'
             })
@@ -33,7 +33,10 @@ const loadCart = async (req, res) => {
             for (let i = 0; i < products.products.length; i++) {
                 grandTotal = grandTotal + ((products.products[i].productId.salesPrice * products.products[i].quantity) - (products.products[i].productId.offerAmount * products.products[i].quantity))
             }
-            return res.render("user/cart", { loggedIn, products, grandTotal });
+            let userCartAndWishlist = { cartCount: 0, wishlistCount: 0 };
+            userCartAndWishlist = await getUserCartAndWishlist(req.user?._id);
+
+            return res.render("user/cart", { loggedIn, products, grandTotal, userCartAndWishlist });
         }
         res.render("user/login", { error: "please login to continue" })
     } catch (error) {
@@ -122,13 +125,12 @@ const clearAllCart = async (req, res) => {
 const updateQuantity = async (req, res) => {
     try {
         const { productId, quantity } = req.body
-        const email = req.user
-        const userData = await userModel.findOne({ email });
-        const userCart = await cartModel.findOne({ userId: userData._id });
+        const {_id} = req.user
+        const userCart = await cartModel.findOne({ userId: _id });
         for (const item of userCart.products) {
             // console.log("inside");
             if (item._id == productId) {
-                await cartModel.updateOne({ userId: userData._id, "products._id": productId },
+                await cartModel.updateOne({ userId: _id, "products._id": productId },
                     { $set: { "products.$.quantity": quantity } });
             }
         }

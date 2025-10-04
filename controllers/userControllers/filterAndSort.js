@@ -1,6 +1,8 @@
 const categoryModel = require("../../models/categoryModel");
 const productModel = require("../../models/productModel")
 const mongoose = require('mongoose');
+const getUserCartAndWishlist = require("../../utils/getUserCartAndWishlist");
+const userModel = require("../../models/userModel");
 
 const filterAndSort = async (req, res) => {
     try {
@@ -43,6 +45,12 @@ const filterAndSort = async (req, res) => {
 
         const category = await categoryModel.find({});
 
+        let userCartAndWishlist = { cartCount: 0, wishlistCount: 0 };
+            if (loggedIn) {
+                const user = await userModel.findOne({email:userEmail});
+                userCartAndWishlist = await getUserCartAndWishlist(user?._id);
+            }
+
         res.render("user/home", {
             userEmail,
             loggedIn,
@@ -51,7 +59,8 @@ const filterAndSort = async (req, res) => {
             totalPages,
             page,
             selectedSort: sort,
-            selectedCategories: categories || []
+            selectedCategories: categories || [],
+            userCartAndWishlist
         });
     } catch (error) {
         console.log(error);
@@ -74,7 +83,13 @@ const searchProduct = async (req, res) => {
         const totalPages = Math.ceil(totalProducts / no_doc_on_each_pages)
         const skip = (page - 1) * no_doc_on_each_pages
         const products = await productModel.find({ productName: regex, status: "Active" }).skip(skip).limit(no_doc_on_each_pages)
-        res.render("user/home", { userEmail, loggedIn, products, category, page, totalPages, selectedSort: null, selectedCategories: [] });
+
+        let userCartAndWishlist = { cartCount: 0, wishlistCount: 0 };
+        const user = await userModel.findOne({email:userEmail});
+        if (loggedIn && user) {
+            userCartAndWishlist = await getUserCartAndWishlist(user?._id);
+        }
+        res.render("user/home", { userEmail, loggedIn, products, category, page, totalPages, selectedSort: null, selectedCategories: [], userCartAndWishlist });
     } catch (error) {
         console.log(error);
     }
@@ -84,7 +99,12 @@ const searchProduct = async (req, res) => {
 const aboutPage = async (req, res) => {
     try {
         const loggedIn = req.cookies.loggedIn
-        res.render("user/about", { loggedIn })
+        let userCartAndWishlist = { cartCount: 0, wishlistCount: 0 };
+        if(loggedIn){
+            const user = await userModel.findOne({email: req.cookies.userEmail})
+            userCartAndWishlist = await getUserCartAndWishlist(user._id)
+        }
+        res.render("user/about", { loggedIn , userCartAndWishlist})
     } catch (error) {
         console.log(error);
     }
@@ -94,7 +114,12 @@ const loadSalesPage = async (req, res) => {
     try {
         const loggedIn = req.cookies.loggedIn
         const products = await productModel.find({ discountStatus: "Active" })
-        res.render("user/salesPage", { loggedIn, products })
+        let userCartAndWishlist = { cartCount: 0, wishlistCount: 0 };
+        if(loggedIn){
+            const user = await userModel.findOne({email: req.cookies.userEmail})
+            userCartAndWishlist = await getUserCartAndWishlist(user._id)
+        }
+        res.render("user/salesPage", { loggedIn, products, userCartAndWishlist })
     } catch (error) {
         console.log(error);
     }

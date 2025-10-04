@@ -72,7 +72,6 @@ const statusCategory = async (req, res) => {
     try {
         const { id } = req.query
         let userData = await categoryModel.findById({ _id: id })
-        console.log(userData);
         if (userData.status === "Active") {
             userData.status = "Inactive"
             await userData.save()

@@ -5,11 +5,12 @@ const productModel = require("../../models/productModel");
 const userModel = require("../../models/userModel");
 const walletModel = require("../../models/walletModel");
 const { emit } = require("../../routers/adminRouter");
+const getUserCartAndWishlist = require("../../utils/getUserCartAndWishlist");
 
 const loadUserProfile = async (req, res) => {
     try {
         const loggedIn = req.cookies.loggedIn
-        const user = await userModel.findOne({ email: req.user })
+        const user = await userModel.findOne({ email: req.user.email })
         const address = await addressModel.findOne({ userId: user._id })
         const wallet = await walletModel.findOne({ userId: user._id })
         const orders = await orderModel.find({ userId: user._id })
@@ -17,7 +18,12 @@ const loadUserProfile = async (req, res) => {
                 path: "products.productId",
                 model: "Product"
             }).exec()
-        res.render("user/userProfile", { loggedIn, user, address, orders, wallet })
+
+        let userCartAndWishlist = { cartCount: 0, wishlistCount: 0 };
+        if(loggedIn){
+            userCartAndWishlist = await getUserCartAndWishlist(req.user?._id);
+        }
+        res.render("user/userProfile", { loggedIn, user, address, orders, wallet, userCartAndWishlist })
     } catch (error) {
         console.log(error);
     }
@@ -32,7 +38,11 @@ const loadAddAddress = async (req, res) => {
             isCheckout = null
             // console.log("inside the is checkout");
         }
-        res.render("user/addAddress", { loggedIn, isCheckout })
+        let userCartAndWishlist = { cartCount: 0, wishlistCount: 0 };
+        if(loggedIn){
+            userCartAndWishlist = await getUserCartAndWishlist(req.user?._id);
+        }
+        res.render("user/addAddress", { loggedIn, isCheckout, userCartAndWishlist })
     } catch (error) {
         console.log(error);
     }
@@ -43,7 +53,7 @@ const submitAddress = async (req, res) => {
         const { phone, pincode, state, landMark, city, name, addressType } = req.body
         const { isCheckout } = req.query
         // console.log(isCheckout);
-        const user = await userModel.findOne({ email: req.user }, { _id: 1 })
+        const user = await userModel.findOne({ email: req.user.email }, { _id: 1 })
         const userAddress = await addressModel.findOne({ userId: user })
         if (!userAddress) {
             const newAddress = new addressModel({
@@ -90,7 +100,11 @@ const loadEditAddress = async (req, res) => {
         // const userId = await userModel.findOne({ email: userEmail }, { _id: 1 })
         const address = await addressModel.findOne({ "address._id": addressId }, { address: { $elemMatch: { _id: addressId } } });
         const loggedIn = req.cookies.loggedIn
-        res.render("user/editAddress", { loggedIn, address })
+        let userCartAndWishlist = { cartCount: 0, wishlistCount: 0 };
+        if(loggedIn){
+            userCartAndWishlist = await getUserCartAndWishlist(req.user?._id);
+        }
+        res.render("user/editAddress", { loggedIn, address , userCartAndWishlist})
     } catch (error) {
         console.log(error);
     }
@@ -135,8 +149,8 @@ const postEditAddress = async (req, res) => {
 const deleteAddress = async (req, res) => {
     try {
         const addressId = req.params.id
-        const userData = await userModel.findOne({ email: req.user })
-        const deletedAddress = await addressModel.updateOne({ userId: userData._id }, { $pull: { address: { _id: addressId } } })
+        const {_id} = req.user;
+        const deletedAddress = await addressModel.updateOne({ userId: _id }, { $pull: { address: { _id: addressId } } })
         res.redirect("/profile")
     } catch (error) {
         console.log(error);
@@ -154,7 +168,12 @@ const loadOrderDetails = async (req, res) => {
                 model: "Product"
             })
 
-        res.render("user/orderDetails", { loggedIn, orderDetails })
+        let userCartAndWishlist = { cartCount: 0, wishlistCount: 0 };
+        if(loggedIn){
+            userCartAndWishlist = await getUserCartAndWishlist(req.user?._id);
+        }
+
+        res.render("user/orderDetails", { loggedIn, orderDetails, userCartAndWishlist })
     } catch (error) {
         console.log(error);
     }
@@ -163,9 +182,9 @@ const loadOrderDetails = async (req, res) => {
 const cancelOrder = async (req, res) => {
     try {
         const orderId = req.params.id
-        const userData = await userModel.findOne({ email: req.user })
-        const userOrder = await orderModel.findOne({ userId: userData._id })
-        const wallet = await walletModel.findOne({ userId: userData._id })
+        const {_id} = req.user;
+        const userOrder = await orderModel.findOne({ userId: _id })
+        const wallet = await walletModel.findOne({ userId: _id })
         let cancelledOrder = await orderModel.findOne({ _id: orderId })
         // console.log(cancelledOrder.returnAmount, "returnAmount");
         // console.log(cancelledOrder.totalAmount, "thsi is total amount");
@@ -195,9 +214,9 @@ const cancelOrder = async (req, res) => {
         }
         if (walletDetail) {
             walletDetail.walletBalance = wallet.balance + walletReturn
-            await walletModel.updateOne({ userId: userData._id }, { $inc: { balance: walletReturn }, $push: { historyDetails: walletDetail } })
+            await walletModel.updateOne({ userId: _id }, { $inc: { balance: walletReturn }, $push: { historyDetails: walletDetail } })
         } else {
-            await walletModel.updateOne({ userId: userData._id }, { $inc: { balance: walletReturn } })
+            await walletModel.updateOne({ userId: _id }, { $inc: { balance: walletReturn } })
         }
 
         await orderModel.updateOne({ _id: orderId }, { $set: { orderStatus: "Cancelled" } })
@@ -211,8 +230,8 @@ const cancelOrder = async (req, res) => {
 const returnOrder = async (req, res) => {
     try {
         const orderId = req.params.id
-        const userData = await userModel.findOne({ email: req.user })
-        const userOrder = await orderModel.findOne({ userId: userData._id })
+        const {_id} = req.user;
+        const userOrder = await orderModel.findOne({ userId: _id })
         const returnedOrder = await orderModel.findOne({ _id: orderId })
         await orderModel.updateOne({ _id: orderId }, { $set: { orderStatus: "Returned" } })
         for (const item of returnedOrder.products) {
@@ -221,7 +240,7 @@ const returnOrder = async (req, res) => {
             })
         }
         if (returnedOrder.paymentStatus == "Success") {
-            const wallet = await walletModel.updateOne({ userId: userData._id }, { $inc: { balance: returnedOrder.totalAmount } })
+            const wallet = await walletModel.updateOne({ userId: _id }, { $inc: { balance: returnedOrder.totalAmount } })
         }
         res.redirect(`/order-status-details?orderRefId=${returnedOrder.referenceId}`)
     } catch (error) {
@@ -232,8 +251,8 @@ const returnOrder = async (req, res) => {
 const singleCancelOrder = async (req, res) => {
     try {
         const { orderId, productStatusId } = req.query;
-        const userData = await userModel.findOne({ email: req.user });
-        const wallet = await walletModel.findOne({ userId: userData._id });
+        const { _id } = req.user;
+        const wallet = await walletModel.findOne({ userId: _id });
         const orderData = await orderModel.findOne({ _id: orderId })
             .populate({
                 path: "products.productId",
